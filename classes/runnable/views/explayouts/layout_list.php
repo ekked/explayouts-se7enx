@@ -84,6 +84,19 @@ class LayoutList extends \Exponential\Runnable\ModuleView
                 {
                     $zoneId = (int)$zone->attribute( 'id' );
                     $newZoneId = $zoneMap[$zoneId];
+                    if ( class_exists( '\expLayoutsCoreBlockService' ) && method_exists( '\expLayoutsCoreBlockService', 'copyTree' ) )
+                    {
+                        // Each top-level block with everything it owns: parameters,
+                        // collections with items and query, child blocks with theirs.
+                        $blockService = new \expLayoutsCoreBlockService();
+                        foreach ( \expLayoutsBlock::fetchByZone( $zoneId, $layout->attribute( 'status' ) ) as $block )
+                        {
+                            if ( (int)$block->attribute( 'parent_id' ) > 0 )
+                                continue;
+                            $blockService->copyTree( $block, $newZoneId, (int)$newLayout->attribute( 'id' ), 1, 0, '', (int)$block->attribute( 'position' ) );
+                        }
+                        continue;
+                    }
                     foreach ( \expLayoutsBlock::fetchByZone( $zoneId, $layout->attribute( 'status' ) ) as $block )
                     {
                         $newBlock = \expLayoutsBlock::create( $newZoneId, $newLayout->attribute( 'id' ), $block->attribute( 'definition_identifier' ), $block->attribute( 'name' ) );
