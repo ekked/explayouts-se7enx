@@ -72,24 +72,39 @@ class expLayoutsTemplateEditor
         return file_put_contents( $file, $content ) !== false;
     }
 
+    /**
+     * The absolute file of a template path, or false. Only .tpl files inside one of the
+     * AllowedTemplateRoots are accepted (also after symbolic links are followed), so the
+     * editor can neither read nor write settings, PHP code or anything outside those roots.
+     */
     protected static function resolve( $path )
     {
+        if ( !is_string( $path ) || $path === '' || strpos( $path, "\0" ) !== false )
+            return false;
+
+        $cleanPath = ltrim( str_replace( '\\', '/', $path ), '/' );
+        if ( substr( $cleanPath, -4 ) !== '.tpl' || strlen( basename( $cleanPath ) ) <= 4 )
+            return false;
+
         $base = realpath( eZSys::rootDir() );
-        $allowedRoots = self::allowedRoots();
-        $cleanPath = ltrim( $path, '/' );
         $candidate = $base . '/' . $cleanPath;
         $dir = @realpath( dirname( $candidate ) );
-
         if ( $dir === false )
             return false;
 
-        foreach ( $allowedRoots as $allowedRoot )
+        $real = $dir . '/' . basename( $candidate );
+        if ( file_exists( $real ) )
+        {
+            $real = @realpath( $real );
+            if ( $real === false || substr( $real, -4 ) !== '.tpl' )
+                return false;
+        }
+
+        foreach ( self::allowedRoots() as $allowedRoot )
         {
             $rootReal = @realpath( $base . '/' . $allowedRoot );
-            if ( $rootReal !== false && strpos( $dir, $rootReal ) === 0 )
-            {
-                return $candidate;
-            }
+            if ( $rootReal !== false && strpos( $real, $rootReal . '/' ) === 0 )
+                return $real;
         }
         return false;
     }

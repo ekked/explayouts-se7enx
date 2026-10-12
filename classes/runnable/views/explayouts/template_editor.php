@@ -2,6 +2,10 @@
 /**
  * The code of extension/explayouts/modules/explayouts/template_editor.php, moved into a class (#207 stage 1). The file extension/explayouts/modules/explayouts/template_editor.php is one call to it.
  * Guide: doc/bc/6.0/cli_cronjob_view_abstractions.md
+ *
+ * The page is standalone (no admin pagelayout): design:explayouts/template_editor.tpl is
+ * rendered through the template engine, and every value the script reads (file list,
+ * translated messages, urls, form token) reaches it as JSON encoded here.
  */
 
 namespace
@@ -10,7 +14,8 @@ if ( !function_exists( 'expTeJsonResponse' ) ) {
 function expTeJsonResponse( $data )
 {
     header( 'Content-Type: application/json; charset=utf-8' );
-    echo json_encode( $data );
+    header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+    echo json_encode( $data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
     eZExecution::cleanExit();
 }
 }
@@ -21,6 +26,8 @@ namespace Exponential\View\Extension\Explayouts\Explayouts
 
 class TemplateEditor extends \Exponential\Runnable\ModuleView
 {
+    const JSON_FLAGS = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+
     public function run( array $scope )
     {
         // the including function's variables ($Params, $Module, $cli, ...)
@@ -29,105 +36,80 @@ class TemplateEditor extends \Exponential\Runnable\ModuleView
                 ${$__name} = &$scope[$__name];
         unset( $__name );
 
-        $editorClassFile = \eZSys::rootDir() . '/extension/explayouts/classes/explayoutstemplateeditor.php';
-        if ( function_exists( 'opcache_invalidate' ) && file_exists( $editorClassFile ) )
-            opcache_invalidate( $editorClassFile, true );
-
-        $httpCharset = \eZTextCodec::httpCharset();
-        $selectedPath = '';
-        $content = '';
-
+        $context = 'design/admin/explayouts/template_editor';
 
         if ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest' )
         {
-            if ( isset( $_GET['file'] ) && $_GET['file'] !== '' )
+            if ( isset( $_GET['file'] ) && is_string( $_GET['file'] ) && $_GET['file'] !== '' )
             {
                 $selectedPath = $_GET['file'];
                 $content = \expLayoutsTemplateEditor::read( $selectedPath );
                 if ( $content === false )
-                {
-                    $candidate = \eZSys::rootDir() . '/' . ltrim( $selectedPath, '/' );
-                    $debug = array(
-                        'time' => date( 'c' ),
-                        'path' => $selectedPath,
-                        'root' => \eZSys::rootDir(),
-                        'candidate' => $candidate,
-                        'realpath_file' => @realpath( $candidate ),
-                        'realpath_dir' => @realpath( dirname( $candidate ) ),
-                        'file_exists' => file_exists( $candidate ),
-                        'is_readable' => is_readable( $candidate ),
-                        'ini_roots' => \eZINI::instance( 'explayouts.ini' )->variable( 'TemplateEditorSettings', 'AllowedTemplateRoots' ),
-                    );
-                    file_put_contents( \eZSys::rootDir() . '/var/log/sevenx_te_debug.log', json_encode( $debug ) . "\n", FILE_APPEND | LOCK_EX );
-                    expTeJsonResponse( array( 'success' => false, 'error' => \ezpI18n::tr( 'design/admin/explayouts/template_editor', 'Unable to read template: %path', null, array( '%path' => $selectedPath ) ) ) );
-                }
+                    expTeJsonResponse( array( 'success' => false, 'error' => \ezpI18n::tr( $context, 'Unable to read template: %path', null, array( '%path' => $selectedPath ) ) ) );
                 expTeJsonResponse( array( 'success' => true, 'content' => $content ) );
             }
 
             if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['SaveTemplate'] ) )
             {
-                $selectedPath = isset( $_POST['SelectedPath'] ) ? $_POST['SelectedPath'] : '';
-                $content = isset( $_POST['TemplateContent'] ) ? $_POST['TemplateContent'] : '';
-                $content = str_replace( "\\r\\n", "\\n", $content );
+                $selectedPath = isset( $_POST['SelectedPath'] ) && is_string( $_POST['SelectedPath'] ) ? $_POST['SelectedPath'] : '';
+                $content = isset( $_POST['TemplateContent'] ) && is_string( $_POST['TemplateContent'] ) ? $_POST['TemplateContent'] : '';
+                $content = str_replace( "\r\n", "\n", $content );
                 $ok = \expLayoutsTemplateEditor::save( $selectedPath, $content );
-                expTeJsonResponse( array( 'success' => $ok, 'message' => $ok ? 'Saved' : \ezpI18n::tr( 'design/admin/explayouts/template_editor', 'Save failed' ) ) );
+                expTeJsonResponse( array(
+                    'success' => $ok,
+                    'message' => $ok ? \ezpI18n::tr( $context, 'Saved' ) : \ezpI18n::tr( $context, 'Save failed' ),
+                ) );
             }
 
-            expTeJsonResponse( array( 'success' => false, 'error' => \ezpI18n::tr( 'design/admin/explayouts/template_editor', 'Unknown request' ) ) );
+            expTeJsonResponse( array( 'success' => false, 'error' => \ezpI18n::tr( $context, 'Unknown request' ) ) );
         }
 
-        $templates = \expLayoutsTemplateEditor::listTemplates();
+        $baseUrl = 'explayouts/template_editor';
+        \eZURI::transformURI( $baseUrl, false, 'relative', false );
+        $exitUrl = '/';
+        \eZURI::transformURI( $exitUrl, false, 'relative', false );
 
-        $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
-        $filesJson = json_encode( $templates, $jsonFlags );
-        if ( $filesJson === false )
-            $filesJson = '[]';
-        $selectedJson = json_encode( $selectedPath, $jsonFlags );
-        if ( $selectedJson === false )
-            $selectedJson = '""';
-        $initialJson = json_encode( $content, $jsonFlags );
-        if ( $initialJson === false )
-            $initialJson = '""';
-
-        $baseUrl = \eZSys::indexDir();
-        if ( $baseUrl === '' || $baseUrl === false )
-            $baseUrl = '/';
-        if ( substr( $baseUrl, -1 ) !== '/' )
-            $baseUrl .= '/';
-        $baseUrl .= 'explayouts/template_editor';
-        $baseUrl = '/' . ltrim( $baseUrl, '/' );
-        $baseUrl = json_encode( $baseUrl, $jsonFlags );
-
-        $csrfToken = ( class_exists( 'ezxFormToken' ) ? \ezxFormToken::getToken() : '' );
-        $csrfJson = json_encode( $csrfToken, $jsonFlags );
-
-        $templateFile = \eZSys::rootDir() . '/extension/explayouts/design/admin/templates/explayouts/template_editor.tpl';
-        if ( !file_exists( $templateFile ) )
-        {
-            $Result = array();
-            $Result['pagelayout'] = false;
-            $Result['content'] = \ezpI18n::tr( 'design/admin/explayouts/template_editor', 'Template not found.' );
-            return $this->viewResult( isset( $Result ) ? $Result : null,  $Result );
-        }
-
-        $html = file_get_contents( $templateFile );
-        $html = str_replace(
-            array( '{$files_json}', '{$selected_json}', '{$initial_content_json}', '{$base_url}', '{$csrf_token}' ),
-            array( $filesJson, $selectedJson, $initialJson, $baseUrl, $csrfJson ),
-            $html
+        $i18n = array(
+            'not_array'      => \ezpI18n::tr( $context, 'TPL_FILES is not an array. Check the server response.' ),
+            'no_match'       => \ezpI18n::tr( $context, 'No templates match.' ),
+            'render_error'   => \ezpI18n::tr( $context, 'Render error: %message' ),
+            'load_error'     => \ezpI18n::tr( $context, 'Load error: %message' ),
+            'no_file'        => \ezpI18n::tr( $context, 'No file selected' ),
+            'saved'          => \ezpI18n::tr( $context, 'Saved' ),
+            'save_failed'    => \ezpI18n::tr( $context, 'Save failed: %message' ),
+            'save_error'     => \ezpI18n::tr( $context, 'Save error: %message' ),
+            'new_path'       => \ezpI18n::tr( $context, 'New template path (relative to design/ or extension/, must end in .tpl):' ),
+            'must_end_tpl'   => \ezpI18n::tr( $context, 'Path must end in .tpl' ),
+            'count'          => \ezpI18n::tr( $context, '(%count templates)' ),
+            'new_file_error' => \ezpI18n::tr( $context, 'New file error: %message' ),
         );
 
-        $Result = array();
-        $Result['pagelayout'] = false;
-        $Result['content'] = $html;
+        $tpl = \eZTemplate::factory();
+        $tpl->setVariable( 'files_json', self::json( \expLayoutsTemplateEditor::listTemplates(), '[]' ) );
+        $tpl->setVariable( 'i18n_json', self::json( $i18n, '{}' ) );
+        $tpl->setVariable( 'base_url_json', self::json( $baseUrl, '""' ) );
+        $tpl->setVariable( 'exit_url_json', self::json( $exitUrl, '"/"' ) );
+        $tpl->setVariable( 'csrf_token_json', self::json( class_exists( 'ezxFormToken' ) ? \ezxFormToken::getToken() : '', '""' ) );
+        $tpl->setVariable( 'language_code', \eZLocale::instance()->httpLocaleCode() );
 
         header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
         header( 'Pragma: no-cache' );
         header( 'Expires: Thu, 1 Jan 1970 00:00:00 GMT' );
 
-        return $this->viewResult( isset( $Result ) ? $Result : null,  $Result );
+        $Result = array();
+        $Result['pagelayout'] = false;
+        $Result['content'] = $tpl->fetch( 'design:explayouts/template_editor.tpl' );
 
-        return $this->viewResult( isset( $Result ) ? $Result : null, null );
+        return $this->viewResult( $Result, $Result );
+    }
+
+    /**
+     * A value as JSON that is safe inside a <script> element (no <, >, &, ' or " survive raw).
+     */
+    protected static function json( $value, $fallback )
+    {
+        $json = json_encode( $value, self::JSON_FLAGS );
+        return $json === false ? $fallback : $json;
     }
 }
 

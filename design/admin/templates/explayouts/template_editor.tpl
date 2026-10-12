@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+{* Standalone page (the view sets no pagelayout). Every value the script reads is JSON encoded by the view; the CSS and the script are literal. *}
+<html lang="{$language_code|wash}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{'7x Template Editor'|i18n( 'design/admin/explayouts/template_editor' )}</title>
+    <title>{'7x Template Editor'|i18n( 'design/admin/explayouts/template_editor' )|wash}</title>
+{literal}
     <style>
         :root {
             --bg: #0f172a;
@@ -49,54 +51,41 @@
         .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 1.2rem; }
         .error-box { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--danger); padding: 1rem; text-align: center; }
     </style>
+{/literal}
 </head>
 <body>
 <div class="app">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h1>{'7x Template Editor'|i18n( 'design/admin/explayouts/template_editor' )} <small id="tpl-count"></small></h1>
-            <input type="text" id="filter" placeholder="{'Filter templates...'|i18n( 'design/admin/explayouts/template_editor' )}" autocomplete="off">
+            <h1>{'7x Template Editor'|i18n( 'design/admin/explayouts/template_editor' )|wash} <small id="tpl-count"></small></h1>
+            <input type="text" id="filter" placeholder="{'Filter templates...'|i18n( 'design/admin/explayouts/template_editor' )|wash}" autocomplete="off">
         </div>
         <nav class="flat-list" id="tree"></nav>
         <div class="resizer" id="resizer"></div>
     </aside>
     <main class="main">
         <div class="toolbar">
-            <button class="btn secondary" id="new-file">{'New'|i18n( 'design/admin/explayouts/template_editor' )}</button>
-            <button class="btn" id="save-file">{'Save'|i18n( 'design/admin/explayouts/template_editor' )}</button>
-            <button class="btn secondary exit-btn" id="exit-editor" title="{'Return to admin'|i18n( 'design/admin/explayouts/template_editor' )}">×</button>
-            <span class="path" id="path">{'No file selected'|i18n( 'design/admin/explayouts/template_editor' )}</span>
+            <button class="btn secondary" id="new-file">{'New'|i18n( 'design/admin/explayouts/template_editor' )|wash}</button>
+            <button class="btn" id="save-file">{'Save'|i18n( 'design/admin/explayouts/template_editor' )|wash}</button>
+            <button class="btn secondary exit-btn" id="exit-editor" title="{'Return to admin'|i18n( 'design/admin/explayouts/template_editor' )|wash}">×</button>
+            <span class="path" id="path">{'No file selected'|i18n( 'design/admin/explayouts/template_editor' )|wash}</span>
             <span class="status" id="status"></span>
         </div>
         <div class="editor-wrap" id="editor-wrap">
-            <div class="empty">{'Select a template from the list to start editing.'|i18n( 'design/admin/explayouts/template_editor' )}</div>
+            <div class="empty">{'Select a template from the list to start editing.'|i18n( 'design/admin/explayouts/template_editor' )|wash}</div>
         </div>
     </main>
 </div>
 
 <script>
-window.TPL_I18N = {ldelim}
-    not_array: '{'TPL_FILES is not an array. Check the server response.'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    no_match: '{'No templates match.'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    render_error: '{'Render error: %message'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    load_error: '{'Load error: %message'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    no_file: '{'No file selected'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    saved: '{'Saved'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    save_failed: '{'Save failed: %message'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    save_error: '{'Save error: %message'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    new_path: '{'New template path (relative to design/ or extension/, must end in .tpl):'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    must_end_tpl: '{'Path must end in .tpl'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    count: '{'(%count templates)'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}',
-    new_file_error: '{'New file error: %message'|i18n( 'design/admin/explayouts/template_editor' )|wash( javascript )}'
-{rdelim};
-</script>
-<script>
+window.TPL_I18N = {$i18n_json};
 window.TPL_FILES = {$files_json};
-window.BASE_URL = {$base_url};
-window.SELECTED = {$selected_json};
-window.INITIAL = {$initial_content_json};
-window.CSRF_TOKEN = {$csrf_token};
-
+window.BASE_URL = {$base_url_json};
+window.EXIT_URL = {$exit_url_json};
+window.CSRF_TOKEN = {$csrf_token_json};
+</script>
+{literal}
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     if (!Array.isArray(window.TPL_FILES)) {
         window.TPL_FILES = [];
@@ -141,8 +130,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function showError(where, msg) {
-        where.innerHTML = '<div class="error-box">' + msg + '</div>';
+        var box = document.createElement('div');
+        box.className = 'error-box';
+        box.textContent = msg;
+        where.innerHTML = '';
+        where.appendChild(box);
         console.error(msg);
+    }
+
+    function countText(n) {
+        return TPL_I18N.count.replace('%count', n);
     }
 
     function renderFlat(term) {
@@ -157,7 +154,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? window.TPL_FILES.filter(function(p) { return p.toLowerCase().indexOf(lower) !== -1; })
                 : window.TPL_FILES;
             if (!files.length) {
-                tree.innerHTML = '<p class="empty">' + TPL_I18N.no_match + '</p>';
+                var empty = document.createElement('p');
+                empty.className = 'empty';
+                empty.textContent = TPL_I18N.no_match;
+                tree.appendChild(empty);
                 return;
             }
             files.forEach(function(file) {
@@ -266,13 +266,13 @@ document.addEventListener('DOMContentLoaded', function() {
     saveBtn.addEventListener('click', saveFile);
 
     exitBtn.addEventListener('click', function() {
+        var target = window.EXIT_URL || '/';
         try {
-            window.location.href = document.referrer && document.referrer.indexOf(window.location.hostname) !== -1
-                ? document.referrer
-                : '/';
-        } catch (e) {
-            window.location.href = '/';
-        }
+            if (document.referrer && new URL(document.referrer).origin === window.location.origin) {
+                target = document.referrer;
+            }
+        } catch (e) {}
+        window.location.href = target;
     });
 
     newBtn.addEventListener('click', function() {
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!Array.isArray(window.TPL_FILES)) window.TPL_FILES = [];
             window.TPL_FILES.push(p);
             window.TPL_FILES.sort();
-            countEl.textContent = TPL_I18N.count.replace('%count', window.TPL_FILES.length);
+            countEl.textContent = countText(window.TPL_FILES.length);
             renderFlat(filter.value);
         } catch (e) {
             showStatus(TPL_I18N.new_file_error.replace('%message', e.message), false);
@@ -298,25 +298,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     filter.addEventListener('input', function() { renderFlat(filter.value); });
 
-    if (SELECTED) {
-        currentPath = SELECTED;
-        pathEl.textContent = SELECTED;
-    }
-
-    if (window.TPL_FILES && window.TPL_FILES.length) {
-        countEl.textContent = TPL_I18N.count.replace('%count', window.TPL_FILES.length);
-    } else {
-        countEl.textContent = '(0 templates)';
-    }
+    countEl.textContent = countText(window.TPL_FILES.length);
 
     renderFlat('');
-
-    if (SELECTED) {
-        createEditor();
-        editor.value = INITIAL;
-        updateLineNumbers();
-    }
 });
 </script>
+{/literal}
 </body>
 </html>
