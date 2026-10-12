@@ -37,7 +37,7 @@
                         <td>{$layout.id|wash}</td>
                         <td><a href={concat('explayouts/layout_edit/',$layout.id)|ezurl}>{$layout.name|wash}</a></td>
                         <td>{$layout.identifier|wash}</td>
-                        <td>{$layout.modified|datetime( 'custom', '%Y-%m-%d %H:%M' )}</td>
+                        <td>{$layout.modified|datetime( 'custom', '%Y-%m-%d %H:%i' )}</td>
                     </tr>
                 {/foreach}
             </table>
