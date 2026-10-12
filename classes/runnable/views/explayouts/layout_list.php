@@ -181,6 +181,7 @@ class LayoutList extends \Exponential\Runnable\ModuleView
 
         $Result = array();
         $Result['content'] = $tpl->fetch( 'design:explayouts/layout_list.tpl' );
+        $Result['left_menu'] = 'design:parts/explayouts_ui/menu.tpl';
         $Result['path'] = array( array( 'url' => false,
                                         'text' => \ezpI18n::tr( 'explayouts/layout', 'Layouts' ) ) );
         return $this->viewResult( isset( $Result ) ? $Result : null,  $Result );

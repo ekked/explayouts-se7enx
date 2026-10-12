@@ -104,7 +104,9 @@ class Setup extends \Exponential\Runnable\ModuleView
 
         $Result = array();
         $Result['content'] = $tpl->fetch( 'design:explayouts/setup.tpl' );
-        $Result['path'] = array( array( 'url' => false,
+        $Result['left_menu'] = 'design:parts/explayouts_ui/menu.tpl';
+        $Result['path'] = array( array( 'url' => 'explayouts_ui/dashboard', 'text' => \ezpI18n::tr( 'explayouts/layout', 'Layouts' ) ),
+                                 array( 'url' => false,
                                         'text' => \ezpI18n::tr( 'explayouts/setup', 'Setup' ) ) );
         return $this->viewResult( isset( $Result ) ? $Result : null,  $Result );
 
