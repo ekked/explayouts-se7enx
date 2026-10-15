@@ -596,21 +596,29 @@ Group=admin
 
 [LayoutType_1_column]
 Name=1 column
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/1_column.tpl
 Zones[]=main
 
 [LayoutType_2_column]
 Name=2 columns
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/2_column.tpl
 Zones[]=left
 Zones[]=right
 
 [LayoutType_3_column]
 Name=3 columns
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/3_column.tpl
 Zones[]=left
 Zones[]=main
 Zones[]=right
 
 [LayoutType_4_column]
 Name=4 columns
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/4_column.tpl
 Zones[]=col1
 Zones[]=col2
 Zones[]=col3
@@ -618,6 +626,8 @@ Zones[]=col4
 
 [LayoutType_hero]
 Name=Hero + 3 columns
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/hero.tpl
 Zones[]=top
 Zones[]=left
 Zones[]=main
@@ -625,16 +635,22 @@ Zones[]=right
 
 [LayoutType_sidebar_left]
 Name=Sidebar left
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/sidebar_left.tpl
 Zones[]=sidebar
 Zones[]=main
 
 [LayoutType_sidebar_right]
 Name=Sidebar right
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/sidebar_right.tpl
 Zones[]=main
 Zones[]=sidebar
 
 [LayoutType_featured]
 Name=Featured
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/featured.tpl
 Zones[]=hero
 Zones[]=feature1
 Zones[]=feature2
@@ -643,6 +659,8 @@ Zones[]=bottom
 
 [LayoutType_mosaic]
 Name=Mosaic
+# The template that draws the zones in their places (explayouts/layout.tpl uses it).
+Template=explayouts/layouts/mosaic.tpl
 Zones[]=a
 Zones[]=b
 Zones[]=c

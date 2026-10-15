@@ -2,9 +2,7 @@
     {foreach $layout.zones as $zone}
         {if eq($zone.identifier,'hero')}
             <div class="sevenx-zone sevenx-zone-hero" data-zone-id="{$zone.id|wash}">
-                {foreach $zone.blocks as $block}
-                    {include uri=concat('design:explayouts/block/',$block.definition_identifier,'.tpl') block=$block}
-                {/foreach}
+                {include uri='design:explayouts/zone_blocks.tpl' zone=$zone module_result=$module_result}
             </div>
         {/if}
     {/foreach}
@@ -12,9 +10,7 @@
         {foreach $layout.zones as $zone}
             {if or(eq($zone.identifier,'feature1'),eq($zone.identifier,'feature2'),eq($zone.identifier,'feature3'))}
                 <div class="sevenx-zone sevenx-zone-{$zone.identifier|wash}" data-zone-id="{$zone.id|wash}">
-                    {foreach $zone.blocks as $block}
-                        {include uri=concat('design:explayouts/block/',$block.definition_identifier,'.tpl') block=$block}
-                    {/foreach}
+                    {include uri='design:explayouts/zone_blocks.tpl' zone=$zone module_result=$module_result}
                 </div>
             {/if}
         {/foreach}
@@ -22,9 +18,7 @@
     {foreach $layout.zones as $zone}
         {if eq($zone.identifier,'bottom')}
             <div class="sevenx-zone sevenx-zone-bottom" data-zone-id="{$zone.id|wash}">
-                {foreach $zone.blocks as $block}
-                    {include uri=concat('design:explayouts/block/',$block.definition_identifier,'.tpl') block=$block}
-                {/foreach}
+                {include uri='design:explayouts/zone_blocks.tpl' zone=$zone module_result=$module_result}
             </div>
         {/if}
     {/foreach}
