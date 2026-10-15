@@ -458,6 +458,7 @@ AvailableBlocks[]=admin_left_menu
 AvailableBlocks[]=admin_content_tree
 AvailableBlocks[]=admin_clear_cache
 AvailableBlocks[]=admin_bookmarks
+AvailableBlocks[]=admin_ui_switch
 AvailableBlocks[]=admin_current_user
 AvailableBlocks[]=admin_preferences
 AvailableBlocks[]=admin_quick_settings
@@ -526,6 +527,13 @@ Group=admin
 
 [BlockDefinition_admin_bookmarks]
 Name=Admin: bookmarks
+Handler=expLayoutsAdminPartBlockHandler
+ViewTypes[]=default
+Category=admin_sidebar
+Group=admin
+
+[BlockDefinition_admin_ui_switch]
+Name=Admin: interface choices (language)
 Handler=expLayoutsAdminPartBlockHandler
 ViewTypes[]=default
 Category=admin_sidebar
