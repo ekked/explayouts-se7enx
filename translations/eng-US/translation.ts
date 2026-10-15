@@ -305,6 +305,30 @@
         <source>Cannot move block.</source>
         <translation>Cannot move block.</translation>
     </message>
+    <message>
+        <source>Block type</source>
+        <translation>Block type</translation>
+    </message>
+    <message>
+        <source>Identifier</source>
+        <translation>Identifier</translation>
+    </message>
+    <message>
+        <source>Layout type</source>
+        <translation>Layout type</translation>
+    </message>
+    <message>
+        <source>Move down</source>
+        <translation>Move down</translation>
+    </message>
+    <message>
+        <source>Move to zone</source>
+        <translation>Move to zone</translation>
+    </message>
+    <message>
+        <source>Move up</source>
+        <translation>Move up</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -466,6 +490,18 @@
     <message>
         <source>Rule saved.</source>
         <translation>Rule saved.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation>Layout</translation>
+    </message>
+    <message>
+        <source>New Rule</source>
+        <translation>New Rule</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Priority</translation>
     </message>
 </context>
 <context>
