@@ -116,15 +116,15 @@ class expLayoutsLayout extends eZPersistentObject
             eZDB::instance()->query( 'UPDATE explayouts_zone SET linked_layout_id = ' . (int)$this->attribute( 'id' ) . ' WHERE linked_layout_id = ' . $publishedId );
         }
 
+        // Zones and blocks have no modification time of their own (explayouts_zone and explayouts_block carry
+        // no such column): the layout's 'modified' above is the one that changes.
         foreach ( expLayoutsZone::fetchByLayout( (int)$this->attribute( 'id' ), null ) as $zone )
         {
             $zone->setAttribute( 'status', 2 );
-            $zone->setAttribute( 'modified', time() );
             $zone->store();
             foreach ( expLayoutsBlock::fetchByZone( (int)$zone->attribute( 'id' ), null ) as $block )
             {
                 $block->setAttribute( 'status', 2 );
-                $block->setAttribute( 'modified', time() );
                 $block->store();
             }
         }
