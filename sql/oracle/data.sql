@@ -1294,7 +1294,7 @@ INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (390, 
 INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (390, 1650, 'css_id', NULL);
 INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (390, 1651, 'set_container', NULL);
 INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (390, 1652, 'set_container:size', NULL);
-INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (391, 1653, 'content', TO_CLOB('<p style="text-align:center;">State of complete physical, mental, and social well-being</p>'));
+INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (391, 1653, 'content', TO_CLOB('<p style="text-align:center;">Simple, nourishing food for an active life</p>'));
 INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (391, 1654, 'vertical_whitespace:enabled', TO_CLOB('1'));
 INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (391, 1655, 'vertical_whitespace:top', TO_CLOB('small'));
 INSERT INTO explayouts_block_parameter (block_id, id, name, value) VALUES (391, 1656, 'vertical_whitespace:bottom', TO_CLOB('none'));
