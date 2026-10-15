@@ -1,0 +1,19 @@
+/* The older admin views of the module explayouts in admin4 (design/admin4/templates/explayouts/). Only what
+   admin4's components (.a4-*) cannot do, from the --a4-* tokens. Class prefix: .explayouts-a4. */
+.explayouts-a4 .explayouts-a4-inline-form {
+    display: inline;
+    margin: 0;
+}
+.explayouts-a4 .explayouts-a4-add {
+    align-items: center;
+    gap: var(--a4-space-2);
+    margin-top: var(--a4-space-3);
+}
+.explayouts-a4 .explayouts-a4-muted-row > td {
+    color: var(--a4-muted);
+}
+/* The left column: admin4's card (admin4.css paints it navy on these pages for design/admin's dark menu). */
+#page.ezexplayoutsuinavigationpart #leftmenu-design {
+    background-color: var(--a4-card-bg);
+    box-shadow: 0 0 0 1px var(--a4-card-edge), var(--a4-card-shadow);
+}
