@@ -1039,4 +1039,23 @@
         <translation>Setup</translation>
     </message>
 </context>
+<context>
+    <name>design/admin/explayouts/tab</name>
+    <message>
+        <source>Layouts</source>
+        <translation>Layouts</translation>
+    </message>
+    <message>
+        <source>View layouts and rules associated with this node</source>
+        <translation>View layouts and rules associated with this node</translation>
+    </message>
+    <message>
+        <source>Authors</source>
+        <translation>Authors</translation>
+    </message>
+    <message>
+        <source>View content author and publication information</source>
+        <translation>View content author and publication information</translation>
+    </message>
+</context>
 </TS>

@@ -1039,4 +1039,23 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>design/admin/explayouts/tab</name>
+    <message>
+        <source>Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View layouts and rules associated with this node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View content author and publication information</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>
