@@ -1,0 +1,153 @@
+/* The template editor (module explayouts, view template_editor), a page of its own in every admin design: the
+   editor layout in the --a4-* tokens of components.css (loaded before this file), light and dark through
+   html[data-a4-theme]. design/admin's and admin4's template_editor.tpl both load it; the editor's markup is
+   parts/template_editor_body.tpl. */
+* { box-sizing: border-box; }
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--a4-surface);
+    color: var(--a4-ink);
+    font-family: var(--a4-mono);
+    font-size: var(--a4-text-m);
+}
+.app { display: flex; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.sidebar {
+    width: 420px;
+    min-width: 260px;
+    max-width: 80vw;
+    background: var(--a4-card);
+    border-right: 1px solid var(--a4-line);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.resizer {
+    width: var(--a4-space-2);
+    cursor: col-resize;
+    background: var(--a4-line);
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: var(--a4-z-raised);
+}
+.sidebar-header { padding: var(--a4-space-4); border-bottom: 1px solid var(--a4-line); }
+.sidebar-header h1 {
+    margin: 0 0 var(--a4-space-2);
+    font-size: var(--a4-text-l);
+    color: var(--a4-accent-text);
+    font-family: var(--a4-font);
+}
+.sidebar-header h1 small { color: var(--a4-muted); font-weight: 400; }
+.sidebar input[type="text"] {
+    width: 100%;
+    padding: var(--a4-space-2);
+    background: var(--a4-field);
+    color: var(--a4-ink);
+    border: 1px solid var(--a4-field-line);
+    border-radius: var(--a4-radius-s);
+}
+.flat-list { flex: 1; overflow: auto; padding: var(--a4-space-2); }
+.flat-list .empty { color: var(--a4-muted); padding: var(--a4-space-4) var(--a4-space-2); text-align: center; }
+.flat-list button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    color: var(--a4-ink);
+    border: none;
+    border-radius: var(--a4-radius-s);
+    padding: var(--a4-space-1) var(--a4-space-2);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--a4-text-s);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.flat-list button:hover { background: var(--a4-soft); }
+.flat-list button.active { background: var(--a4-accent-soft); color: var(--a4-accent-text); font-weight: 600; }
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--a4-space-2);
+    padding: var(--a4-space-3) var(--a4-space-4);
+    background: var(--a4-card);
+    border-bottom: 1px solid var(--a4-line);
+}
+.exit-btn { margin-left: auto; }
+.toolbar .path { flex: 1; color: var(--a4-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toolbar .status {
+    padding: var(--a4-space-1) var(--a4-space-3);
+    border-radius: var(--a4-radius-s);
+    font-size: var(--a4-text-s);
+    opacity: 0;
+    transition: opacity .2s;
+}
+.toolbar .status.show { opacity: 1; }
+.toolbar .status.ok { background: var(--a4-ok-bg); color: var(--a4-ok); }
+.toolbar .status.err { background: var(--a4-bad-bg); color: var(--a4-bad); }
+.btn {
+    padding: var(--a4-space-2) var(--a4-space-4);
+    border: none;
+    border-radius: var(--a4-radius-s);
+    background: var(--a4-accent-strong);
+    color: var(--a4-on-accent);
+    cursor: pointer;
+    font-weight: 600;
+    font-family: inherit;
+}
+.btn:hover { background: var(--a4-accent-press); color: var(--a4-on-accent-hover); }
+.btn.secondary { background: var(--a4-soft); color: var(--a4-ink); box-shadow: inset 0 0 0 1px var(--a4-line); }
+.btn.secondary:hover { background: var(--a4-line); color: var(--a4-ink); }
+.editor-wrap { flex: 1; display: flex; overflow: hidden; position: relative; }
+.line-numbers {
+    width: 3.5rem;
+    padding: var(--a4-space-4) var(--a4-space-2);
+    background: var(--a4-card);
+    color: var(--a4-muted);
+    text-align: right;
+    overflow: hidden;
+    white-space: pre;
+    line-height: var(--a4-leading);
+}
+textarea#tpl-editor {
+    flex: 1;
+    padding: var(--a4-space-4);
+    background: var(--a4-surface);
+    color: var(--a4-ink);
+    border: none;
+    outline: none;
+    resize: none;
+    line-height: var(--a4-leading);
+    font-family: var(--a4-mono);
+    font-size: var(--a4-text-m);
+    tab-size: 2;
+    white-space: pre;
+    overflow: auto;
+}
+textarea#tpl-editor:focus-visible { box-shadow: inset 0 0 0 2px var(--a4-ring); }
+.empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--a4-muted); font-size: var(--a4-text-l); }
+.error-box { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--a4-bad); padding: var(--a4-space-4); text-align: center; }
+
+/* The header with the way back to the Layouts pages. */
+.explayouts-te-header {
+    display: flex;
+    align-items: center;
+    gap: var(--a4-space-3);
+    padding: var(--a4-space-2) var(--a4-space-4);
+    background: var(--a4-card);
+    border-bottom: 1px solid var(--a4-line);
+    font-family: var(--a4-font);
+    font-size: var(--a4-text-m);
+}
+.explayouts-te-header a { color: var(--a4-accent-text); }
+.explayouts-te-header .explayouts-te-title { font-weight: 600; color: var(--a4-ink); }
+.btn:focus-visible, .flat-list button:focus-visible, .explayouts-te-header a:focus-visible, input:focus-visible {
+    outline: 2px solid var(--a4-ring);
+    outline-offset: 2px;
+}
