@@ -8,7 +8,7 @@ AdditionalTabs[]=layouts
 NavigationPartName=ezcontentnavigationpart
 Title=Layouts
 Description=View layouts and rules associated with this node
-# Title and Description are translated in this context (translations/*/translation.ts)
+# Title and Description are translated in this context (the translation.ts of each language under translations)
 TranslationContext=design/admin/explayouts/tab
 HeaderTemplate=
 Template=explayouts.tpl
