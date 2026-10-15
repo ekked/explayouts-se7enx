@@ -17,6 +17,7 @@
         <a class="a4-btn" href={'explayouts/setup'|ezurl}>{'Setup DB'|i18n( 'design/admin/explayouts/layout_list' )}</a>
     </div>
 </div>
+{if count( $layouts )}
 <div class="a4-table-wrap"><table class="a4-table">
     <thead><tr><th scope="col" class="a4-num">ID</th><th scope="col">{'Identifier'|i18n( 'design/admin/explayouts/layout_list' )}</th><th scope="col">{'Name'|i18n( 'design/admin/explayouts/layout_list' )}</th><th scope="col">{'Type'|i18n( 'design/admin/explayouts/layout_list' )}</th><th scope="col">{'Status'|i18n( 'design/admin/explayouts/layout_list' )}</th><th scope="col"><span class="a4-sr-only">{'Edit'|i18n( 'design/admin/explayouts/layout_list' )}</span></th></tr></thead>
     <tbody>
@@ -39,6 +40,9 @@
     {/foreach}
     </tbody>
 </table></div>
+{else}
+<p class="a4-empty">{'No layouts yet.'|i18n( 'design/admin/explayouts/layout_list' )}</p>
+{/if}
 <form class="a4-form is-wide a4-section" method="post" action={'explayouts/layout_list'|ezurl}>
     <div class="a4-field a4-field-wide">
         <label class="a4-label" for="import-json">{'Import layout from JSON:'|i18n( 'design/admin/explayouts/layout_list' )}</label>

@@ -50,7 +50,7 @@
 </table>
 </div>
 {else}
-<p class="a4-muted">{'No mappings'|i18n( 'design/admin/tabs/explayouts' )}</p>
+<p class="a4-empty">{'No mappings'|i18n( 'design/admin/tabs/explayouts' )}</p>
 {/if}
 </section>
 

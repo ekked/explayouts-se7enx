@@ -436,6 +436,10 @@
         <source>No JSON provided.</source>
         <translation>Kein JSON angegeben.</translation>
     </message>
+    <message>
+        <source>No layouts yet.</source>
+        <translation>Noch keine Layouts.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/rule_edit</name>
@@ -561,6 +565,10 @@
     <message>
         <source>Rule copied.</source>
         <translation>Regel kopiert.</translation>
+    </message>
+    <message>
+        <source>No rules yet.</source>
+        <translation>Noch keine Regeln.</translation>
     </message>
 </context>
 <context>

@@ -29,6 +29,8 @@
     {/foreach}
     </tbody>
 </table></div>
+{else}
+<p class="a4-empty">{'No rules yet.'|i18n( 'design/admin/explayouts/rule_list' )}</p>
 {/if}
 </div></div></div>
 </div>

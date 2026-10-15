@@ -436,6 +436,10 @@
         <source>No JSON provided.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No layouts yet.</source>
+        <translation>No layouts yet.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/rule_edit</name>
@@ -561,6 +565,10 @@
     <message>
         <source>Rule copied.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No rules yet.</source>
+        <translation>No rules yet.</translation>
     </message>
 </context>
 <context>
