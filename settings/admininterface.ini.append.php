@@ -17,3 +17,4 @@ Title=Authors
 Description=View content author and publication information
 HeaderTemplate=
 Template=authors.tpl
+*/ ?>

@@ -305,6 +305,30 @@
         <source>Cannot move block.</source>
         <translation>Der Block kann nicht verschoben werden.</translation>
     </message>
+    <message>
+        <source>Block type</source>
+        <translation>Blocktyp</translation>
+    </message>
+    <message>
+        <source>Identifier</source>
+        <translation>Bezeichner</translation>
+    </message>
+    <message>
+        <source>Layout type</source>
+        <translation>Layouttyp</translation>
+    </message>
+    <message>
+        <source>Move down</source>
+        <translation>Nach unten</translation>
+    </message>
+    <message>
+        <source>Move to zone</source>
+        <translation>In Zone verschieben</translation>
+    </message>
+    <message>
+        <source>Move up</source>
+        <translation>Nach oben</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -466,6 +490,18 @@
     <message>
         <source>Rule saved.</source>
         <translation>Regel gespeichert.</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation>Layout</translation>
+    </message>
+    <message>
+        <source>New Rule</source>
+        <translation>Neue Regel</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Priorität</translation>
     </message>
 </context>
 <context>

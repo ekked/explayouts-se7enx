@@ -2,3 +2,4 @@
 
 [ExtensionSettings]
 DesignExtensions[]=explayouts
+*/ ?>

@@ -3,3 +3,4 @@
 [ModuleSettings]
 ExtensionRepositories[]=explayouts
 ModuleList[]=explayouts
+*/ ?>
