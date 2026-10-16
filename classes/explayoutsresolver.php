@@ -3,7 +3,57 @@ class expLayoutsResolver
 {
     private static $resolvedCache = array();
 
-    static function resolve( $path = false )
+    /** What resolve() answered in this request, path => answer, for the debug bar's panel (pageResolution()) */
+    private static $resolutions = array();
+
+    /** Paths remembered at most: a list of nodes that each resolve their layout must not grow without end */
+    const REMEMBERED_RESOLUTIONS = 100;
+
+    /**
+     * What resolve() answered in this request for the page itself: for the path of the request, else for the URL
+     * alias of the page's node (the pagelayouts resolve the layout of the node, whose alias the front page does not
+     * have in its address). The answer is path, siteaccess, source (rule, cache, default or none), rule_id and
+     * layout_id; null when neither was asked. A page also resolves the layouts of other nodes (menus, the summary
+     * of a node's layout); those are not the page's. Read by expLayoutsDebugBarPanel, nothing else depends on it.
+     *
+     * @param int $nodeId the node the page shows, 0 for none
+     * @return array|null
+     */
+    static function pageResolution( $nodeId = 0 )
+    {
+        if ( !self::$resolutions )
+            return null;
+        $path = self::normalizedPath( false );
+        if ( isset( self::$resolutions[$path] ) )
+            return self::$resolutions[$path];
+        if ( (int)$nodeId > 0 )
+        {
+            $node = eZContentObjectTreeNode::fetch( (int)$nodeId );
+            if ( $node instanceof eZContentObjectTreeNode )
+            {
+                $path = self::normalizedPath( (string)$node->attribute( 'url_alias' ) );
+                if ( isset( self::$resolutions[$path] ) )
+                    return self::$resolutions[$path];
+            }
+        }
+        return null;
+    }
+
+    private static function remember( $path, $siteAccessName, $source, $ruleId, $layoutId )
+    {
+        // the request's own path always, whatever the page resolved before it
+        if ( !isset( self::$resolutions[$path] ) && count( self::$resolutions ) >= self::REMEMBERED_RESOLUTIONS
+             && $path !== self::normalizedPath( false ) )
+            return;
+        self::$resolutions[$path] = array( 'path' => $path, 'siteaccess' => $siteAccessName, 'source' => $source,
+                                           'rule_id' => (int)$ruleId, 'layout_id' => (int)$layoutId );
+    }
+
+    /**
+     * The path resolve() looks up: the request's URI for false, without the leading slash and index.php, "home" for
+     * the front page.
+     */
+    private static function normalizedPath( $path )
     {
         if ( $path === false )
         {
@@ -23,6 +73,12 @@ class expLayoutsResolver
             $path = substr( $path, 10 );
         if ( $path === '' )
             $path = 'home';
+        return $path;
+    }
+
+    static function resolve( $path = false )
+    {
+        $path = self::normalizedPath( $path );
 
         $current = eZSiteAccess::current();
         $siteAccessName = ( is_array( $current ) && isset( $current['name'] ) ) ? $current['name'] : 'default';
@@ -36,12 +92,14 @@ class expLayoutsResolver
                 if ( $layout && (int)$layout->attribute( 'status' ) === 2 && !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
                 {
                     eZDebug::writeNotice( "Cache hit for path '$path', layout=" . $layout->attribute( 'identifier' ), 'expLayoutsResolver' );
+                    self::remember( $path, $siteAccessName, 'cache', isset( $cached['rule_id'] ) ? $cached['rule_id'] : 0, $layout->attribute( 'id' ) );
                     return $layout;
                 }
             }
             else
             {
                 eZDebug::writeNotice( "Cache hit for path '$path', no match", 'expLayoutsResolver' );
+                self::remember( $path, $siteAccessName, 'cache', 0, 0 );
                 return false;
             }
         }
@@ -57,6 +115,7 @@ class expLayoutsResolver
                 {
                     self::writeCache( $path, $siteAccessName, (int)$rule->attribute( 'id' ), (int)$layout->attribute( 'id' ) );
                     eZDebug::writeNotice( 'Matched rule ' . $rule->attribute( 'id' ) . " for path '$path', layout=" . $layout->attribute( 'identifier' ), 'expLayoutsResolver' );
+                    self::remember( $path, $siteAccessName, 'rule', $rule->attribute( 'id' ), $layout->attribute( 'id' ) );
                     return $layout;
                 }
             }
@@ -71,11 +130,13 @@ class expLayoutsResolver
             if ( $layout && !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
             {
                 self::writeCache( $path, $siteAccessName, 0, (int)$layout->attribute( 'id' ) );
+                self::remember( $path, $siteAccessName, 'default', 0, $layout->attribute( 'id' ) );
                 return $layout;
             }
         }
 
         self::writeCache( $path, $siteAccessName, 0, 0 );
+        self::remember( $path, $siteAccessName, 'none', 0, 0 );
         return false;
     }
 

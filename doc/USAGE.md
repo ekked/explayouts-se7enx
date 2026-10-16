@@ -108,6 +108,29 @@ Used by the transfer endpoints of `explayouts_ui_api` and the Import screen in `
 - Admin module views: `/explayouts/dashboard`, `/explayouts/layout_list`, `/explayouts/layout_edit`, `/explayouts/block_edit`, `/explayouts/rule_list`, `/explayouts/rule_edit`, `/explayouts/preview`, `/explayouts/setup`, `/explayouts/template_editor`.
 - The "Layouts" tab on the admin content node view shows layouts and rules for the node (template `design/admin/templates/tabs/explayouts.tpl`).
 
+## The Exp Layouts panel of the debug bar
+
+With Exponential 6.0.15 or later the Exp Debug bar has an **Exp Layouts** tab on public pages, for users who may edit
+layouts (`explayouts_ui/edit`); the bar also shows to anonymous visitors when `DebugByIP` matches, and they do not
+get it. Its chip in the summary names the layout of the page (`Layout: Landing Page / Home`). The tab shows:
+
+- the layout (name, identifier, id, type) and what chose it: a rule, the resolver cache, the default layout
+  (`[ResolverSettings] DefaultLayout`) or nothing, with the path and the siteaccess;
+- links to edit the layout and the rule in the administration, to the rule list, and to the page with
+  `?expl_debug=1`, the overlay that lists the blocks found in the page;
+- every zone with its blocks in order, nested blocks under their parent, linked zones with their source, each block
+  with a link to edit it;
+- the blocks available for site layouts (`[BlockSettings] AvailableBlocks[]`) with name, category and views.
+
+The panel reads what `expLayoutsResolver::resolve()` answered for the page (`pageResolution()`: the request's path,
+else the URL alias of the page's node; the layouts a page resolves for other nodes are not the page's) and how
+`expLayoutsRenderer::prepareLayout()` prepared that layout (`prepared()`). Its own queries are the page's node, when
+the request's path is not what the page resolved, and the layout's name when the layout was resolved but not
+rendered. It is registered in
+`settings/debugbar.ini.append.php`; older kernels ignore that file. The links go to
+`explayouts.ini [DebugBarSettings] AdminURL` when it is set (an administration on its own host), else to the site's
+directory followed by the first plain name of `[AdminLayoutSettings] SiteAccessMatch[]` (`/admin`).
+
 ## CLI
 
 Helper scripts under `bin/php/`, e.g.:

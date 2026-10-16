@@ -19,6 +19,7 @@ This extension provides the following capabilities:
 - Template fetch functions - Resolve and load layouts directly from templates via the `explayouts` module fetch functions.
 - Import / export - Transfer layouts and mapping rules between installations.
 - CLI tooling - Command line helpers for schema installation, base data seeding, listing, publishing and diagnostics.
+- Debug bar panel - An Exp Layouts tab in the Exp Debug bar (Exponential 6.0.15 and later): the layout of the page, the rule that chose it, its zones and blocks with links to edit them, and the available blocks, for users who may edit layouts.
 
 Features
 --------

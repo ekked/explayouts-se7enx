@@ -13,6 +13,7 @@
 return array(
     'ExplBlockXHTMLXMLOutput' => 'extension/explayouts/classes/explblockxhtmlxmloutput.php',
     'ExplBlockDebug' => 'extension/explayouts/event/explblockdebug.php',
+    'expLayoutsDebugBarPanel' => 'extension/explayouts/classes/explayoutsdebugbarpanel.php',
 );
 
 ?>

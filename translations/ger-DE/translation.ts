@@ -1058,4 +1058,143 @@
         <translation>Autor und Veröffentlichungsdaten des Inhalts anzeigen</translation>
     </message>
 </context>
+<context>
+    <name>extension/explayouts/debugbar</name>
+    <message>
+        <source>Exp Layouts</source>
+        <translation>Exp Layouts</translation>
+    </message>
+    <message>
+        <source>Layout: %name</source>
+        <translation>Layout: %name</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>keins</translation>
+    </message>
+    <message>
+        <source>%zones zones, %blocks blocks</source>
+        <translation>%zones Zonen, %blocks Blöcke</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation>Layout</translation>
+    </message>
+    <message>
+        <source>Identifier</source>
+        <translation>Kennung</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Typ</translation>
+    </message>
+    <message>
+        <source>Chosen by</source>
+        <translation>Gewählt durch</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Pfad</translation>
+    </message>
+    <message>
+        <source>Siteaccess</source>
+        <translation>Siteaccess</translation>
+    </message>
+    <message>
+        <source>Edit layout</source>
+        <translation>Layout bearbeiten</translation>
+    </message>
+    <message>
+        <source>Edit rule</source>
+        <translation>Regel bearbeiten</translation>
+    </message>
+    <message>
+        <source>All rules</source>
+        <translation>Alle Regeln</translation>
+    </message>
+    <message>
+        <source>Show the blocks on the page</source>
+        <translation>Blöcke auf der Seite zeigen</translation>
+    </message>
+    <message>
+        <source>Not looked up by the resolver on this page</source>
+        <translation>Auf dieser Seite nicht über den Resolver ermittelt</translation>
+    </message>
+    <message>
+        <source>Rule %id</source>
+        <translation>Regel %id</translation>
+    </message>
+    <message>
+        <source>Rule %id (from the resolver cache)</source>
+        <translation>Regel %id (aus dem Resolver-Cache)</translation>
+    </message>
+    <message>
+        <source>No rule (from the resolver cache)</source>
+        <translation>Keine Regel (aus dem Resolver-Cache)</translation>
+    </message>
+    <message>
+        <source>No rule matched: the default layout (explayouts.ini DefaultLayout)</source>
+        <translation>Keine Regel passte: das Standard-Layout (explayouts.ini DefaultLayout)</translation>
+    </message>
+    <message>
+        <source>No rule matched and no default layout</source>
+        <translation>Keine Regel passte und kein Standard-Layout</translation>
+    </message>
+    <message>
+        <source>The layout was not rendered on this page: no zones to show.</source>
+        <translation>Das Layout wurde auf dieser Seite nicht gerendert: keine Zonen zu zeigen.</translation>
+    </message>
+    <message>
+        <source>Zones and blocks</source>
+        <translation>Zonen und Blöcke</translation>
+    </message>
+    <message>
+        <source>Zone</source>
+        <translation>Zone</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>Block</translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation>Art</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Ansicht</translation>
+    </message>
+    <message>
+        <source>(linked: layout %layout, zone %zone)</source>
+        <translation>(verknüpft: Layout %layout, Zone %zone)</translation>
+    </message>
+    <message>
+        <source>empty</source>
+        <translation>leer</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <source>Available blocks (%count)</source>
+        <translation>Verfügbare Blöcke (%count)</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Kategorie</translation>
+    </message>
+    <message>
+        <source>Views</source>
+        <translation>Ansichten</translation>
+    </message>
+    <message>
+        <source>No rule matched: the default layout (from the resolver cache)</source>
+        <translation>Keine Regel passte: das Standard-Layout (aus dem Resolver-Cache)</translation>
+    </message>
+</context>
 </TS>
