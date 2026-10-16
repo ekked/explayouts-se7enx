@@ -63,6 +63,9 @@ class expLayoutsTemplateEditor
                 continue;
             $full = $dir . '/' . $entry;
             $rel  = $relative . '/' . $entry;
+            // resolve() refuses symbolic links, so they are not offered either.
+            if ( is_link( $full ) )
+                continue;
             if ( is_dir( $full ) )
             {
                 self::scan( $full, $rel, $list );
@@ -92,7 +95,7 @@ class expLayoutsTemplateEditor
     public static function save( $path, $content )
     {
         $file = self::resolve( $path );
-        if ( $file === false )
+        if ( $file === false || is_link( $file ) )
             return false;
 
         $exists = is_file( $file );
@@ -108,9 +111,9 @@ class expLayoutsTemplateEditor
     }
 
     /**
-     * Copies a template to <var>/explayouts/template_backup/<path relative to the installation>, the
-     * copy of the save before replaced. False when the copy could not be made, so nothing is overwritten
-     * without one.
+     * Copies a template to <var>/explayouts/template_backup/<path relative to the installation>. One
+     * generation: each save replaces the copy of the save before. False when the copy could not be made,
+     * so nothing is overwritten without one.
      */
     protected static function backup( $file )
     {
@@ -151,6 +154,11 @@ class expLayoutsTemplateEditor
             return false;
 
         $real = $dir . '/' . basename( $candidate );
+        // A symbolic link is never a template here: one that points nowhere passes
+        // file_exists() as false, skipped the realpath() below, and save() then
+        // wrote through it to wherever it points, outside every root.
+        if ( is_link( $real ) )
+            return false;
         if ( file_exists( $real ) )
         {
             $real = @realpath( $real );

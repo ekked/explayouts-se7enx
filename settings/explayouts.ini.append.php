@@ -768,8 +768,11 @@ AllowedTemplateRoots[]=extension/explayouts/design/standard/templates/explayouts
 # (its New button is shown). disabled: only existing templates can be saved.
 AllowNewTemplates=disabled
 # Before a template is overwritten, its previous version is copied to
-# <var directory>/explayouts/template_backup/<path>; no .tpl.bak is written
-# next to the template.
+# <var directory>/explayouts/template_backup/<path>, one generation (the next
+# save replaces it); no .tpl.bak is written next to the template. The var
+# directory must not be served by the web server: the shipped .htaccess_root
+# of Exponential serves only listed storage and cache paths below var/.
+# Symbolic links inside a root are never read or written.
 
 [ResolverSettings]
 DefaultLayout=1d96945167435ac185b86cc0f9ef7084

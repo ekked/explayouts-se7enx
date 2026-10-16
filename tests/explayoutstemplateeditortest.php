@@ -12,6 +12,8 @@
  *  TE-03 - a template that does not exist yet is created only with AllowNewTemplates=enabled
  *  TE-04 - an empty AllowedTemplateRoots[] allows nothing (no fallback to design/ and extension/)
  *  TE-05 - paths outside the roots, with .., or not ending in .tpl are refused
+ *  TE-06 - a symbolic link inside a root is not listed, read or written, also one that points nowhere and with
+ *          AllowNewTemplates=enabled (the write would go wherever it points)
  *
  * The sandbox is made under EXPLAYOUTS_TEST_TMP, or the system temporary directory, and removed afterwards.
  */
@@ -168,6 +170,22 @@ try
     teCheck( expLayoutsTemplateEditor::read( 'extension/explayouts/design/standard/templates/explayouts/layouts/../../../../../../../' . $pagelayout ) === false, 'TE-05 .. out of a root is refused' );
     teCheck( expLayoutsTemplateEditor::save( 'extension/explayouts/design/standard/templates/explayouts/layouts/x.php', 'x' ) === false, 'TE-05 not a .tpl' );
     teCheck( expLayoutsTemplateEditor::read( 'settings/site.ini' ) === false, 'TE-05 settings are not read' );
+
+    // TE-06
+    $layoutsDir = eZSys::$root . '/extension/explayouts/design/standard/templates/explayouts/layouts';
+    $outside = eZSys::$root . '/design/admin4/templates/planted.tpl';
+    symlink( $outside, $layoutsDir . '/dangling.tpl' );
+    symlink( eZSys::$root . '/' . $pagelayout, $layoutsDir . '/to_pagelayout.tpl' );
+    eZINI::$overrides = array( 'TemplateEditorSettings' => array( 'AllowNewTemplates' => 'enabled' ) );
+    teCheck( expLayoutsTemplateEditor::save( 'extension/explayouts/design/standard/templates/explayouts/layouts/dangling.tpl', 'planted' ) === false
+             && !file_exists( $outside ), 'TE-06 a link that points nowhere is not written through, even with AllowNewTemplates=enabled' );
+    teCheck( expLayoutsTemplateEditor::read( 'extension/explayouts/design/standard/templates/explayouts/layouts/to_pagelayout.tpl' ) === false, 'TE-06 a link to a template outside the roots is not read' );
+    teCheck( expLayoutsTemplateEditor::save( 'extension/explayouts/design/standard/templates/explayouts/layouts/to_pagelayout.tpl', 'x' ) === false
+             && file_get_contents( eZSys::$root . '/' . $pagelayout ) === 'admin page layout', 'TE-06 nor written' );
+    $listed = expLayoutsTemplateEditor::listTemplates();
+    teCheck( !in_array( 'extension/explayouts/design/standard/templates/explayouts/layouts/to_pagelayout.tpl', $listed, true )
+             && !in_array( 'extension/explayouts/design/standard/templates/explayouts/layouts/dangling.tpl', $listed, true ), 'TE-06 links are not listed' );
+    eZINI::$overrides = array();
 }
 finally
 {

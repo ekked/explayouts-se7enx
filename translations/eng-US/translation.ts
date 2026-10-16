@@ -685,8 +685,8 @@
         <translation>Save error: %message</translation>
     </message>
     <message>
-        <source>New template path (relative to design/ or extension/, must end in .tpl):</source>
-        <translation>New template path (relative to design/ or extension/, must end in .tpl):</translation>
+        <source>New template path (from the installation root, inside an allowed folder, must end in .tpl):</source>
+        <translation>New template path (from the installation root, inside an allowed folder, must end in .tpl):</translation>
     </message>
     <message>
         <source>Path must end in .tpl</source>

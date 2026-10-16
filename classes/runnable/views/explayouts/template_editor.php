@@ -78,7 +78,7 @@ class TemplateEditor extends \Exponential\Runnable\ModuleView
             'saved'          => \ezpI18n::tr( $context, 'Saved' ),
             'save_failed'    => \ezpI18n::tr( $context, 'Save failed: %message' ),
             'save_error'     => \ezpI18n::tr( $context, 'Save error: %message' ),
-            'new_path'       => \ezpI18n::tr( $context, 'New template path (relative to design/ or extension/, must end in .tpl):' ),
+            'new_path'       => \ezpI18n::tr( $context, 'New template path (from the installation root, inside an allowed folder, must end in .tpl):' ),
             'must_end_tpl'   => \ezpI18n::tr( $context, 'Path must end in .tpl' ),
             'count'          => \ezpI18n::tr( $context, '(%count templates)' ),
             'new_file_error' => \ezpI18n::tr( $context, 'New file error: %message' ),
