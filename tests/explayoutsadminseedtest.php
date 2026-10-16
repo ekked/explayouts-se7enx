@@ -5,6 +5,9 @@
  *
  * - every block of the stock admin layouts has a block definition and is listed in [AdminBlockSettings] AvailableBlocks[];
  * - the tab menu sits in the topmenu zone of every stock layout, so admin4l draws its header from the zones;
+ * - the header zone is logo, menu button, search, theme switch, sidebar controls (the page draws the logo and the menu
+ *   button before the menu panel, so the Tab order is admin4's), and the old combined block admin_sidebar_toggles
+ *   stays defined for layouts stored before the split;
  * - the right column of admin_3col is the toolbars admin_right and admin_developer, in admin4's order;
  * - SiteAccessMatch[] covers the admin siteaccesses named <site>_admin, and not the public siteaccesses.
  *
@@ -93,9 +96,12 @@ unset( $byZone, $byPosition );
 foreach ( array( 'admin_3col', 'admin_2col', 'admin_full' ) as $layout )
 {
     check( isset( $blocksByZone[$layout]['topmenu'] ) && array_values( $blocksByZone[$layout]['topmenu'] ) === array( 'admin_tab_menu' ), "$layout: the topmenu zone holds the tab menu" );
+    check( isset( $blocksByZone[$layout]['header'] ) && array_values( $blocksByZone[$layout]['header'] ) === array( 'admin_logo', 'admin_menu_button', 'admin_search', 'admin_theme_switch', 'admin_sidebar_controls' ), "$layout: the header zone has the menu button after the logo and the sidebar controls last" );
     check( isset( $blocksByZone[$layout]['header'] ) && !in_array( 'admin_tab_menu', $blocksByZone[$layout]['header'], true ), "$layout: the tab menu is not in the header zone" );
 }
 check( isset( $blocksByZone['admin_3col']['right'] ) && array_values( $blocksByZone['admin_3col']['right'] ) === array( 'admin_toolbar_right', 'admin_toolbar_developer' ), 'admin_3col: the right column is admin_right, then admin_developer' );
+foreach ( array( 'admin_menu_button', 'admin_sidebar_controls', 'admin_sidebar_toggles' ) as $identifier )
+    check( in_array( $identifier, $available, true ) && isset( $ini['BlockDefinition_' . $identifier] ), "$identifier stays defined and available (stored layouts keep the combined block)" );
 foreach ( array( 'admin_toolbar_right', 'admin_toolbar_developer' ) as $identifier )
 {
     check( isset( $ini['BlockDefinition_' . $identifier]['Handler'] ) && $ini['BlockDefinition_' . $identifier]['Handler'] === 'expLayoutsAdminPartBlockHandler', "$identifier is an admin part block" );
