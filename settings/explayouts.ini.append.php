@@ -751,9 +751,25 @@ DefaultLayout=admin_3col
 CacheTTL=3600
 
 [TemplateEditorSettings]
+# Folders, relative to the installation, whose .tpl files the template editor
+# (explayouts/template_editor, explayouts_ui/template_editor) lists, reads and
+# writes. Shipped: the templates of the layout types and blocks only. Every
+# template in a root can be changed by whoever may open the editor, so do not
+# add design/ or extension/ as a whole: they hold the administration's page
+# layout and every admin override. A site design that overrides layout
+# templates is added with its own folder, for example
+#   AllowedTemplateRoots[]=extension/mysite/design/mysite/templates/explayouts
+# An empty list allows nothing.
 AllowedTemplateRoots[]
-AllowedTemplateRoots[]=design
-AllowedTemplateRoots[]=extension
+AllowedTemplateRoots[]=extension/explayouts/design/standard/templates/explayouts/layouts
+AllowedTemplateRoots[]=extension/explayouts/design/standard/templates/explayouts/block
+AllowedTemplateRoots[]=extension/explayouts/design/standard/templates/explayouts/tpl_block
+# enabled: the editor may create a .tpl that does not exist yet inside a root
+# (its New button is shown). disabled: only existing templates can be saved.
+AllowNewTemplates=disabled
+# Before a template is overwritten, its previous version is copied to
+# <var directory>/explayouts/template_backup/<path>; no .tpl.bak is written
+# next to the template.
 
 [ResolverSettings]
 DefaultLayout=1d96945167435ac185b86cc0f9ef7084

@@ -12,7 +12,8 @@
     </aside>
     <main class="main">
         <div class="toolbar">
-            <button class="btn secondary" id="new-file">{'New'|i18n( 'design/admin/explayouts/template_editor' )|wash}</button>
+            {* New only with [TemplateEditorSettings] AllowNewTemplates=enabled; the server refuses to create a file otherwise. *}
+            {if $allow_new_templates}<button class="btn secondary" id="new-file">{'New'|i18n( 'design/admin/explayouts/template_editor' )|wash}</button>{/if}
             <button class="btn" id="save-file">{'Save'|i18n( 'design/admin/explayouts/template_editor' )|wash}</button>
             <button class="btn secondary exit-btn" id="exit-editor" title="{'Return to admin'|i18n( 'design/admin/explayouts/template_editor' )|wash}">×</button>
             <span class="path" id="path">{'No file selected'|i18n( 'design/admin/explayouts/template_editor' )|wash}</span>
@@ -222,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = target;
     });
 
-    newBtn.addEventListener('click', function() {
+    if (newBtn) newBtn.addEventListener('click', function() {
         try {
             var p = prompt(TPL_I18N.new_path);
             if (!p) return;

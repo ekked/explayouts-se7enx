@@ -90,6 +90,7 @@ class TemplateEditor extends \Exponential\Runnable\ModuleView
         $tpl->setVariable( 'base_url_json', self::json( $baseUrl, '""' ) );
         $tpl->setVariable( 'exit_url_json', self::json( $exitUrl, '"/"' ) );
         $tpl->setVariable( 'csrf_token_json', self::json( class_exists( 'ezxFormToken' ) ? \ezxFormToken::getToken() : '', '""' ) );
+        $tpl->setVariable( 'allow_new_templates', \expLayoutsTemplateEditor::newTemplatesAllowed() );
         $tpl->setVariable( 'language_code', \eZLocale::instance()->httpLocaleCode() );
 
         header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
