@@ -9,20 +9,21 @@
         {if $schema_file}
             <p>{'Schema file:'|i18n( 'design/admin/explayouts/setup' )} <code>{$schema_file|wash}</code></p>
             <form method="post" action={'explayouts/setup'|ezurl}>
-                <input class="defaultbutton" type="submit" name="InstallSchema" value="{'Install / update schema'|i18n( 'design/admin/explayouts/setup' )}" onclick="return confirm('{'Run the schema DDL? Existing data in these tables will not be removed because CREATE TABLE IF NOT EXISTS is used.'|i18n( 'design/admin/explayouts/setup' )|wash( javascript )}');" />
+                <input class="defaultbutton" type="submit" name="InstallSchema" value="{'Install / update schema'|i18n( 'design/admin/explayouts/setup' )}" data-explayouts-confirm="{'Run the schema DDL? Existing data in these tables will not be removed because CREATE TABLE IF NOT EXISTS is used.'|i18n( 'design/admin/explayouts/setup' )|wash}" />
             </form>
         {else}
             <p>{'Could not determine a supported schema file for this database.'|i18n( 'design/admin/explayouts/setup' )}</p>
         {/if}
 
         <form method="post" action={'explayouts/setup'|ezurl}>
-            <input class="button" type="submit" name="InstallBaseData" value="{'Install base data'|i18n( 'design/admin/explayouts/setup' )}" onclick="return confirm('{'Install base data? This adds a default homepage layout and catch-all rule.'|i18n( 'design/admin/explayouts/setup' )|wash( javascript )}');" />
+            <input class="button" type="submit" name="InstallBaseData" value="{'Install base data'|i18n( 'design/admin/explayouts/setup' )}" data-explayouts-confirm="{'Install base data? This adds a default homepage layout and catch-all rule.'|i18n( 'design/admin/explayouts/setup' )|wash}" />
         </form>
 
         <form method="post" action={'explayouts/setup'|ezurl}>
-            <input class="button" type="submit" name="InstallTestData" value="{'Install test data'|i18n( 'design/admin/explayouts/setup' )}" onclick="return confirm('{'Install test data? This adds demo layouts and resolver rules.'|i18n( 'design/admin/explayouts/setup' )|wash( javascript )}');" />
+            <input class="button" type="submit" name="InstallTestData" value="{'Install test data'|i18n( 'design/admin/explayouts/setup' )}" data-explayouts-confirm="{'Install test data? This adds demo layouts and resolver rules.'|i18n( 'design/admin/explayouts/setup' )|wash}" />
         </form>
 
         <p><a href={'explayouts/layout_list'|ezurl} class="button">{'Back to layouts'|i18n( 'design/admin/explayouts/setup' )}</a></p>
     </div>
 </div>
+{ezscript( array( 'explayouts_admin.js' ) )}

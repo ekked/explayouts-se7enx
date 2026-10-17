@@ -25,7 +25,7 @@
                         </form>
                         <form method="post" action={'explayouts/rule_list'|ezurl} class="expl-inline-form">
                             <input type="hidden" name="DeleteRuleID" value="{$rule.id|wash}" />
-                            <button type="submit" name="DeleteRule" class="button" onclick="return confirm('{'Delete this rule?'|i18n( 'design/admin/explayouts/rule_list' )|wash( javascript )}');">{'Delete'|i18n( 'design/admin/explayouts/rule_list' )}</button>
+                            <button type="submit" name="DeleteRule" class="button" data-explayouts-confirm="{'Delete this rule?'|i18n( 'design/admin/explayouts/rule_list' )|wash}">{'Delete'|i18n( 'design/admin/explayouts/rule_list' )}</button>
                         </form>
                     </td>
                 </tr>
@@ -34,3 +34,4 @@
         <a class="button" href={'explayouts/rule_edit/'|ezurl}><img src={'new.png'|ezimage} width="16" height="16" alt="{'New rule'|i18n( 'design/admin/explayouts/rule_list' )}" class="expl-icon" /> {'New rule'|i18n( 'design/admin/explayouts/rule_list' )}</a>
     </div>
 </div>
+{ezscript( array( 'explayouts_admin.js' ) )}

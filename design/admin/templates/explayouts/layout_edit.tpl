@@ -22,7 +22,7 @@
 
             <input class="button" type="submit" name="SaveDraft" value="{'Save draft'|i18n( 'design/admin/explayouts/layout_edit' )}" />
             <input class="defaultbutton" type="submit" name="Publish" value="{'Publish'|i18n( 'design/admin/explayouts/layout_edit' )}" />
-            <input class="button" type="button" value="{'Cancel'|i18n( 'design/admin/explayouts/layout_edit' )}" onclick="window.location.href='/explayouts/layout_list';" />
+            <input class="button" type="button" value="{'Cancel'|i18n( 'design/admin/explayouts/layout_edit' )}" data-explayouts-href="/explayouts/layout_list" />
         </form>
 
         <hr/>
@@ -37,7 +37,7 @@
 
                     <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} class="expl-inline-form">
                         <input type="hidden" name="DeleteZoneID" value="{$zone.id|wash}" />
-                        <button type="submit" name="DeleteZone" class="button" onclick="return confirm('{'Delete this zone and all its blocks?'|i18n( 'design/admin/explayouts/layout_edit' )|wash( javascript )}');">{'Delete zone'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
+                        <button type="submit" name="DeleteZone" class="button" data-explayouts-confirm="{'Delete this zone and all its blocks?'|i18n( 'design/admin/explayouts/layout_edit' )|wash}">{'Delete zone'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
                     </form>
 
                     {if count($blocks)}
@@ -71,7 +71,7 @@
 
                                         <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} class="expl-inline-form">
                                             <input type="hidden" name="DeleteBlockID" value="{$block.id|wash}" />
-                                            <button type="submit" name="DeleteBlock" class="button" onclick="return confirm('{'Delete this block?'|i18n( 'design/admin/explayouts/layout_edit' )|wash( javascript )}');">{'Delete'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
+                                            <button type="submit" name="DeleteBlock" class="button" data-explayouts-confirm="{'Delete this block?'|i18n( 'design/admin/explayouts/layout_edit' )|wash}">{'Delete'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -104,3 +104,4 @@
         </form>
     </div>
 </div>
+{ezscript( array( 'explayouts_admin.js' ) )}

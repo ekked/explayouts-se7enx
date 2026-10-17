@@ -20,7 +20,7 @@
                     </div>
                     <div class="nl-node-rule-actions">
                         <a href={concat('explayouts_ui/layout_preview/',$resolved.id,'/2')|ezurl} target="_blank" class="nl-btn"><i class="material-icons">visibility</i> {'Preview'|i18n( 'design/admin/tabs/explayouts' )}</a>
-                        <a href={concat('explayouts_ui_api/app#layout/',$resolved.id)|ezurl} class="nl-btn nl-btn-primary" onclick="sessionStorage.setItem('explayouts_return_to','{concat('content/view/full/', $node.node_id)|ezurl('no')|wash('javascript')}'); return true;"><i class="material-icons">edit</i> {'Edit layout'|i18n( 'design/admin/tabs/explayouts' )}</a>
+                        <a href={concat('explayouts_ui_api/app#layout/',$resolved.id)|ezurl} class="nl-btn nl-btn-primary" data-explayouts-return-to="{concat('content/view/full/', $node.node_id)|ezurl('no')|wash}"><i class="material-icons">edit</i> {'Edit layout'|i18n( 'design/admin/tabs/explayouts' )}</a>
                     </div>
                 </div>
                 {def $zone_count = count($resolved.zones)}
@@ -73,3 +73,4 @@
         </div>
     </div>
 </div>
+{ezscript( array( 'explayouts_admin.js' ) )}

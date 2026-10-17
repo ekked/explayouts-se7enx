@@ -33,7 +33,7 @@
                         </form>
                         <form method="post" action={'explayouts/layout_list'|ezurl} class="expl-inline-form">
                             <input type="hidden" name="DeleteLayoutID" value="{$layout.id|wash}" />
-                            <button type="submit" name="DeleteLayout" class="button" onclick="return confirm('{'Delete this layout and all its zones/blocks?'|i18n( 'design/admin/explayouts/layout_list' )|wash( javascript )}');">{'Delete'|i18n( 'design/admin/explayouts/layout_list' )}</button>
+                            <button type="submit" name="DeleteLayout" class="button" data-explayouts-confirm="{'Delete this layout and all its zones/blocks?'|i18n( 'design/admin/explayouts/layout_list' )|wash}">{'Delete'|i18n( 'design/admin/explayouts/layout_list' )}</button>
                         </form>
                     </td>
                 </tr>
@@ -54,3 +54,4 @@
         </div>
     </div>
 </div>
+{ezscript( array( 'explayouts_admin.js' ) )}
