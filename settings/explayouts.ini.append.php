@@ -763,6 +763,12 @@ Zones[]=main
 Zones[]=main_bottom
 Zones[]=footer
 
+# The Exp Layouts panel of the Exp Debug bar (settings/debugbar.ini.append.php). Its links into the administration
+# go to AdminURL when set (e.g. https://admin.example.com, for an admin on its own host), else to the site's
+# directory followed by the first plain name of [AdminLayoutSettings] SiteAccessMatch[].
+[DebugBarSettings]
+AdminURL=
+
 # The admin layouts: the pages of the administration interface assembled from
 # layouts, zones and blocks (design admin4l). Layout types with Group=admin are
 # admin layouts. They are resolved by module and view for the siteaccesses

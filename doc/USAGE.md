@@ -110,6 +110,29 @@ Used by the transfer endpoints of `explayouts_ui_api` and the Import screen in `
 - The template editor (`/explayouts/template_editor`, and `/explayouts_ui/template_editor` of `explayouts_ui`) lists, reads and writes only the `.tpl` files inside `explayouts.ini` `[TemplateEditorSettings] AllowedTemplateRoots[]`. Shipped are the folders of the layout type and block templates (`extension/explayouts/design/standard/templates/explayouts/{layouts,block,tpl_block}`); an empty list allows nothing. Do not add `design` or `extension` as a whole: whoever may open the editor could then change the administration's page layout. A site design that overrides layout templates adds its own folder in `settings/override/explayouts.ini.append.php`.
 - The editor creates a template that does not exist yet only with `AllowNewTemplates=enabled` (its New button is shown only then). Before a template is overwritten, its previous version is copied to `<var directory>/explayouts/template_backup/<path>`. That is one generation: the next save replaces it. No `.tpl.bak` is written next to the template. The var directory must not be served by the web server; the `.htaccess_root` shipped with Exponential serves only listed storage and cache paths below `var/` and sends everything else to `index.php`. A symbolic link inside a root is never listed as editable, read or written. Existing `*.tpl.bak` files from earlier versions can be deleted.
 
+## The Exp Layouts panel of the debug bar
+
+With Exponential 6.0.15 or later the Exp Debug bar has an **Exp Layouts** tab on public pages, for users who may edit
+layouts (`explayouts_ui/edit`); the bar also shows to anonymous visitors when `DebugByIP` matches, and they do not
+get it. Its chip in the summary names the layout of the page (`Layout: Landing Page / Home`). The tab shows:
+
+- the layout (name, identifier, id, type) and what chose it: a rule, the resolver cache, the default layout
+  (`[ResolverSettings] DefaultLayout`) or nothing, with the path and the siteaccess;
+- links to edit the layout and the rule in the administration, to the rule list, and to the page with
+  `?expl_debug=1`, the overlay that lists the blocks found in the page;
+- every zone with its blocks in order, nested blocks under their parent, linked zones with their source, each block
+  with a link to edit it;
+- the blocks available for site layouts (`[BlockSettings] AvailableBlocks[]`) with name, category and views.
+
+The panel reads what `expLayoutsResolver::resolve()` answered for the page (`pageResolution()`: the request's path,
+else the URL alias of the page's node; the layouts a page resolves for other nodes are not the page's) and how
+`expLayoutsRenderer::prepareLayout()` prepared that layout (`prepared()`). Its own queries are the page's node, when
+the request's path is not what the page resolved, and the layout's name when the layout was resolved but not
+rendered. It is registered in
+`settings/debugbar.ini.append.php`; older kernels ignore that file. The links go to
+`explayouts.ini [DebugBarSettings] AdminURL` when it is set (an administration on its own host), else to the site's
+directory followed by the first plain name of `[AdminLayoutSettings] SiteAccessMatch[]` (`/admin`).
+
 ## CLI
 
 Helper scripts under `bin/php/`, e.g.:

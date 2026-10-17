@@ -1,6 +1,21 @@
 <?php
 class expLayoutsRenderer
 {
+    /** The layouts prepareLayout() prepared in this request, id => prepared, for the debug bar's panel (prepared()) */
+    private static $prepared = array();
+
+    /**
+     * The layout $layoutId as prepareLayout() prepared it in this request, or null when it was not prepared. Read by
+     * expLayoutsDebugBarPanel, nothing else depends on it.
+     *
+     * @param int $layoutId
+     * @return array|null
+     */
+    static function prepared( $layoutId )
+    {
+        return isset( self::$prepared[(int)$layoutId] ) ? self::$prepared[(int)$layoutId] : null;
+    }
+
     static function prepareLayout( $layout, $status = 2 )
     {
         if ( !$layout instanceof expLayoutsLayout )
@@ -19,7 +34,7 @@ class expLayoutsRenderer
             $blockCount += count( $preparedZone['blocks'] );
         }
 
-        return array(
+        $prepared = array(
             'id' => $layout->attribute( 'id' ),
             'identifier' => $layout->attribute( 'identifier' ),
             'name' => $layout->attribute( 'name' ),
@@ -27,6 +42,8 @@ class expLayoutsRenderer
             'zones' => $preparedZones,
             'block_count' => $blockCount,
         );
+        self::$prepared[(int)$prepared['id']] = $prepared;
+        return $prepared;
     }
 
     /**
