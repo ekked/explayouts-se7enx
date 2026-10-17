@@ -452,6 +452,8 @@ AvailableBlocks[]
 AvailableBlocks[]=admin_logo
 AvailableBlocks[]=admin_search
 AvailableBlocks[]=admin_theme_switch
+AvailableBlocks[]=admin_menu_button
+AvailableBlocks[]=admin_sidebar_controls
 AvailableBlocks[]=admin_sidebar_toggles
 AvailableBlocks[]=admin_tab_menu
 AvailableBlocks[]=admin_left_menu
@@ -492,8 +494,24 @@ ViewTypes[]=default
 Category=admin_header
 Group=admin
 
+[BlockDefinition_admin_menu_button]
+Name=Admin: menu button (phone width)
+Handler=expLayoutsAdminPartBlockHandler
+ViewTypes[]=default
+Category=admin_header
+Group=admin
+
+[BlockDefinition_admin_sidebar_controls]
+Name=Admin: sidebar controls
+Handler=expLayoutsAdminPartBlockHandler
+ViewTypes[]=default
+Category=admin_header
+Group=admin
+
+# Kept for layouts stored before the split: the menu button and the sidebar controls in one block. The page draws
+# it with the rest of the header zone, after the tools (the old Tab order); new layouts use the two blocks above.
 [BlockDefinition_admin_sidebar_toggles]
-Name=Admin: sidebar toggles
+Name=Admin: menu button and sidebar controls (combined)
 Handler=expLayoutsAdminPartBlockHandler
 ViewTypes[]=default
 Category=admin_header
