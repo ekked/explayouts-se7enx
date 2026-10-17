@@ -9,6 +9,25 @@ class expLayoutsResolver
     /** Paths remembered at most: a list of nodes that each resolve their layout must not grow without end */
     const REMEMBERED_RESOLUTIONS = 100;
 
+    /** The request $resolutions belong to ($_SERVER['REQUEST_TIME_FLOAT']), null before the first one */
+    private static $resolutionsRequest = null;
+
+    /**
+     * Forgets the resolutions of an earlier request. A persistent worker (Exponential Velocity with
+     * ForkPerRequest=disabled) serves many requests with the same class statics, and the debug bar must not show
+     * what another request resolved. The request is told apart by $_SERVER['REQUEST_TIME_FLOAT'], which the server
+     * sets for each request; without it nothing is forgotten (one process per request).
+     */
+    static function forgetEarlierRequests()
+    {
+        $request = isset( $_SERVER['REQUEST_TIME_FLOAT'] ) ? (string)$_SERVER['REQUEST_TIME_FLOAT'] : null;
+        if ( $request === self::$resolutionsRequest )
+            return;
+        if ( self::$resolutionsRequest !== null )
+            self::$resolutions = array();
+        self::$resolutionsRequest = $request;
+    }
+
     /**
      * What resolve() answered in this request for the page itself: for the path of the request, else for the URL
      * alias of the page's node (the pagelayouts resolve the layout of the node, whose alias the front page does not
@@ -21,6 +40,7 @@ class expLayoutsResolver
      */
     static function pageResolution( $nodeId = 0 )
     {
+        self::forgetEarlierRequests();
         if ( !self::$resolutions )
             return null;
         $path = self::normalizedPath( false );
@@ -41,6 +61,7 @@ class expLayoutsResolver
 
     private static function remember( $path, $siteAccessName, $source, $ruleId, $layoutId )
     {
+        self::forgetEarlierRequests();
         // the request's own path always, whatever the page resolved before it
         if ( !isset( self::$resolutions[$path] ) && count( self::$resolutions ) >= self::REMEMBERED_RESOLUTIONS
              && $path !== self::normalizedPath( false ) )

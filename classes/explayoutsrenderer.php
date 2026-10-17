@@ -4,6 +4,24 @@ class expLayoutsRenderer
     /** The layouts prepareLayout() prepared in this request, id => prepared, for the debug bar's panel (prepared()) */
     private static $prepared = array();
 
+    /** The request $prepared belongs to ($_SERVER['REQUEST_TIME_FLOAT']), null before the first one */
+    private static $preparedRequest = null;
+
+    /**
+     * Forgets the layouts an earlier request prepared: a persistent worker (Exponential Velocity with
+     * ForkPerRequest=disabled) keeps class statics from one request to the next. See
+     * expLayoutsResolver::forgetEarlierRequests().
+     */
+    static function forgetEarlierRequests()
+    {
+        $request = isset( $_SERVER['REQUEST_TIME_FLOAT'] ) ? (string)$_SERVER['REQUEST_TIME_FLOAT'] : null;
+        if ( $request === self::$preparedRequest )
+            return;
+        if ( self::$preparedRequest !== null )
+            self::$prepared = array();
+        self::$preparedRequest = $request;
+    }
+
     /**
      * The layout $layoutId as prepareLayout() prepared it in this request, or null when it was not prepared. Read by
      * expLayoutsDebugBarPanel, nothing else depends on it.
@@ -13,6 +31,7 @@ class expLayoutsRenderer
      */
     static function prepared( $layoutId )
     {
+        self::forgetEarlierRequests();
         return isset( self::$prepared[(int)$layoutId] ) ? self::$prepared[(int)$layoutId] : null;
     }
 
@@ -42,6 +61,7 @@ class expLayoutsRenderer
             'zones' => $preparedZones,
             'block_count' => $blockCount,
         );
+        self::forgetEarlierRequests();
         self::$prepared[(int)$prepared['id']] = $prepared;
         return $prepared;
     }

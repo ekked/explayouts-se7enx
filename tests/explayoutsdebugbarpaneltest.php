@@ -149,6 +149,23 @@ if ( $saved === null )
 else
     $ini->setVariable( 'DebugBarSettings', 'AdminURL', $saved );
 
+// A persistent worker serves the next request with the same statics: what the request before resolved and prepared
+// is not shown for it.
+$requestTime = isset( $_SERVER['REQUEST_TIME_FLOAT'] ) ? $_SERVER['REQUEST_TIME_FLOAT'] : null;
+$_SERVER['REQUEST_TIME_FLOAT'] = 1000.25;
+expLayoutsResolver::forgetEarlierRequests();
+expLayoutsRenderer::forgetEarlierRequests();
+setStatic( 'expLayoutsResolver', 'resolutions', array( 'home' => array( 'path' => 'home', 'siteaccess' => 'site', 'source' => 'rule', 'rule_id' => 5, 'layout_id' => 2 ) ) );
+setStatic( 'expLayoutsRenderer', 'prepared', array( 2 => array( 'id' => 2, 'identifier' => 'x', 'name' => 'X', 'layout_type' => 't', 'zones' => array() ) ) );
+check( expLayoutsResolver::pageResolution() !== null && expLayoutsRenderer::prepared( 2 ) !== null, 'the same request keeps its resolution and prepared layout' );
+$_SERVER['REQUEST_TIME_FLOAT'] = 1001.5;
+check( expLayoutsResolver::pageResolution() === null, 'the next request of a persistent worker does not see the resolution of the request before' );
+check( expLayoutsRenderer::prepared( 2 ) === null, 'nor the layout the request before prepared' );
+if ( $requestTime === null )
+    unset( $_SERVER['REQUEST_TIME_FLOAT'] );
+else
+    $_SERVER['REQUEST_TIME_FLOAT'] = $requestTime;
+
 setStatic( 'expLayoutsResolver', 'resolutions', array() );
 setStatic( 'expLayoutsRenderer', 'prepared', array() );
 
