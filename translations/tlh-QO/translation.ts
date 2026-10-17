@@ -1061,4 +1061,143 @@
         <translation>De&apos; ghItlhwI&apos; &apos;anghach De&apos; je yIlegh</translation>
     </message>
 </context>
+<context>
+    <name>extension/explayouts/debugbar</name>
+    <message>
+        <source>Exp Layouts</source>
+        <translation>Exp Layouts</translation>
+    </message>
+    <message>
+        <source>Layout: %name</source>
+        <translation>mIch mIw: %name</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>pagh</translation>
+    </message>
+    <message>
+        <source>%zones zones, %blocks blocks</source>
+        <translation>%zones mIch, %blocks ngogh</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation>mIch mIw</translation>
+    </message>
+    <message>
+        <source>Identifier</source>
+        <translation>ngu&apos;wI&apos;</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Segh</translation>
+    </message>
+    <message>
+        <source>Chosen by</source>
+        <translation>wIvwI&apos;</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>He</translation>
+    </message>
+    <message>
+        <source>Siteaccess</source>
+        <translation>yoS lojmIt</translation>
+    </message>
+    <message>
+        <source>Edit layout</source>
+        <translation>mIch mIw yIchoH</translation>
+    </message>
+    <message>
+        <source>Edit rule</source>
+        <translation>chut yIchoH</translation>
+    </message>
+    <message>
+        <source>All rules</source>
+        <translation>chutmey Hoch</translation>
+    </message>
+    <message>
+        <source>Show the blocks on the page</source>
+        <translation>navDaq ngoghmey tI&apos;ang</translation>
+    </message>
+    <message>
+        <source>Not looked up by the resolver on this page</source>
+        <translation>navvamDaq wIvwI&apos; nejbe&apos;pu&apos;</translation>
+    </message>
+    <message>
+        <source>Rule %id</source>
+        <translation>chut %id</translation>
+    </message>
+    <message>
+        <source>Rule %id (from the resolver cache)</source>
+        <translation>chut %id (wIvwI&apos; De&apos; polwI&apos;vo&apos;)</translation>
+    </message>
+    <message>
+        <source>No rule (from the resolver cache)</source>
+        <translation>chut tu&apos;lu&apos;be&apos; (wIvwI&apos; De&apos; polwI&apos;vo&apos;)</translation>
+    </message>
+    <message>
+        <source>No rule matched: the default layout (explayouts.ini DefaultLayout)</source>
+        <translation>chut rurbe&apos;pu&apos;: motlh mIch mIw (explayouts.ini DefaultLayout)</translation>
+    </message>
+    <message>
+        <source>No rule matched and no default layout</source>
+        <translation>chut rurbe&apos;pu&apos;, motlh mIch mIw tu&apos;lu&apos;be&apos; je</translation>
+    </message>
+    <message>
+        <source>The layout was not rendered on this page: no zones to show.</source>
+        <translation>navvamDaq mIch mIw cha&apos;lu&apos;be&apos;pu&apos;: mIchmey &apos;anglu&apos;be&apos;.</translation>
+    </message>
+    <message>
+        <source>Zones and blocks</source>
+        <translation>mIchmey ngoghmey je</translation>
+    </message>
+    <message>
+        <source>Zone</source>
+        <translation>mIch</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>ngogh</translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation>Segh</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>yIlegh</translation>
+    </message>
+    <message>
+        <source>(linked: layout %layout, zone %zone)</source>
+        <translation>(rarlu&apos;ta&apos;: mIch mIw %layout, mIch %zone)</translation>
+    </message>
+    <message>
+        <source>empty</source>
+        <translation>chIm</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>yIchoH</translation>
+    </message>
+    <message>
+        <source>Available blocks (%count)</source>
+        <translation>lo&apos;laHbogh ngoghmey (%count)</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>pong</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>tlhegh ghom</translation>
+    </message>
+    <message>
+        <source>Views</source>
+        <translation>Qorwaghmey</translation>
+    </message>
+    <message>
+        <source>No rule matched: the default layout (from the resolver cache)</source>
+        <translation>chut rurbe&apos;pu&apos;: motlh mIch mIw (wIvwI&apos; De&apos; polwI&apos;vo&apos;)</translation>
+    </message>
+</context>
 </TS>

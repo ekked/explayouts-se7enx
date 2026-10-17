@@ -1061,4 +1061,143 @@
         <translation>Auctorem contenti et notitiam publicationis inspicere</translation>
     </message>
 </context>
+<context>
+    <name>extension/explayouts/debugbar</name>
+    <message>
+        <source>Exp Layouts</source>
+        <translation>Exp Layouts</translation>
+    </message>
+    <message>
+        <source>Layout: %name</source>
+        <translation>Dispositio: %name</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>nullum</translation>
+    </message>
+    <message>
+        <source>%zones zones, %blocks blocks</source>
+        <translation>Zonae: %zones, segmenta: %blocks</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation>Dispositio</translation>
+    </message>
+    <message>
+        <source>Identifier</source>
+        <translation>Identificator</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Genus</translation>
+    </message>
+    <message>
+        <source>Chosen by</source>
+        <translation>Electa ab</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Via</translation>
+    </message>
+    <message>
+        <source>Siteaccess</source>
+        <translation>Aditus situs</translation>
+    </message>
+    <message>
+        <source>Edit layout</source>
+        <translation>Dispositionem recensere</translation>
+    </message>
+    <message>
+        <source>Edit rule</source>
+        <translation>Normam recensere</translation>
+    </message>
+    <message>
+        <source>All rules</source>
+        <translation>Omnes normae</translation>
+    </message>
+    <message>
+        <source>Show the blocks on the page</source>
+        <translation>Segmenta in pagina ostendere</translation>
+    </message>
+    <message>
+        <source>Not looked up by the resolver on this page</source>
+        <translation>A resolutore in hac pagina non quaesitum</translation>
+    </message>
+    <message>
+        <source>Rule %id</source>
+        <translation>Norma %id</translation>
+    </message>
+    <message>
+        <source>Rule %id (from the resolver cache)</source>
+        <translation>Norma %id (ex promptuario resolutoris)</translation>
+    </message>
+    <message>
+        <source>No rule (from the resolver cache)</source>
+        <translation>Nulla norma (ex promptuario resolutoris)</translation>
+    </message>
+    <message>
+        <source>No rule matched: the default layout (explayouts.ini DefaultLayout)</source>
+        <translation>Nulla norma congruit: dispositio praedefinita (explayouts.ini DefaultLayout)</translation>
+    </message>
+    <message>
+        <source>No rule matched and no default layout</source>
+        <translation>Nulla norma congruit nec ulla dispositio praedefinita est</translation>
+    </message>
+    <message>
+        <source>The layout was not rendered on this page: no zones to show.</source>
+        <translation>Dispositio in hac pagina reddita non est: nullae zonae ostendendae.</translation>
+    </message>
+    <message>
+        <source>Zones and blocks</source>
+        <translation>Zonae et segmenta</translation>
+    </message>
+    <message>
+        <source>Zone</source>
+        <translation>Zona</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>Segmentum</translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation>Genus</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Inspicere</translation>
+    </message>
+    <message>
+        <source>(linked: layout %layout, zone %zone)</source>
+        <translation>(coniuncta: dispositio %layout, zona %zone)</translation>
+    </message>
+    <message>
+        <source>empty</source>
+        <translation>vacuum</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Recensere</translation>
+    </message>
+    <message>
+        <source>Available blocks (%count)</source>
+        <translation>Segmenta praesto (%count)</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nomen</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Categoria</translation>
+    </message>
+    <message>
+        <source>Views</source>
+        <translation>Visiones</translation>
+    </message>
+    <message>
+        <source>No rule matched: the default layout (from the resolver cache)</source>
+        <translation>Nulla norma congruit: dispositio praedefinita (ex promptuario resolutoris)</translation>
+    </message>
+</context>
 </TS>

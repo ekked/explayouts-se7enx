@@ -1060,4 +1060,143 @@
         <translation>הצגת מחבר התוכן ומידע על הפרסום</translation>
     </message>
 </context>
+<context>
+    <name>extension/explayouts/debugbar</name>
+    <message>
+        <source>Exp Layouts</source>
+        <translation>Exp Layouts</translation>
+    </message>
+    <message>
+        <source>Layout: %name</source>
+        <translation>פריסה: %name</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>ללא</translation>
+    </message>
+    <message>
+        <source>%zones zones, %blocks blocks</source>
+        <translation>%zones אזורים, %blocks בלוקים</translation>
+    </message>
+    <message>
+        <source>Layout</source>
+        <translation>פריסה</translation>
+    </message>
+    <message>
+        <source>Identifier</source>
+        <translation>מזהה</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>סוג</translation>
+    </message>
+    <message>
+        <source>Chosen by</source>
+        <translation>נבחרה על ידי</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>נתיב</translation>
+    </message>
+    <message>
+        <source>Siteaccess</source>
+        <translation>גישת אתר</translation>
+    </message>
+    <message>
+        <source>Edit layout</source>
+        <translation>עריכת פריסה</translation>
+    </message>
+    <message>
+        <source>Edit rule</source>
+        <translation>עריכת הכלל</translation>
+    </message>
+    <message>
+        <source>All rules</source>
+        <translation>כל הכללים</translation>
+    </message>
+    <message>
+        <source>Show the blocks on the page</source>
+        <translation>הצגת הבלוקים בעמוד</translation>
+    </message>
+    <message>
+        <source>Not looked up by the resolver on this page</source>
+        <translation>המפענח לא חיפש בעמוד זה</translation>
+    </message>
+    <message>
+        <source>Rule %id</source>
+        <translation>כלל %id</translation>
+    </message>
+    <message>
+        <source>Rule %id (from the resolver cache)</source>
+        <translation>כלל %id (ממטמון המפענח)</translation>
+    </message>
+    <message>
+        <source>No rule (from the resolver cache)</source>
+        <translation>אין כלל (ממטמון המפענח)</translation>
+    </message>
+    <message>
+        <source>No rule matched: the default layout (explayouts.ini DefaultLayout)</source>
+        <translation>אף כלל לא התאים: פריסת ברירת המחדל (explayouts.ini DefaultLayout)</translation>
+    </message>
+    <message>
+        <source>No rule matched and no default layout</source>
+        <translation>אף כלל לא התאים ואין פריסת ברירת מחדל</translation>
+    </message>
+    <message>
+        <source>The layout was not rendered on this page: no zones to show.</source>
+        <translation>הפריסה לא עובדה בעמוד זה: אין אזורים להצגה.</translation>
+    </message>
+    <message>
+        <source>Zones and blocks</source>
+        <translation>אזורים ובלוקים</translation>
+    </message>
+    <message>
+        <source>Zone</source>
+        <translation>אזור</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>בלוק</translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation>סוג</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>תצוגה</translation>
+    </message>
+    <message>
+        <source>(linked: layout %layout, zone %zone)</source>
+        <translation>(מקושר: פריסה %layout, אזור %zone)</translation>
+    </message>
+    <message>
+        <source>empty</source>
+        <translation>ריק</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>עריכה</translation>
+    </message>
+    <message>
+        <source>Available blocks (%count)</source>
+        <translation>בלוקים זמינים (%count)</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>שם</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>קטגוריה</translation>
+    </message>
+    <message>
+        <source>Views</source>
+        <translation>תצוגות</translation>
+    </message>
+    <message>
+        <source>No rule matched: the default layout (from the resolver cache)</source>
+        <translation>אף כלל לא התאים: פריסת ברירת המחדל (ממטמון המפענח)</translation>
+    </message>
+</context>
 </TS>
