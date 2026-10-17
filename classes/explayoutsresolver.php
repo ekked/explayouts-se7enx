@@ -112,14 +112,14 @@ class expLayoutsResolver
                 $layout = expLayoutsLayout::fetch( $cached['layout_id'] );
                 if ( $layout && (int)$layout->attribute( 'status' ) === 2 && !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
                 {
-                    eZDebug::writeNotice( "Cache hit for path '$path', layout=" . $layout->attribute( 'identifier' ), 'expLayoutsResolver' );
+                    eZDebug::writeDebug( "Cache hit for path '$path', layout=" . $layout->attribute( 'identifier' ), 'expLayoutsResolver' );
                     self::remember( $path, $siteAccessName, 'cache', isset( $cached['rule_id'] ) ? $cached['rule_id'] : 0, $layout->attribute( 'id' ) );
                     return $layout;
                 }
             }
             else
             {
-                eZDebug::writeNotice( "Cache hit for path '$path', no match", 'expLayoutsResolver' );
+                eZDebug::writeDebug( "Cache hit for path '$path', no match", 'expLayoutsResolver' );
                 self::remember( $path, $siteAccessName, 'cache', 0, 0 );
                 return false;
             }
@@ -135,13 +135,13 @@ class expLayoutsResolver
                 if ( $layout && (int)$layout->attribute( 'status' ) === 2 && !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
                 {
                     self::writeCache( $path, $siteAccessName, (int)$rule->attribute( 'id' ), (int)$layout->attribute( 'id' ) );
-                    eZDebug::writeNotice( 'Matched rule ' . $rule->attribute( 'id' ) . " for path '$path', layout=" . $layout->attribute( 'identifier' ), 'expLayoutsResolver' );
+                    eZDebug::writeDebug( 'Matched rule ' . $rule->attribute( 'id' ) . " for path '$path', layout=" . $layout->attribute( 'identifier' ), 'expLayoutsResolver' );
                     self::remember( $path, $siteAccessName, 'rule', $rule->attribute( 'id' ), $layout->attribute( 'id' ) );
                     return $layout;
                 }
             }
         }
-        eZDebug::writeNotice( "No rule matched for path '$path'", 'expLayoutsResolver' );
+        eZDebug::writeDebug( "No rule matched for path '$path'", 'expLayoutsResolver' );
 
         $ini = eZINI::instance( 'explayouts.ini' );
         $default = $ini->variable( 'ResolverSettings', 'DefaultLayout' );

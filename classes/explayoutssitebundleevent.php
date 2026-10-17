@@ -25,7 +25,7 @@ class expLayoutsSiteBundleEvent
 
     public static function dispatch( $eventName, array $args = array() )
     {
-        eZDebug::writeNotice( 'Dispatch: ' . $eventName, 'expLayoutsSiteBundleEvent' );
+        eZDebug::writeDebug( 'Dispatch: ' . $eventName, 'expLayoutsSiteBundleEvent' );
         return $args;
     }
 }

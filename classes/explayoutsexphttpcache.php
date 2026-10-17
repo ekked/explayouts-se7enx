@@ -16,7 +16,7 @@ class expLayoutsExpHttpCache
     {
         foreach ( $tags as $tag )
         {
-            eZDebug::writeNotice( 'Invalidate cache tag: ' . $tag, 'expLayoutsExpHttpCache' );
+            eZDebug::writeDebug( 'Invalidate cache tag: ' . $tag, 'expLayoutsExpHttpCache' );
         }
         return true;
     }
