@@ -32,16 +32,16 @@
             {foreach $zones as $zoneEntry}
                 {def $zone=$zoneEntry.zone}
                 {def $blocks=$zoneEntry.blocks}
-                <div style="border:1px solid #ccc;margin:1rem 0;padding:1rem;">
+                <div class="expl-zone-panel">
                     <h3>{'Zone:'|i18n( 'design/admin/explayouts/layout_edit' )} {$zone.identifier|wash}</h3>
 
-                    <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} style="display:inline;margin:0;">
+                    <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} class="expl-inline-form">
                         <input type="hidden" name="DeleteZoneID" value="{$zone.id|wash}" />
                         <button type="submit" name="DeleteZone" class="button" onclick="return confirm('{'Delete this zone and all its blocks?'|i18n( 'design/admin/explayouts/layout_edit' )|wash( javascript )}');">{'Delete zone'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
                     </form>
 
                     {if count($blocks)}
-                        <table class="list" cellspacing="0" style="margin-top:1rem;">
+                        <table class="list expl-spaced" cellspacing="0">
                             <tr><th>{'Position'|i18n( 'design/admin/explayouts/layout_edit' )}</th><th>{'Name'|i18n( 'design/admin/explayouts/layout_edit' )}</th><th>{'Type'|i18n( 'design/admin/explayouts/layout_edit' )}</th><th>&nbsp;</th></tr>
                             {foreach $blocks as $block}
                                 <tr>
@@ -51,13 +51,13 @@
                                     <td>
                                         <a href={concat('explayouts/block_edit/',$block.id)|ezurl}>{'Edit'|i18n( 'design/admin/explayouts/layout_edit' )}</a>
 
-                                        <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} style="display:inline;margin:0;">
+                                        <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} class="expl-inline-form">
                                             <input type="hidden" name="MoveBlockID" value="{$block.id|wash}" />
                                             <button type="submit" name="MoveBlockUp" class="button">{'Up'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
                                             <button type="submit" name="MoveBlockDown" class="button">{'Down'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
                                         </form>
 
-                                        <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} style="display:inline;margin:0;">
+                                        <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} class="expl-inline-form">
                                             <input type="hidden" name="MoveBlockID" value="{$block.id|wash}" />
                                             <select name="TargetZoneID">
                                                 {foreach $zones as $z}
@@ -69,7 +69,7 @@
                                             <button type="submit" name="MoveBlockToZone" class="button">{'Move'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
                                         </form>
 
-                                        <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} style="display:inline;margin:0;">
+                                        <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} class="expl-inline-form">
                                             <input type="hidden" name="DeleteBlockID" value="{$block.id|wash}" />
                                             <button type="submit" name="DeleteBlock" class="button" onclick="return confirm('{'Delete this block?'|i18n( 'design/admin/explayouts/layout_edit' )|wash( javascript )}');">{'Delete'|i18n( 'design/admin/explayouts/layout_edit' )}</button>
                                         </form>
@@ -82,7 +82,7 @@
                     {/if}
 
                     {if count($available_blocks)}
-                        <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} style="margin-top:.5rem;">
+                        <form method="post" action={concat('explayouts/layout_edit/',$layout.id)|ezurl} class="expl-form-after">
                             <input type="hidden" name="ZoneID" value="{$zone.id|wash}" />
                             <select name="DefinitionIdentifier">
                                 {foreach $available_blocks as $blockInfo}

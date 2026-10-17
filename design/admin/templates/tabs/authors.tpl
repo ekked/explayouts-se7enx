@@ -29,15 +29,13 @@
     <th>{'Contributors'|i18n( 'design/admin/tabs/authors' )}{if $tab_contributors|count|gt(1)} ({$tab_contributors|count}){/if}</th>
 </tr>
 <tr class="bglight">
-    <td style="white-space: nowrap;">{$node.object.published|l10n(shortdatetime)}</td>
-    <td style="white-space: nowrap;">{$node.object.modified|l10n(shortdatetime)}</td>
-    <td style="white-space: nowrap;"><a href={$node.object.owner.main_node.url_alias|ezurl}>{$node.object.owner.name|wash}</a></td>
-    <td style="white-space: nowrap;"><a href={$node.object.current.creator.main_node.url_alias|ezurl}>{$node.object.current.creator.name|wash}</a></td>
-    {* max-width:0 with width:100% is what makes a table cell wrap instead of
-       stretching the table: it lets this column take the leftover width and
-       forces the text to break, however many names there are. The other cells
-       are nowrap so a long list cannot squash the dates onto two lines. *}
-    <td class="contributors" style="width: 100%; max-width: 0; white-space: normal; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.7;">
+    <td class="a4-nowrap">{$node.object.published|l10n(shortdatetime)}</td>
+    <td class="a4-nowrap">{$node.object.modified|l10n(shortdatetime)}</td>
+    <td class="a4-nowrap"><a href={$node.object.owner.main_node.url_alias|ezurl}>{$node.object.owner.name|wash}</a></td>
+    <td class="a4-nowrap"><a href={$node.object.current.creator.main_node.url_alias|ezurl}>{$node.object.current.creator.name|wash}</a></td>
+    {* The contributors column (expl-authors-contributors in explayouts_admin.css) takes the leftover width and
+       wraps; the other cells are a4-nowrap so a long list cannot squash the dates onto two lines. *}
+    <td class="contributors expl-authors-contributors">
         {if $tab_contributors|count|gt(0)}{$tab_contributors|implode(', ')|wash}{else}-{/if}
     </td>
 </tr>

@@ -68,7 +68,7 @@
                                 <td>{$item.value_id|wash}</td>
                                 <td>{$item.position|wash}</td>
                                 <td>
-                                    <form method="post" action={concat('explayouts/block_edit/',$block.id)|ezurl} style="display:inline;margin:0;">
+                                    <form method="post" action={concat('explayouts/block_edit/',$block.id)|ezurl} class="expl-inline-form">
                                         <input type="hidden" name="CollectionItemID" value="{$item.id|wash}" />
                                         <button type="submit" name="RemoveCollectionItem" class="button">{'Remove'|i18n( 'design/admin/explayouts/block_edit' )}</button>
                                     </form>

@@ -3,82 +3,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 {def $resolved = fetch('explayouts','layout_summary_for_node',hash('node_id',$node.node_id))}
 {def $rules = fetch('explayouts','rules_for_node',hash('node_id',$node.node_id))}
-{literal}<style>
-.exp-node-layout-tab { padding: 0px; }
-.exp-node-layout-tab .layouts-header { margin-bottom: 8px; }
-.nl-node-resolved { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 12px; margin-bottom: 10px; }
-.nl-node-resolved-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
-.nl-node-resolved-title { font-size: 16px; font-weight: 500; color: #333; margin: 0 0 2px; }
-.nl-node-resolved-meta { font-size: 11px; color: #777; margin: 0; }
-.nl-node-resolved-stats { display: flex; gap: 12px; margin: 8px 0; }
-.nl-node-resolved-stat { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #555; }
-.nl-node-resolved-stat i { color: #666; font-size: 16px; }
-.nl-node-rules-title { font-size: 14px; font-weight: 500; color: #333; margin: 0 0 6px; }
-.nl-node-rule { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px 12px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
-.nl-node-rule-info { min-width: 0; }
-.nl-node-rule-name { font-size: 13px; font-weight: 500; color: #333; margin: 0 0 2px; }
-.nl-node-rule-meta { font-size: 11px; color: #777; margin: 0; }
-.nl-node-rule-actions { display: flex; align-items: center; gap: 6px; }
-.nl-status { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 12px; font-size: 10px; font-weight: 500; text-transform: uppercase; }
-.nl-status.enabled { background: #e6f5e6; color: #2e7d32; }
-.nl-status.disabled { background: #f5f5f5; color: #777; }
-.nl-empty-state { background: #f9f9f9; border: 1px dashed #d0d0d0; border-radius: 4px; padding: 16px; text-align: center; color: #777; }
-.nl-empty-state i { font-size: 32px; color: #bbb; margin-bottom: 6px; }
-.nl-empty-text { color: #777; font-size: 13px; margin: 0 0 14px; }
-.layouts-controls { margin-top: 12px; display: flex; justify-content: flex-end; gap: 8px; }
-
-/* Fitting into the container it is given -------------------------------------
-
-   This tab is drawn inside the node view panel, which is as wide as the admin
-   content column and no wider. Everything below is about the tab surviving that
-   rather than deciding its own width.
-
-   .layouts-content is a flex item of .ng-layouts-app. A flex item will not
-   shrink below its min-content width unless it is told it may, so one long
-   thing inside was setting the width of the whole tab: 423px of content in a
-   360px column, with the Preview and Edit layout buttons carried off the right
-   hand edge. min-width:0 lifts that floor; the rules after it are what make the
-   content survive being narrow, because a floor lifted with nothing able to
-   wrap only moves the clipping somewhere else. */
-.exp-node-layout-tab .layouts-content { min-width: 0; }
-
-/* The two header rows are space-between with the actions on the right. Without
-   wrapping there is no narrow arrangement for them to fall back to. */
-.exp-node-layout-tab .nl-node-resolved-header,
-.exp-node-layout-tab .nl-node-rule { flex-wrap: wrap; gap: 8px; }
-.exp-node-layout-tab .nl-node-resolved-header > div:first-child,
-.exp-node-layout-tab .nl-node-rule-info { flex: 1 1 200px; min-width: 0; }
-.exp-node-layout-tab .nl-node-rule-actions { flex: 0 0 auto; flex-wrap: wrap; }
-.exp-node-layout-tab .nl-node-resolved-stats,
-.exp-node-layout-tab .layouts-controls { flex-wrap: wrap; }
-
-/* Layout identifiers are single unbreakable tokens - a remote id is thirty two
-   characters with nowhere to break - so they set a min-content width on their
-   own unless told they may break anywhere. */
-.exp-node-layout-tab .layouts-header p,
-.exp-node-layout-tab .nl-node-resolved-meta,
-.exp-node-layout-tab .nl-node-rule-name,
-.exp-node-layout-tab .nl-node-rule-meta { overflow-wrap: anywhere; word-break: break-word; }
-
-/* layouts-exponential.css gives every .nl-btn a 20px right margin. In a flex row that
-   is spacing after the last button as well, and in a flex-end row it is the
-   last button standing 20px short of where it belongs. The rows here space
-   themselves with gap. */
-.exp-node-layout-tab .nl-btn { margin-right: 0; }
-
-@media (max-width: 600px) {
-    /* Full width buttons rather than three of them squeezed onto one line. */
-    .exp-node-layout-tab .nl-node-resolved-header .nl-node-rule-actions,
-    .exp-node-layout-tab .layouts-controls { width: 100%; justify-content: flex-start; }
-    .exp-node-layout-tab .nl-node-resolved-header .nl-node-rule-actions .nl-btn,
-    .exp-node-layout-tab .layouts-controls .nl-btn { flex: 1 1 auto; justify-content: center; }
-}
-</style>{/literal}
 <div class="ng-layouts-app row exp-node-layout-tab">
     <div class="layouts-content">
         <div class="layouts-header">
             <div>
-                <p style="margin:0;color:#777;font-size:12px;">{'Node: %name (ID: %node_id) · URL alias: %url_alias'|i18n( 'design/admin/tabs/explayouts',, hash( '%name', $node.name|wash, '%node_id', $node.node_id, '%url_alias', $node.url_alias|wash ) )}</p>
+                <p class="expl-node-line">{'Node: %name (ID: %node_id) · URL alias: %url_alias'|i18n( 'design/admin/tabs/explayouts',, hash( '%name', $node.name|wash, '%node_id', $node.node_id, '%url_alias', $node.url_alias|wash ) )}</p>
             </div>
         </div>
 
@@ -104,7 +33,7 @@
                 {undef $zone_count $block_count}
             </div>
         {else}
-            <div class="nl-empty-state" style="margin-bottom:22px;">
+            <div class="nl-empty-state expl-empty-spaced">
                 <i class="material-icons">layers</i>
                 <p>{'No layout resolves for this node.'|i18n( 'design/admin/tabs/explayouts' )}</p>
             </div>

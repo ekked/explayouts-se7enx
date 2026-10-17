@@ -20,18 +20,18 @@
                     <td>{$layout.layout_type|wash}</td>
                     <td>{if eq($layout.status,2)}{'Published'|i18n( 'design/admin/explayouts/layout_list' )}{else}{'Draft'|i18n( 'design/admin/explayouts/layout_list' )}{/if}</td>
                     <td>
-                        <a href={concat('explayouts/layout_edit/',$layout.id)|ezurl} title="{'Edit'|i18n( 'design/admin/explayouts/layout_list' )}"><img src={'edit.gif'|ezimage} width="16" height="16" alt="{'Edit'|i18n( 'design/admin/explayouts/layout_list' )}" style="vertical-align:middle;" /></a>
-                        <a href={concat('explayouts/layout_preview/',$layout.id,'/',$layout.status)|ezurl} target="_blank" title="{'Preview'|i18n( 'design/admin/explayouts/layout_list' )}"><img src={'find.png'|ezimage} width="16" height="16" alt="{'Preview'|i18n( 'design/admin/explayouts/layout_list' )}" style="vertical-align:middle;" /></a>
+                        <a href={concat('explayouts/layout_edit/',$layout.id)|ezurl} title="{'Edit'|i18n( 'design/admin/explayouts/layout_list' )}"><img src={'edit.gif'|ezimage} width="16" height="16" alt="{'Edit'|i18n( 'design/admin/explayouts/layout_list' )}" class="expl-icon" /></a>
+                        <a href={concat('explayouts/layout_preview/',$layout.id,'/',$layout.status)|ezurl} target="_blank" title="{'Preview'|i18n( 'design/admin/explayouts/layout_list' )}"><img src={'find.png'|ezimage} width="16" height="16" alt="{'Preview'|i18n( 'design/admin/explayouts/layout_list' )}" class="expl-icon" /></a>
                         {if eq($layout.status,2)}<a href="/explayouts_ui_api/app#layout/{$layout.id}/create_new_draft">{'New draft'|i18n( 'design/admin/explayouts/layout_list' )}</a>{else}<a href="/explayouts_ui_api/app#layout/{$layout.id}/edit">{'Edit in UI'|i18n( 'design/admin/explayouts/layout_list' )}</a>{/if}
-                        <form method="post" action={'explayouts/layout_list'|ezurl} style="display:inline;margin:0;">
+                        <form method="post" action={'explayouts/layout_list'|ezurl} class="expl-inline-form">
                             <input type="hidden" name="ExportLayoutID" value="{$layout.id|wash}" />
                             <button type="submit" name="ExportLayout" class="button">{'Export'|i18n( 'design/admin/explayouts/layout_list' )}</button>
                         </form>
-                        <form method="post" action={'explayouts/layout_list'|ezurl} style="display:inline;margin:0;">
+                        <form method="post" action={'explayouts/layout_list'|ezurl} class="expl-inline-form">
                             <input type="hidden" name="CopyLayoutID" value="{$layout.id|wash}" />
                             <button type="submit" name="CopyLayout" class="button">{'Copy'|i18n( 'design/admin/explayouts/layout_list' )}</button>
                         </form>
-                        <form method="post" action={'explayouts/layout_list'|ezurl} style="display:inline;margin:0;">
+                        <form method="post" action={'explayouts/layout_list'|ezurl} class="expl-inline-form">
                             <input type="hidden" name="DeleteLayoutID" value="{$layout.id|wash}" />
                             <button type="submit" name="DeleteLayout" class="button" onclick="return confirm('{'Delete this layout and all its zones/blocks?'|i18n( 'design/admin/explayouts/layout_list' )|wash( javascript )}');">{'Delete'|i18n( 'design/admin/explayouts/layout_list' )}</button>
                         </form>
@@ -40,7 +40,7 @@
             {/foreach}
         </table>
 
-        <form method="post" action={'explayouts/layout_list'|ezurl} style="margin-top:1rem;">
+        <form method="post" action={'explayouts/layout_list'|ezurl} class="expl-form-spaced">
             <label for="import-json"><strong>{'Import layout from JSON:'|i18n( 'design/admin/explayouts/layout_list' )}</strong></label><br/>
             <textarea id="import-json" name="ImportJson" rows="6" cols="80" placeholder="{'Paste exported layout JSON here'|i18n( 'design/admin/explayouts/layout_list' )}"></textarea><br/>
             <button type="submit" name="ImportLayout" class="defaultbutton">{'Import layout'|i18n( 'design/admin/explayouts/layout_list' )}</button>
