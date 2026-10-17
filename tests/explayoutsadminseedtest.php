@@ -8,7 +8,8 @@
  * - the header zone is logo, menu button, search, theme switch, sidebar controls (the page draws the logo and the menu
  *   button before the menu panel, so the Tab order is admin4's), and the old combined block admin_sidebar_toggles
  *   stays defined for layouts stored before the split;
- * - the right column of admin_3col is the toolbars admin_right and admin_developer, in admin4's order;
+ * - the right column of admin_3col is the toolbars admin_right and admin_developer, in admin4's order, and the single
+ *   tools it held before (admin_ui_switch among them) stay defined and available for layouts stored with them;
  * - SiteAccessMatch[] covers the admin siteaccesses named <site>_admin, and not the public siteaccesses.
  *
  * Run directly with:
@@ -100,8 +101,8 @@ foreach ( array( 'admin_3col', 'admin_2col', 'admin_full' ) as $layout )
     check( isset( $blocksByZone[$layout]['header'] ) && !in_array( 'admin_tab_menu', $blocksByZone[$layout]['header'], true ), "$layout: the tab menu is not in the header zone" );
 }
 check( isset( $blocksByZone['admin_3col']['right'] ) && array_values( $blocksByZone['admin_3col']['right'] ) === array( 'admin_toolbar_right', 'admin_toolbar_developer' ), 'admin_3col: the right column is admin_right, then admin_developer' );
-foreach ( array( 'admin_menu_button', 'admin_sidebar_controls', 'admin_sidebar_toggles' ) as $identifier )
-    check( in_array( $identifier, $available, true ) && isset( $ini['BlockDefinition_' . $identifier] ), "$identifier stays defined and available (stored layouts keep the combined block)" );
+foreach ( array( 'admin_menu_button', 'admin_sidebar_controls', 'admin_sidebar_toggles', 'admin_ui_switch', 'admin_clear_cache', 'admin_bookmarks', 'admin_current_user', 'admin_preferences', 'admin_quick_settings' ) as $identifier )
+    check( in_array( $identifier, $available, true ) && isset( $ini['BlockDefinition_' . $identifier] ), "$identifier stays defined and available for layouts stored with it" );
 foreach ( array( 'admin_toolbar_right', 'admin_toolbar_developer' ) as $identifier )
 {
     check( isset( $ini['BlockDefinition_' . $identifier]['Handler'] ) && $ini['BlockDefinition_' . $identifier]['Handler'] === 'expLayoutsAdminPartBlockHandler', "$identifier is an admin part block" );
