@@ -685,8 +685,8 @@
         <translation>Error al guardar: %message</translation>
     </message>
     <message>
-        <source>New template path (relative to design/ or extension/, must end in .tpl):</source>
-        <translation>Ruta de la nueva plantilla (relativa a design/ o extension/, debe terminar en .tpl):</translation>
+        <source>New template path (from the installation root, inside an allowed folder, must end in .tpl):</source>
+        <translation>Ruta de la nueva plantilla (desde la raíz de la instalación, dentro de una carpeta permitida, debe terminar en .tpl):</translation>
     </message>
     <message>
         <source>Path must end in .tpl</source>

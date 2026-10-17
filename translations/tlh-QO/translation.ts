@@ -688,8 +688,8 @@
         <translation>polghach Qagh: %message</translation>
     </message>
     <message>
-        <source>New template path (relative to design/ or extension/, must end in .tpl):</source>
-        <translation>mIw &apos;echlet He chu&apos; (design/ extension/ ghapvo&apos;, .tpl rInnIS):</translation>
+        <source>New template path (from the installation root, inside an allowed folder, must end in .tpl):</source>
+        <translation>mIw &apos;echlet He chu&apos; (jom wa&apos;DIchvo&apos;, qa&apos;rI&apos; chaw&apos;lu&apos;bogh Dalqa&apos;, .tpl rInnIS):</translation>
     </message>
     <message>
         <source>Path must end in .tpl</source>

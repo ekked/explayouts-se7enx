@@ -687,8 +687,8 @@
         <translation>שגיאת שמירה: %message</translation>
     </message>
     <message>
-        <source>New template path (relative to design/ or extension/, must end in .tpl):</source>
-        <translation>נתיב התבנית החדשה (יחסית ל־design/ או ל־extension/, חייב להסתיים ב־.tpl):</translation>
+        <source>New template path (from the installation root, inside an allowed folder, must end in .tpl):</source>
+        <translation>נתיב התבנית החדשה (משורש ההתקנה, בתוך תיקייה מותרת, חייב להסתיים ב־.tpl):</translation>
     </message>
     <message>
         <source>Path must end in .tpl</source>
