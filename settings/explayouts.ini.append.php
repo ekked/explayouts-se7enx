@@ -462,6 +462,8 @@ AvailableBlocks[]=admin_ui_switch
 AvailableBlocks[]=admin_current_user
 AvailableBlocks[]=admin_preferences
 AvailableBlocks[]=admin_quick_settings
+AvailableBlocks[]=admin_toolbar_right
+AvailableBlocks[]=admin_toolbar_developer
 AvailableBlocks[]=admin_breadcrumb
 AvailableBlocks[]=admin_module_result
 AvailableBlocks[]=admin_footer
@@ -555,6 +557,20 @@ Group=admin
 
 [BlockDefinition_admin_quick_settings]
 Name=Admin: quick settings
+Handler=expLayoutsAdminPartBlockHandler
+ViewTypes[]=default
+Category=admin_sidebar
+Group=admin
+
+[BlockDefinition_admin_toolbar_right]
+Name=Admin: right toolbar (toolbar.ini admin_right)
+Handler=expLayoutsAdminPartBlockHandler
+ViewTypes[]=default
+Category=admin_sidebar
+Group=admin
+
+[BlockDefinition_admin_toolbar_developer]
+Name=Admin: developer toolbar (toolbar.ini admin_developer)
 Handler=expLayoutsAdminPartBlockHandler
 ViewTypes[]=default
 Category=admin_sidebar
@@ -741,6 +757,7 @@ Enabled=enabled
 SiteAccessMatch[]
 SiteAccessMatch[]=admin
 SiteAccessMatch[]=admin_*
+SiteAccessMatch[]=*_admin
 SiteAccessMatch[]=admintest_*
 SiteAccessMatch[]=editor
 # Layout used when no admin rule matches the module and view (identifier of a

@@ -85,10 +85,10 @@ $data = array (
         4 => '',
         5 => '0',
         6 => '',
-        7 => '4',
+        7 => '0',
         8 => '2',
         9 => 'default',
-        10 => '100001',
+        10 => '100002',
       ),
       5 => 
       array (
@@ -106,7 +106,7 @@ $data = array (
       ),
       6 => 
       array (
-        0 => 'admin_clear_cache',
+        0 => 'admin_toolbar_right',
         1 => '100008',
         2 => '',
         3 => '100001',
@@ -120,7 +120,7 @@ $data = array (
       ),
       7 => 
       array (
-        0 => 'admin_bookmarks',
+        0 => 'admin_toolbar_developer',
         1 => '100009',
         2 => '',
         3 => '100001',
@@ -134,48 +134,6 @@ $data = array (
       ),
       8 => 
       array (
-        0 => 'admin_current_user',
-        1 => '100010',
-        2 => '',
-        3 => '100001',
-        4 => '',
-        5 => '0',
-        6 => '',
-        7 => '3',
-        8 => '2',
-        9 => 'default',
-        10 => '100004',
-      ),
-      9 => 
-      array (
-        0 => 'admin_preferences',
-        1 => '100011',
-        2 => '',
-        3 => '100001',
-        4 => '',
-        5 => '0',
-        6 => '',
-        7 => '4',
-        8 => '2',
-        9 => 'default',
-        10 => '100004',
-      ),
-      10 => 
-      array (
-        0 => 'admin_quick_settings',
-        1 => '100012',
-        2 => '',
-        3 => '100001',
-        4 => '',
-        5 => '0',
-        6 => '',
-        7 => '5',
-        8 => '2',
-        9 => 'default',
-        10 => '100004',
-      ),
-      11 => 
-      array (
         0 => 'admin_breadcrumb',
         1 => '100013',
         2 => '',
@@ -188,7 +146,7 @@ $data = array (
         9 => 'default',
         10 => '100005',
       ),
-      12 => 
+      9 => 
       array (
         0 => 'admin_module_result',
         1 => '100014',
@@ -202,7 +160,7 @@ $data = array (
         9 => 'default',
         10 => '100006',
       ),
-      13 => 
+      10 => 
       array (
         0 => 'admin_footer',
         1 => '100015',
@@ -216,7 +174,7 @@ $data = array (
         9 => 'default',
         10 => '100008',
       ),
-      14 => 
+      11 => 
       array (
         0 => 'admin_popup_menu',
         1 => '100016',
@@ -230,7 +188,7 @@ $data = array (
         9 => 'default',
         10 => '100008',
       ),
-      15 => 
+      12 => 
       array (
         0 => 'admin_debug_area',
         1 => '100017',
@@ -244,7 +202,7 @@ $data = array (
         9 => 'default',
         10 => '100008',
       ),
-      16 => 
+      13 => 
       array (
         0 => 'admin_overlay',
         1 => '100018',
@@ -258,7 +216,7 @@ $data = array (
         9 => 'default',
         10 => '100008',
       ),
-      17 => 
+      14 => 
       array (
         0 => 'admin_logo',
         1 => '100019',
@@ -272,7 +230,7 @@ $data = array (
         9 => 'default',
         10 => '100009',
       ),
-      18 => 
+      15 => 
       array (
         0 => 'admin_search',
         1 => '100020',
@@ -286,7 +244,7 @@ $data = array (
         9 => 'default',
         10 => '100009',
       ),
-      19 => 
+      16 => 
       array (
         0 => 'admin_theme_switch',
         1 => '100021',
@@ -300,7 +258,7 @@ $data = array (
         9 => 'default',
         10 => '100009',
       ),
-      20 => 
+      17 => 
       array (
         0 => 'admin_sidebar_toggles',
         1 => '100022',
@@ -314,7 +272,7 @@ $data = array (
         9 => 'default',
         10 => '100009',
       ),
-      21 => 
+      18 => 
       array (
         0 => 'admin_tab_menu',
         1 => '100023',
@@ -323,12 +281,12 @@ $data = array (
         4 => '',
         5 => '0',
         6 => '',
-        7 => '4',
+        7 => '0',
         8 => '2',
         9 => 'default',
-        10 => '100009',
+        10 => '100010',
       ),
-      22 => 
+      19 => 
       array (
         0 => 'admin_left_menu',
         1 => '100024',
@@ -342,7 +300,7 @@ $data = array (
         9 => 'default',
         10 => '100011',
       ),
-      23 => 
+      20 => 
       array (
         0 => 'admin_breadcrumb',
         1 => '100026',
@@ -356,7 +314,7 @@ $data = array (
         9 => 'default',
         10 => '100012',
       ),
-      24 => 
+      21 => 
       array (
         0 => 'admin_module_result',
         1 => '100027',
@@ -370,7 +328,7 @@ $data = array (
         9 => 'default',
         10 => '100013',
       ),
-      25 => 
+      22 => 
       array (
         0 => 'admin_footer',
         1 => '100028',
@@ -384,7 +342,7 @@ $data = array (
         9 => 'default',
         10 => '100015',
       ),
-      26 => 
+      23 => 
       array (
         0 => 'admin_popup_menu',
         1 => '100029',
@@ -398,7 +356,7 @@ $data = array (
         9 => 'default',
         10 => '100015',
       ),
-      27 => 
+      24 => 
       array (
         0 => 'admin_debug_area',
         1 => '100030',
@@ -412,7 +370,7 @@ $data = array (
         9 => 'default',
         10 => '100015',
       ),
-      28 => 
+      25 => 
       array (
         0 => 'admin_overlay',
         1 => '100031',
@@ -426,7 +384,7 @@ $data = array (
         9 => 'default',
         10 => '100015',
       ),
-      29 => 
+      26 => 
       array (
         0 => 'admin_logo',
         1 => '100032',
@@ -440,7 +398,7 @@ $data = array (
         9 => 'default',
         10 => '100016',
       ),
-      30 => 
+      27 => 
       array (
         0 => 'admin_search',
         1 => '100033',
@@ -454,7 +412,7 @@ $data = array (
         9 => 'default',
         10 => '100016',
       ),
-      31 => 
+      28 => 
       array (
         0 => 'admin_theme_switch',
         1 => '100034',
@@ -468,7 +426,7 @@ $data = array (
         9 => 'default',
         10 => '100016',
       ),
-      32 => 
+      29 => 
       array (
         0 => 'admin_sidebar_toggles',
         1 => '100035',
@@ -482,7 +440,7 @@ $data = array (
         9 => 'default',
         10 => '100016',
       ),
-      33 => 
+      30 => 
       array (
         0 => 'admin_tab_menu',
         1 => '100036',
@@ -491,12 +449,12 @@ $data = array (
         4 => '',
         5 => '0',
         6 => '',
-        7 => '4',
+        7 => '0',
         8 => '2',
         9 => 'default',
-        10 => '100016',
+        10 => '100017',
       ),
-      34 => 
+      31 => 
       array (
         0 => 'admin_breadcrumb',
         1 => '100037',
@@ -510,7 +468,7 @@ $data = array (
         9 => 'default',
         10 => '100018',
       ),
-      35 => 
+      32 => 
       array (
         0 => 'admin_module_result',
         1 => '100038',
@@ -524,7 +482,7 @@ $data = array (
         9 => 'default',
         10 => '100019',
       ),
-      36 => 
+      33 => 
       array (
         0 => 'admin_footer',
         1 => '100039',
@@ -538,7 +496,7 @@ $data = array (
         9 => 'default',
         10 => '100021',
       ),
-      37 => 
+      34 => 
       array (
         0 => 'admin_popup_menu',
         1 => '100040',
@@ -552,7 +510,7 @@ $data = array (
         9 => 'default',
         10 => '100021',
       ),
-      38 => 
+      35 => 
       array (
         0 => 'admin_debug_area',
         1 => '100041',
@@ -566,7 +524,7 @@ $data = array (
         9 => 'default',
         10 => '100021',
       ),
-      39 => 
+      36 => 
       array (
         0 => 'admin_overlay',
         1 => '100042',
@@ -579,20 +537,6 @@ $data = array (
         8 => '2',
         9 => 'default',
         10 => '100021',
-      ),
-      40 => 
-      array (
-        0 => 'admin_ui_switch',
-        1 => '100043',
-        2 => '',
-        3 => '100001',
-        4 => '',
-        5 => '0',
-        6 => '',
-        7 => '2',
-        8 => '2',
-        9 => 'default',
-        10 => '100004',
       ),
     ),
   ),
