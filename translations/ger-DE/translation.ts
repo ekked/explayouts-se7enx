@@ -685,8 +685,8 @@
         <translation>Fehler beim Speichern: %message</translation>
     </message>
     <message>
-        <source>New template path (relative to design/ or extension/, must end in .tpl):</source>
-        <translation>Pfad des neuen Templates (relativ zu design/ oder extension/, muss auf .tpl enden):</translation>
+        <source>New template path (from the installation root, inside an allowed folder, must end in .tpl):</source>
+        <translation>Pfad des neuen Templates (ab der Wurzel der Installation, in einem erlaubten Ordner, muss auf .tpl enden):</translation>
     </message>
     <message>
         <source>Path must end in .tpl</source>

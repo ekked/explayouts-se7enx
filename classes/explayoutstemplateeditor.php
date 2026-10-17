@@ -18,13 +18,38 @@ class expLayoutsTemplateEditor
         return $list;
     }
 
+    /**
+     * The folders (relative to the installation) whose templates the editor may read and write:
+     * [TemplateEditorSettings] AllowedTemplateRoots[]. None set means none: earlier versions fell back to
+     * all of design/ and extension/ for an empty list, which includes the administration's page layout.
+     */
     protected static function allowedRoots()
     {
         $ini = eZINI::instance( 'explayouts.ini' );
-        $roots = $ini->variable( 'TemplateEditorSettings', 'AllowedTemplateRoots' );
-        if ( !is_array( $roots ) || empty( $roots ) )
-            $roots = array( 'design', 'extension' );
-        return $roots;
+        $roots = $ini->hasVariable( 'TemplateEditorSettings', 'AllowedTemplateRoots' )
+            ? $ini->variable( 'TemplateEditorSettings', 'AllowedTemplateRoots' )
+            : array();
+        if ( !is_array( $roots ) )
+            return array();
+        $clean = array();
+        foreach ( $roots as $root )
+        {
+            $root = trim( str_replace( '\\', '/', (string)$root ), '/' );
+            if ( $root !== '' )
+                $clean[] = $root;
+        }
+        return $clean;
+    }
+
+    /**
+     * Whether save() may create a template that does not exist yet:
+     * [TemplateEditorSettings] AllowNewTemplates=enabled. Off unless set.
+     */
+    public static function newTemplatesAllowed()
+    {
+        $ini = eZINI::instance( 'explayouts.ini' );
+        return $ini->hasVariable( 'TemplateEditorSettings', 'AllowNewTemplates' )
+            && $ini->variable( 'TemplateEditorSettings', 'AllowNewTemplates' ) === 'enabled';
     }
 
     protected static function scan( $dir, $relative, &$list )
@@ -38,6 +63,9 @@ class expLayoutsTemplateEditor
                 continue;
             $full = $dir . '/' . $entry;
             $rel  = $relative . '/' . $entry;
+            // resolve() refuses symbolic links, so they are not offered either.
+            if ( is_link( $full ) )
+                continue;
             if ( is_dir( $full ) )
             {
                 self::scan( $full, $rel, $list );
@@ -58,18 +86,51 @@ class expLayoutsTemplateEditor
         return file_get_contents( $file );
     }
 
+    /**
+     * Writes a template inside the allowed roots. A file that does not exist yet is only created with
+     * AllowNewTemplates=enabled. The previous version is kept in the var directory
+     * (<var>/explayouts/template_backup/<path>), not as <file>.tpl.bak next to the template: a backup in
+     * the design folders is deployed, listed and found by the design resolution like any other file.
+     */
     public static function save( $path, $content )
     {
         $file = self::resolve( $path );
-        if ( $file === false || !is_writable( dirname( $file ) ) )
+        if ( $file === false || is_link( $file ) )
             return false;
 
-        if ( is_file( $file ) )
-        {
-            copy( $file, $file . '.bak' );
-        }
+        $exists = is_file( $file );
+        if ( !$exists && !self::newTemplatesAllowed() )
+            return false;
+        if ( $exists ? !is_writable( $file ) : !is_writable( dirname( $file ) ) )
+            return false;
+
+        if ( $exists && !self::backup( $file ) )
+            return false;
 
         return file_put_contents( $file, $content ) !== false;
+    }
+
+    /**
+     * Copies a template to <var>/explayouts/template_backup/<path relative to the installation>. One
+     * generation: each save replaces the copy of the save before. False when the copy could not be made,
+     * so nothing is overwritten without one.
+     */
+    protected static function backup( $file )
+    {
+        $base = realpath( eZSys::rootDir() );
+        if ( $base === false || strpos( $file, $base . '/' ) !== 0 )
+            return false;
+
+        $varDir = eZSys::varDirectory();
+        if ( $varDir === '' || $varDir[0] !== '/' )
+            $varDir = $base . '/' . $varDir;
+
+        $target = rtrim( $varDir, '/' ) . '/explayouts/template_backup/' . substr( $file, strlen( $base ) + 1 );
+        $dir = dirname( $target );
+        if ( !is_dir( $dir ) && !eZDir::mkdir( $dir, false, true ) )
+            return false;
+
+        return copy( $file, $target );
     }
 
     /**
@@ -93,6 +154,11 @@ class expLayoutsTemplateEditor
             return false;
 
         $real = $dir . '/' . basename( $candidate );
+        // A symbolic link is never a template here: one that points nowhere passes
+        // file_exists() as false, skipped the realpath() below, and save() then
+        // wrote through it to wherever it points, outside every root.
+        if ( is_link( $real ) )
+            return false;
         if ( file_exists( $real ) )
         {
             $real = @realpath( $real );

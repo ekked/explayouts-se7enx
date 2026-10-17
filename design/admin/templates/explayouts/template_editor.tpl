@@ -12,6 +12,6 @@
     <link rel="stylesheet" href={'stylesheets/explayouts_template_editor.css'|ezdesign}>
 </head>
 <body>
-{include uri='design:explayouts/parts/template_editor_body.tpl' i18n_json=$i18n_json files_json=$files_json base_url_json=$base_url_json exit_url_json=$exit_url_json csrf_token_json=$csrf_token_json}
+{include uri='design:explayouts/parts/template_editor_body.tpl' i18n_json=$i18n_json files_json=$files_json base_url_json=$base_url_json exit_url_json=$exit_url_json csrf_token_json=$csrf_token_json allow_new_templates=$allow_new_templates}
 </body>
 </html>

@@ -1,5 +1,8 @@
 {* admin4: the Layouts tab of the node view (admininterface.ini [AdditionalTab_layouts]) with admin4's components
-   only: no stylesheet of its own, no web fonts from outside. Same fetches and links as design/admin's tab. *}
+   only: no stylesheet of its own, no web fonts from outside. Same fetches and links as design/admin's tab. No inline
+   script: Edit layout carries the page to return to in data-explayouts-return-to, javascript/explayouts_admin4.js
+   keeps it for the layouts editor. *}
+{ezscript_require( 'explayouts_admin4.js' )}
 {def $resolved = fetch( 'explayouts', 'layout_summary_for_node', hash( 'node_id', $node.node_id ) )
      $rules = fetch( 'explayouts', 'rules_for_node', hash( 'node_id', $node.node_id ) )}
 <div class="a4-page a4-stack">
@@ -15,7 +18,7 @@
         </div>
         <div class="a4-actions">
             <a class="a4-btn a4-btn-small" href={concat( 'explayouts_ui/layout_preview/', $resolved.id, '/2' )|ezurl} target="_blank">{'Preview'|i18n( 'design/admin/tabs/explayouts' )}</a>
-            <a class="a4-btn a4-btn-small a4-btn-primary" href={concat( 'explayouts_ui_api/app#layout/', $resolved.id )|ezurl} onclick="sessionStorage.setItem('explayouts_return_to','{concat( 'content/view/full/', $node.node_id )|ezurl( 'no' )|wash( 'javascript' )}'); return true;">{'Edit layout'|i18n( 'design/admin/tabs/explayouts' )}</a>
+            <a class="a4-btn a4-btn-small a4-btn-primary" href={concat( 'explayouts_ui_api/app#layout/', $resolved.id )|ezurl} data-explayouts-return-to="{concat( 'content/view/full/', $node.node_id )|ezurl( 'no' )|wash}">{'Edit layout'|i18n( 'design/admin/tabs/explayouts' )}</a>
         </div>
     </div>
     <p class="a4-meta">{'%name (%identifier) · Type: %layout_type'|i18n( 'design/admin/tabs/explayouts',, hash( '%name', $resolved.name|wash, '%identifier', $resolved.identifier|wash, '%layout_type', $resolved.layout_type|wash ) )}</p>
