@@ -14,7 +14,8 @@
  *  RS-05 - rules on the path alone are cached as before
  *  RS-06 - the cache is pruned to CacheMaxEntries (expired entries first, then the oldest); paths longer than
  *          CACHE_MAX_PATH_LENGTH are not written
- *  RS-07 - the type lists name every type ruleMatches()/conditionMatches() know
+ *  RS-07 - the type lists name every type ruleMatches()/conditionMatches() know, also ibexa_content_type of the
+ *          shipped media site data (a condition the resolver did not know was ignored, now it would never be met)
  */
 
 $failures = 0;
@@ -187,7 +188,7 @@ try
     // RS-07
     foreach ( array( 'path', 'path_prefix', 'path_info_prefix', 'path_regex', 'node', 'subtree', 'route', 'module', 'module_view' ) as $type )
         rsCheck( in_array( $type, expLayoutsResolver::TARGET_TYPES, true ), "RS-07 target type $type listed" );
-    foreach ( array( 'siteaccess', 'class', 'content_type', 'query_parameter', 'route_parameter', 'time' ) as $type )
+    foreach ( array( 'siteaccess', 'class', 'content_type', 'ibexa_content_type', 'query_parameter', 'route_parameter', 'time' ) as $type )
         rsCheck( in_array( $type, expLayoutsResolver::CONDITION_TYPES, true ), "RS-07 condition type $type listed" );
 }
 finally

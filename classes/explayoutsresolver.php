@@ -13,8 +13,12 @@ class expLayoutsResolver
     const TARGET_TYPES = array( 'path', 'path_prefix', 'path_info_prefix', 'path_regex', 'node', 'subtree', 'route',
                                 'module', 'module_view' );
 
-    /** The condition types conditionMatches() knows; content_type is the older name of class */
-    const CONDITION_TYPES = array( 'siteaccess', 'class', 'content_type', 'query_parameter', 'route_parameter', 'time' );
+    /**
+     * The condition types conditionMatches() knows; content_type is the older name of class, ibexa_content_type the
+     * name of the reference installation's rules (the media site data of expsite_data_media carries it)
+     */
+    const CONDITION_TYPES = array( 'siteaccess', 'class', 'content_type', 'ibexa_content_type', 'query_parameter',
+                                   'route_parameter', 'time' );
 
     /**
      * Conditions whose answer is not given by the path and the siteaccess, the key of the resolver cache: the query
@@ -858,6 +862,7 @@ class expLayoutsResolver
                 return in_array( $current['name'], $siteAccesses );
             }
             case 'content_type':
+            case 'ibexa_content_type':
             case 'class':
             {
                 $classes = json_decode( $value, true );
