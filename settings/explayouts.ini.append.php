@@ -161,35 +161,86 @@ Category=listing
 [BlockDefinition_gallery]
 Name=Gallery
 Handler=expLayoutsGalleryBlockHandler
-ViewTypes[]=default
+# The reference has one gallery block whose view types are the gallery
+# variants; here each variant is a block of its own in the toolbox, and
+# every one offers all view types in the Design tab, its own first (a new
+# block gets the first one). A block stored with view type 'default'
+# renders as its definition (expLayoutsGalleryBlockHandler::galleryViewType()).
+# ViewTypeNames[] are the labels of the View type select.
+ViewTypes[]=gallery
+ViewTypes[]=slider
+ViewTypes[]=thumb_gallery
+ViewTypes[]=grid_gallery
+ViewTypes[]=sushi_bar
+ViewTypeNames[gallery]=Gallery
+ViewTypeNames[slider]=Slider
+ViewTypeNames[thumb_gallery]=Thumb gallery
+ViewTypeNames[grid_gallery]=Grid gallery
+ViewTypeNames[sushi_bar]=Sushi bar
 HasCollection=1
 
 Category=gallery
 [BlockDefinition_slider]
 Name=Slider
 Handler=expLayoutsGalleryBlockHandler
-ViewTypes[]=default
+ViewTypes[]=slider
+ViewTypes[]=gallery
+ViewTypes[]=thumb_gallery
+ViewTypes[]=grid_gallery
+ViewTypes[]=sushi_bar
+ViewTypeNames[slider]=Slider
+ViewTypeNames[gallery]=Gallery
+ViewTypeNames[thumb_gallery]=Thumb gallery
+ViewTypeNames[grid_gallery]=Grid gallery
+ViewTypeNames[sushi_bar]=Sushi bar
 HasCollection=1
 
 Category=gallery
 [BlockDefinition_thumb_gallery]
 Name=Thumb gallery
 Handler=expLayoutsGalleryBlockHandler
-ViewTypes[]=default
+ViewTypes[]=thumb_gallery
+ViewTypes[]=gallery
+ViewTypes[]=slider
+ViewTypes[]=grid_gallery
+ViewTypes[]=sushi_bar
+ViewTypeNames[thumb_gallery]=Thumb gallery
+ViewTypeNames[gallery]=Gallery
+ViewTypeNames[slider]=Slider
+ViewTypeNames[grid_gallery]=Grid gallery
+ViewTypeNames[sushi_bar]=Sushi bar
 HasCollection=1
 
 Category=gallery
 [BlockDefinition_grid_gallery]
 Name=Grid gallery
 Handler=expLayoutsGalleryBlockHandler
-ViewTypes[]=default
+ViewTypes[]=grid_gallery
+ViewTypes[]=gallery
+ViewTypes[]=slider
+ViewTypes[]=thumb_gallery
+ViewTypes[]=sushi_bar
+ViewTypeNames[grid_gallery]=Grid gallery
+ViewTypeNames[gallery]=Gallery
+ViewTypeNames[slider]=Slider
+ViewTypeNames[thumb_gallery]=Thumb gallery
+ViewTypeNames[sushi_bar]=Sushi bar
 HasCollection=1
 
 Category=gallery
 [BlockDefinition_sushi_bar]
 Name=Sushi bar
 Handler=expLayoutsGalleryBlockHandler
-ViewTypes[]=default
+ViewTypes[]=sushi_bar
+ViewTypes[]=gallery
+ViewTypes[]=slider
+ViewTypes[]=thumb_gallery
+ViewTypes[]=grid_gallery
+ViewTypeNames[sushi_bar]=Sushi bar
+ViewTypeNames[gallery]=Gallery
+ViewTypeNames[slider]=Slider
+ViewTypeNames[thumb_gallery]=Thumb gallery
+ViewTypeNames[grid_gallery]=Grid gallery
 HasCollection=1
 
 Category=gallery

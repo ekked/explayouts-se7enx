@@ -1,6 +1,15 @@
 <?php
 class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
 {
+    /**
+     * The gallery view types. Every gallery block offers all of them in the
+     * Design tab, as the reference gallery block does, and a block renders
+     * with the template of its view type. A block stored with the view type
+     * 'default' (every block before the gallery view types existed) renders
+     * as its own definition: a slider block as a slider.
+     */
+    public static $viewTypes = array( 'gallery', 'slider', 'thumb_gallery', 'grid_gallery', 'sushi_bar' );
+
     public function getParameters()
     {
         return array(
@@ -18,6 +27,21 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
                 'name' => 'Class filter',
                 'type' => 'string',
                 'default' => '',
+            ),
+            // Only for the gallery view types: the editor leaves a parameter out
+            // for a block none of whose view types it names (logos uses this
+            // handler too, and its template has no columns and no lightbox).
+            'number_of_thumbnails' => array(
+                'name' => 'Thumbnails per row/slide',
+                'type' => 'integer',
+                'default' => 6,
+                'view_type' => 'gallery,slider,thumb_gallery,grid_gallery,sushi_bar',
+            ),
+            'enable_lightbox' => array(
+                'name' => 'Enable lightbox',
+                'type' => 'checkbox',
+                'default' => '',
+                'view_type' => 'gallery,slider,thumb_gallery,grid_gallery,sushi_bar',
             ),
             'image_attribute' => array(
                 'name' => 'Image attribute identifier',
@@ -40,6 +64,9 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
         $classFilter = isset( $params['class_filter'] ) ? trim( $params['class_filter'] ) : '';
         $imageAttribute = isset( $params['image_attribute'] ) ? $params['image_attribute'] : 'image';
         $thumbnailSize = isset( $params['thumbnail_size'] ) ? $params['thumbnail_size'] : 'small';
+        $numberOfThumbnails = isset( $params['number_of_thumbnails'] ) && (int)$params['number_of_thumbnails'] > 0
+            ? min( 12, (int)$params['number_of_thumbnails'] )
+            : 6;
 
         $items = array();
         $images = array();
@@ -71,11 +98,14 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
             }
         }
 
+        // The block's collection, fetched once for both cases below.
+        $collection = count( $items ) === 0 && isset( $block['id'] ) ? expLayoutsCollection::fetchByBlock( (int)$block['id'] ) : null;
+
         // dynamic collections imported from Netgen Layouts (queries) come first
-        if ( count( $items ) === 0 && isset( $block['id'] ) )
+        if ( count( $items ) === 0 && $collection )
         {
-            $dynCollection = expLayoutsCollection::fetchByBlock( (int)$block['id'] );
-            if ( $dynCollection && $dynCollection->attribute( 'collection_type' ) === 'dynamic' )
+            $dynCollection = $collection;
+            if ( $dynCollection->attribute( 'collection_type' ) === 'dynamic' )
             {
                 $dynResult = expLayoutsDynamicCollection::fetch( $dynCollection );
                 if ( is_array( $dynResult ) )
@@ -94,36 +124,41 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
             }
         }
 
-        if ( count( $items ) === 0 && isset( $block['id'] ) )
+        if ( count( $items ) === 0 && $collection )
         {
-            $collection = expLayoutsCollection::fetchByBlock( (int)$block['id'] );
-            if ( $collection )
+            // A manual collection shows all its items unless the collection
+            // itself is limited; the block's limit parameter (default 12)
+            // belongs to the parent node query above, and the editor no
+            // longer offers it for a block with a collection.
+            $limit = (int)$collection->attribute( 'limit_value' ) > 0
+                ? (int)$collection->attribute( 'limit_value' )
+                : ( isset( $params['limit'] ) && (int)$params['limit'] > 0 ? (int)$params['limit'] : PHP_INT_MAX );
+            $collectionItems = expLayoutsCollectionItem::fetchByCollection( (int)$collection->attribute( 'id' ) );
+            foreach ( $collectionItems as $collectionItem )
             {
-                $collectionItems = expLayoutsCollectionItem::fetchByCollection( (int)$collection->attribute( 'id' ) );
-                foreach ( $collectionItems as $collectionItem )
+                $nodeId = (int)$collectionItem->attribute( 'value_id' );
+                if ( $nodeId <= 0 )
+                    continue;
+                $item = eZContentObjectTreeNode::fetch( $nodeId );
+                // fetch() checks no permission: an item the visitor may
+                // not read, or a hidden one, was shown to everybody
+                if ( !expLayoutsManualQueryHandler::isShownNode( $item ) )
+                    continue;
+                $object = $item->attribute( 'object' );
+                if ( !$object )
+                    continue;
+                if ( $classFilter !== '' )
                 {
-                    $nodeId = (int)$collectionItem->attribute( 'value_id' );
-                    if ( $nodeId <= 0 )
+                    $filterArray = array_filter( array_map( 'trim', explode( ',', $classFilter ) ) );
+                    if ( !empty( $filterArray ) && !in_array( $item->attribute( 'class_identifier' ), $filterArray ) )
                         continue;
-                    $item = eZContentObjectTreeNode::fetch( $nodeId );
-                    if ( !$item )
-                        continue;
-                    $object = $item->attribute( 'object' );
-                    if ( !$object )
-                        continue;
-                    if ( $classFilter !== '' )
-                    {
-                        $filterArray = array_filter( array_map( 'trim', explode( ',', $classFilter ) ) );
-                        if ( !empty( $filterArray ) && !in_array( $item->attribute( 'class_identifier' ), $filterArray ) )
-                            continue;
-                    }
-                    $entry = self::buildItem( $item, $object, $imageAttribute, $thumbnailSize );
-                    $items[] = $entry;
-                    if ( $entry['has_image'] )
-                        $images[] = $entry;
-                    if ( count( $items ) >= $limit )
-                        break;
                 }
+                $entry = self::buildItem( $item, $object, $imageAttribute, $thumbnailSize );
+                $items[] = $entry;
+                if ( $entry['has_image'] )
+                    $images[] = $entry;
+                if ( count( $items ) >= $limit )
+                    break;
             }
         }
 
@@ -132,36 +167,73 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
             'images' => $images,
             'items' => $items,
             'thumbnail_size' => $thumbnailSize,
+            'view_type' => self::galleryViewType( $block ),
+            'number_of_thumbnails' => $numberOfThumbnails,
+            'enable_lightbox' => isset( $params['enable_lightbox'] ) && (string)$params['enable_lightbox'] !== '' && (string)$params['enable_lightbox'] !== '0',
         );
+    }
+
+    /**
+     * The gallery view type a block renders with: its stored view type when
+     * that is one of the gallery view types, otherwise its definition (a
+     * block stored as 'default'), otherwise 'gallery'.
+     */
+    public static function galleryViewType( $block )
+    {
+        $viewType = is_array( $block ) && isset( $block['view_type'] ) ? (string)$block['view_type'] : '';
+        if ( in_array( $viewType, self::$viewTypes, true ) )
+            return $viewType;
+
+        $definition = is_array( $block ) && isset( $block['definition_identifier'] ) ? (string)$block['definition_identifier'] : '';
+        if ( in_array( $definition, self::$viewTypes, true ) )
+            return $definition;
+
+        return 'gallery';
     }
 
     private static function buildItem( $item, $object, $imageAttribute, $thumbnailSize )
     {
+        // name and node_id are what the editor preview reads from an item
+        // (expLayoutsUIApplicationApi::renderBlockHtml()); without them every
+        // item was skipped there and a gallery with items showed "No content".
         $entry = array(
+            'name' => (string)$item->attribute( 'name' ),
+            'node_id' => (int)$item->attribute( 'node_id' ),
             'alt' => $item->attribute( 'name' ),
             'link' => $item->attribute( 'url_alias' ),
             'node' => $item,
             'has_image' => false,
             'url' => '',
+            'full_url' => '',
         );
 
         $dataMap = $object->attribute( 'data_map' );
-        if ( isset( $dataMap[$imageAttribute] ) )
+        if ( is_array( $dataMap ) && isset( $dataMap[$imageAttribute] ) )
         {
             $attr = $dataMap[$imageAttribute];
-            $image = $attr->hasAttribute( 'content' ) ? $attr->attribute( 'content' ) : false;
-            if ( $image )
+            $image = is_object( $attr ) && $attr->hasAttribute( 'content' ) ? $attr->attribute( 'content' ) : false;
+            // Only an image alias handler has aliases. An attribute of another
+            // type under the same identifier (an object relation list, a
+            // matrix) has an array or another object as content: calling
+            // hasAttribute() on it was "Call to a member function
+            // hasAttribute() on array", and the whole page failed.
+            if ( is_object( $image ) && method_exists( $image, 'hasAttribute' ) && method_exists( $image, 'attribute' ) )
             {
                 $url = '';
                 $thumb = $image->hasAttribute( $thumbnailSize ) ? $image->attribute( $thumbnailSize ) : false;
                 if ( is_array( $thumb ) && isset( $thumb['url'] ) )
                     $url = $thumb['url'];
-                if ( $url === '' && $image->hasAttribute( 'original' ) )
+                $fullUrl = '';
+                if ( $image->hasAttribute( 'original' ) )
                 {
                     $original = $image->attribute( 'original' );
                     if ( is_array( $original ) && isset( $original['url'] ) )
-                        $url = $original['url'];
+                        $fullUrl = (string)$original['url'];
                 }
+                if ( $url === '' )
+                    $url = $fullUrl;
+                if ( $fullUrl !== '' && strpos( $fullUrl, '/' ) !== 0 && strpos( $fullUrl, 'http' ) !== 0 )
+                    $fullUrl = '/' . $fullUrl;
                 if ( $url !== '' )
                 {
                     // Image alias URLs are stored without a leading slash, so
@@ -173,6 +245,7 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
                         $url = '/' . $url;
 
                     $entry['url'] = $url;
+                    $entry['full_url'] = $fullUrl !== '' ? $fullUrl : $url;
                     $entry['has_image'] = true;
                 }
             }
