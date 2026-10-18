@@ -12,8 +12,9 @@
  *  RS-04 - a rule with a condition on the query string or the clock is not cached: the next request with another
  *          query string gets its own answer, for a match as for a non-match
  *  RS-05 - rules on the path alone are cached as before
- *  RS-06 - the cache is pruned to CacheMaxEntries (expired entries first, then the oldest); paths longer than
- *          CACHE_MAX_PATH_LENGTH are not written
+ *  RS-06 - over CacheMaxEntries the cache loses its expired files (by modification time), then the oldest down to
+ *          80 %; paths longer than CACHE_MAX_PATH_LENGTH are not written
+ *  RS-08 - only a request-dependent rule whose targets name the page keeps the answer out of the cache
  *  RS-07 - the type lists name every type ruleMatches()/conditionMatches() know, also ibexa_content_type of the
  *          shipped media site data (a condition the resolver did not know was ignored, now it would never be met)
  */
@@ -174,16 +175,27 @@ try
              'RS-06 a very long path is not cached' );
     for ( $i = 0; $i < 12; $i++ )
     {
-        $data = array( 'path' => "p$i", 'siteaccess' => 'site', 'rule_id' => 0, 'layout_id' => 0, 'expires' => $i < 4 ? time() - 10 : time() + 100 );
-        eZFile::create( "entry$i.php", $cacheDir, '<?php return ' . var_export( $data, true ) . ';' );
-        touch( $cacheDir . "/entry$i.php", time() - 100 + $i );
+        // the content is not read: the age comes from the modification time
+        eZFile::create( "entry$i.php", $cacheDir, '<?php return array();' );
+        touch( $cacheDir . "/entry$i.php", $i < 4 ? time() - 10000 : time() - 100 + $i );
     }
-    $removed = expLayoutsResolver::pruneCache( 5 );
+    $removed = expLayoutsResolver::pruneCache( 5, 3600 );
     $left = array_map( 'basename', glob( $cacheDir . '/*.php' ) );
     sort( $left );
-    rsCheck( $removed === 7 && $left === array( 'entry10.php', 'entry11.php', 'entry7.php', 'entry8.php', 'entry9.php' ),
-             'RS-06 pruned to 5: the expired ones and then the oldest (' . implode( ',', $left ) . ')' );
-    rsCheck( expLayoutsResolver::pruneCache( 5 ) === 0, 'RS-06 nothing to prune under the limit' );
+    rsCheck( $removed === 8 && $left === array( 'entry10.php', 'entry11.php', 'entry8.php', 'entry9.php' ),
+             'RS-06 over 5: the expired ones by modification time, then the oldest down to 80 % (' . implode( ',', $left ) . ')' );
+    rsCheck( expLayoutsResolver::pruneCache( 5, 3600 ) === 0, 'RS-06 nothing to prune under the limit' );
+
+    // RS-08
+    expLayoutsResolver::clearCache();
+    expLayoutsRule::$rules = array(
+        new expLayoutsRule( 4, 40, array( array( 'path', 'campaign' ) ), array( array( 'time', '{"from":"2000-01-01","to":"2001-01-01"}' ) ) ),
+        new expLayoutsRule( 1, 10, array( array( 'path', 'about' ) ) ),
+    );
+    rsCheck( $layoutId( expLayoutsResolver::resolve( 'about' ) ) === 10 && $cachedFiles() === 1,
+             'RS-08 a time rule for another page does not keep this page from being cached' );
+    expLayoutsResolver::clearCache();
+    rsCheck( expLayoutsResolver::resolve( 'campaign' ) === false && $cachedFiles() === 0, 'RS-08 the page the time rule names is not cached' );
 
     // RS-07
     foreach ( array( 'path', 'path_prefix', 'path_info_prefix', 'path_regex', 'node', 'subtree', 'route', 'module', 'module_view' ) as $type )

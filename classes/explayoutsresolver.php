@@ -155,7 +155,8 @@ class expLayoutsResolver
         $requestDependent = false;
         foreach ( $rules as $rule )
         {
-            if ( self::isRequestDependent( $rule ) )
+            // only a rule that names this page can make its answer depend on the request
+            if ( self::isRequestDependent( $rule ) && self::targetsMatch( $rule, $path ) )
                 $requestDependent = true;
             if ( self::ruleMatches( $rule, $path ) )
             {
@@ -307,21 +308,33 @@ class expLayoutsResolver
     }
 
     /**
-     * Keeps the resolver cache at [ResolverSettings] CacheMaxEntries files (CACHE_MAX_ENTRIES without it): expired
-     * entries go first, then the oldest. Returns the number of files removed.
+     * Keeps the resolver cache below [ResolverSettings] CacheMaxEntries files (CACHE_MAX_ENTRIES without it). Once
+     * over the limit, files older than the longest cache lifetime ([ResolverSettings] / [AdminLayoutSettings]
+     * CacheTTL) go first, read from their modification time without opening them; then the oldest, until 80 % of the
+     * limit is left, so the next write does not prune again. Returns the number of files removed.
      *
      * @param int|null $maxEntries
+     * @param int|null $ttl seconds a file stays valid
      * @return int
      */
-    public static function pruneCache( $maxEntries = null )
+    public static function pruneCache( $maxEntries = null, $ttl = null )
     {
+        $ini = eZINI::instance( 'explayouts.ini' );
         if ( $maxEntries === null )
         {
-            $ini = eZINI::instance( 'explayouts.ini' );
             $maxEntries = $ini->hasVariable( 'ResolverSettings', 'CacheMaxEntries' )
                 ? (int)$ini->variable( 'ResolverSettings', 'CacheMaxEntries' ) : self::CACHE_MAX_ENTRIES;
             if ( $maxEntries <= 0 )
                 $maxEntries = self::CACHE_MAX_ENTRIES;
+        }
+        if ( $ttl === null )
+        {
+            $ttl = 3600;
+            foreach ( array( 'ResolverSettings', 'AdminLayoutSettings' ) as $group )
+            {
+                if ( $ini->hasVariable( $group, 'CacheTTL' ) )
+                    $ttl = max( $ttl, (int)$ini->variable( $group, 'CacheTTL' ) );
+            }
         }
         $files = glob( self::cacheDir() . '/*.php' );
         if ( !is_array( $files ) || count( $files ) <= $maxEntries )
@@ -332,19 +345,20 @@ class expLayoutsResolver
         $kept = array();
         foreach ( $files as $file )
         {
-            $data = @include( $file );
-            if ( !is_array( $data ) || !isset( $data['expires'] ) || $data['expires'] <= $now )
+            $modified = (int)@filemtime( $file );
+            if ( $modified + $ttl < $now )
             {
                 if ( @unlink( $file ) )
                     $removed++;
                 continue;
             }
-            $kept[$file] = (int)@filemtime( $file );
+            $kept[$file] = $modified;
         }
-        if ( count( $kept ) > $maxEntries )
+        $target = (int)floor( $maxEntries * 0.8 );
+        if ( count( $kept ) > $target )
         {
             asort( $kept );
-            foreach ( array_slice( array_keys( $kept ), 0, count( $kept ) - $maxEntries ) as $file )
+            foreach ( array_slice( array_keys( $kept ), 0, count( $kept ) - $target ) as $file )
             {
                 if ( @unlink( $file ) )
                     $removed++;
@@ -538,7 +552,7 @@ class expLayoutsResolver
             if ( !$layout || (int)$layout->attribute( 'status' ) !== 2
                 || !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
                 continue;
-            if ( self::isRequestDependent( $rule ) )
+            if ( self::isRequestDependent( $rule ) && self::targetsMatch( $rule, $path, $context ) )
                 $requestDependent = true;
             if ( self::ruleMatches( $rule, $path, $context ) )
             {
@@ -602,9 +616,24 @@ class expLayoutsResolver
                 return false;
         }
 
-        // A rule without a target names no page. It used to match every one, so a rule saved before its targets,
-        // or whose targets were all left out as unknown, took over the whole site. The catch-all is a target of
-        // its own (path_info_prefix "/").
+        return self::targetsMatch( $rule, $path, $context, $targets );
+    }
+
+    /**
+     * Whether one of the rule's targets names the path (conditions aside). A rule without a target names no page.
+     * It used to match every one, so a rule saved before its targets, or whose targets were all left out as unknown,
+     * took over the whole site. The catch-all is a target of its own (path_info_prefix "/").
+     *
+     * @param expLayoutsRule $rule
+     * @param string $path
+     * @param array|false $context
+     * @param array|null $targets the rule's targets when already fetched
+     * @return bool
+     */
+    static function targetsMatch( $rule, $path, $context = false, $targets = null )
+    {
+        if ( $targets === null )
+            $targets = $rule->targets();
         if ( count( $targets ) === 0 )
             return false;
 
