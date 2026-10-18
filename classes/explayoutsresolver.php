@@ -1,7 +1,20 @@
 <?php
 class expLayoutsResolver
 {
+    /**
+     * Cache entries this process has read or written, key => entry. Only a copy of the file entry: every request
+     * checks it against the file once (see readCache()) before trusting it.
+     */
     private static $resolvedCache = array();
+
+    /** What the file of each remembered entry looked like (fileStamp()) when it was read or written, key => stamp */
+    private static $resolvedStamps = array();
+
+    /** Keys checked against their file in the current request, key => true */
+    private static $resolvedChecked = array();
+
+    /** The request $resolvedChecked and $adminMemo belong to ($_SERVER['REQUEST_TIME_FLOAT']), null before the first */
+    private static $cacheRequest = null;
 
     /** What resolve() answered in this request, path => answer, for the debug bar's panel (pageResolution()) */
     private static $resolutions = array();
@@ -177,26 +190,93 @@ class expLayoutsResolver
         return self::cacheDir() . '/' . $key . '.php';
     }
 
+    /**
+     * Starts the per-request state over when a new request began. A persistent worker (Exponential Velocity with
+     * ForkPerRequest=disabled, or any server that keeps a process for many requests) keeps class statics from one
+     * request to the next; what it remembers must then be checked against the cache files again, because another
+     * process may have cleared or rewritten them in between. The request is told apart by
+     * $_SERVER['REQUEST_TIME_FLOAT']; without it (one process per request, the command line) nothing is started over
+     * and an entry is checked once per process.
+     */
+    private static function startRequest()
+    {
+        $request = isset( $_SERVER['REQUEST_TIME_FLOAT'] ) ? (string)$_SERVER['REQUEST_TIME_FLOAT'] : null;
+        if ( $request === self::$cacheRequest )
+            return;
+        self::$cacheRequest = $request;
+        self::$resolvedChecked = array();
+        self::$adminMemo = array();
+    }
+
+    /**
+     * What a cache file looks like now: inode, modification time and size, or false when there is none. A rewrite
+     * goes through a new file renamed over the old one (eZFile::create() atomic), so it changes the inode even
+     * within the same second. One stat, past PHP's and the server's stat caches.
+     */
+    private static function fileStamp( $file )
+    {
+        clearstatcache( true, $file );
+        $stat = @stat( $file );
+        if ( $stat === false )
+            return false;
+        return $stat['ino'] . ':' . $stat['mtime'] . ':' . $stat['size'];
+    }
+
+    private static function forget( $key )
+    {
+        unset( self::$resolvedCache[$key], self::$resolvedStamps[$key], self::$resolvedChecked[$key] );
+    }
+
+    /**
+     * The cache entry for a path, or false. An entry this process remembers is used only while it has not expired
+     * and its file is still the one it was read from or written to: checked once per request with one stat, so a
+     * clear, a publish or a rule change made by any process (Apache, another worker, the command line) is seen by the
+     * next request. No database query.
+     */
     private static function readCache( $path, $siteAccessName )
     {
+        self::startRequest();
         $key = self::cacheKey( $path, $siteAccessName );
-
-        if ( array_key_exists( $key, self::$resolvedCache ) )
-        {
-            return self::$resolvedCache[$key];
-        }
-
         $file = self::cacheFile( $key );
-        if ( file_exists( $file ) )
+        $now = time();
+        $stamp = null;
+        $changed = false;
+
+        if ( isset( self::$resolvedCache[$key] ) )
         {
-            $data = @include( $file );
-            if ( is_array( $data ) && isset( $data['expires'] ) && $data['expires'] > time() )
+            $data = self::$resolvedCache[$key];
+            $fresh = isset( $data['expires'] ) && $data['expires'] > $now;
+            if ( $fresh && isset( self::$resolvedChecked[$key] ) )
+                return $data;
+            $stamp = self::fileStamp( $file );
+            if ( $fresh && $stamp !== false && isset( self::$resolvedStamps[$key] ) && self::$resolvedStamps[$key] === $stamp )
             {
-                self::$resolvedCache[$key] = $data;
+                self::$resolvedChecked[$key] = true;
                 return $data;
             }
-            @unlink( $file );
+            $changed = $stamp !== false && ( !isset( self::$resolvedStamps[$key] ) || self::$resolvedStamps[$key] !== $stamp );
+            self::forget( $key );
         }
+
+        if ( $stamp === null )
+            $stamp = self::fileStamp( $file );
+        if ( $stamp === false )
+            return false;
+
+        // The file changed under a compile the opcode cache may still hold (it revalidates by mtime, at most every
+        // opcache.revalidate_freq seconds): read what is on disk now.
+        if ( $changed && function_exists( 'opcache_invalidate' ) )
+            @opcache_invalidate( $file, true );
+
+        $data = @include( $file );
+        if ( is_array( $data ) && isset( $data['expires'] ) && $data['expires'] > $now )
+        {
+            self::$resolvedCache[$key] = $data;
+            self::$resolvedStamps[$key] = $stamp;
+            self::$resolvedChecked[$key] = true;
+            return $data;
+        }
+        @unlink( $file );
 
         return false;
     }
@@ -248,13 +328,31 @@ class expLayoutsResolver
             'expires' => time() + $ttl,
         );
 
-        self::$resolvedCache[$key] = $data;
+        self::storeEntry( $key, $data );
+    }
+
+    /**
+     * Writes a cache entry and remembers it with the stamp of the file written. When the file could not be written
+     * the entry still serves the rest of this request, and the next one resolves again.
+     */
+    private static function storeEntry( $key, $data )
+    {
+        self::startRequest();
         eZFile::create( $key . '.php', self::cacheDir(), '<?php return ' . var_export( $data, true ) . ';', true );
+        $stamp = self::fileStamp( self::cacheFile( $key ) );
+        self::$resolvedCache[$key] = $data;
+        self::$resolvedChecked[$key] = true;
+        if ( $stamp !== false )
+            self::$resolvedStamps[$key] = $stamp;
+        else
+            unset( self::$resolvedStamps[$key] );
     }
 
     public static function clearCache()
     {
         self::$resolvedCache = array();
+        self::$resolvedStamps = array();
+        self::$resolvedChecked = array();
         self::$adminMemo = array();
         self::bumpAdminGeneration();
 
@@ -409,8 +507,9 @@ class expLayoutsResolver
 
         $current = eZSiteAccess::current();
         $siteAccessName = ( is_array( $current ) && isset( $current['name'] ) ) ? $current['name'] : 'default';
+        self::startRequest();
         $generation = self::adminGeneration();
-        $memoKey = $generation . '|' . $siteAccessName . '|' . $module . '|' . $view;
+        $memoKey =$generation . '|' . $siteAccessName . '|' . $module . '|' . $view;
         if ( array_key_exists( $memoKey, self::$adminMemo ) )
             return self::$adminMemo[$memoKey];
 
@@ -479,8 +578,7 @@ class expLayoutsResolver
             'generation' => $generation,
             'expires' => time() + $ttl,
         );
-        self::$resolvedCache[$key] = $data;
-        eZFile::create( $key . '.php', self::cacheDir(), '<?php return ' . var_export( $data, true ) . ';', true );
+        self::storeEntry( $key, $data );
     }
 
     static function ruleMatches( $rule, $path, $context = false )

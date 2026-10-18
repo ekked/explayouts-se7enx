@@ -20,6 +20,19 @@ if ( $layout instanceof expLayoutsLayout )
 }
 ```
 
+### The resolver cache
+
+Each answer is kept in `var/<site>/cache/explayouts/resolver/<md5 of path|siteaccess>.php` for
+`[ResolverSettings] CacheTTL` seconds (default 3600; "no rule matched" and the default layout at most 300).
+`expLayoutsResolver::clearCache()` removes every entry and bumps the admin generation; publishing a layout and
+changing a rule run it. Deleting the directory by hand clears it as well.
+
+A process also remembers the entries it read or wrote, for the rest of its life when the server keeps it for many
+requests (Exponential Velocity with `ForkPerRequest=disabled`). That copy is checked against the file once per request
+(`$_SERVER['REQUEST_TIME_FLOAT']` tells requests apart), with one `stat()` and no database query: an entry whose file
+was deleted, rewritten by another process or has passed its TTL is not used, so a clear made by Apache, another worker
+or the command line reaches every server on the next request, without a restart.
+
 ## Resolving a layout in templates
 
 The extension registers fetch functions on the `explayouts` module:
