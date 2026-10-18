@@ -14,6 +14,8 @@
  *  SV-06 - the handlers of title, video, map, image, card, badge, button, progress and template block hand the
  *          templates checked values; the link parameter checks the href after its suffix
  *  SV-07 - the standard templates check again with the template operators, and the operators are registered
+ *  SV-08 - every include of a block template by its definition_identifier (zones, containers) checks the name first:
+ *          a stored identifier is not validated (rows from before the block forms checked it, imports)
  */
 
 $failures = 0;
@@ -124,6 +126,26 @@ svCheck( $value === '', 'SV-07 explayouts_safe_url empties a script address' );
 $value = 'script';
 $operator->modify( null, 'explayouts_safe_tag', array(), '', '', $value, array( 'level' => 5 ) );
 svCheck( $value === 'h5', 'SV-07 explayouts_safe_tag falls back to the level' );
+
+// SV-08
+$unguarded = array();
+$guarded = 0;
+$it = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $root . '/design/standard/templates/explayouts', FilesystemIterator::SKIP_DOTS ) );
+foreach ( $it as $file )
+{
+    if ( substr( $file->getFilename(), -4 ) !== '.tpl' )
+        continue;
+    foreach ( file( $file->getPathname() ) as $number => $line )
+    {
+        if ( !preg_match( "#'design:explayouts/block/'\\s*,\\s*\\$(\\w+)\\.definition_identifier#", $line ) )
+            continue;
+        if ( preg_match( "#\\{if \\$(\\w+)\\.definition_identifier\\|explayouts_safe_template_name\\}\\{include uri=concat\\( 'design:explayouts/block/', \\$\\1\\.definition_identifier\\|explayouts_safe_template_name, '\\.tpl' \\)#", $line ) )
+            $guarded++;
+        else
+            $unguarded[] = basename( $file->getPathname() ) . ':' . ( $number + 1 );
+    }
+}
+svCheck( $guarded >= 12 && $unguarded === array(), "SV-08 every block include checks the identifier ($guarded guarded)" . ( $unguarded ? ': ' . implode( ', ', $unguarded ) : '' ) );
 
 echo $failures ? "$failures failed\n" : "all passed\n";
 exit( $failures ? 1 : 0 );
