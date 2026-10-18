@@ -52,11 +52,18 @@ class expLayoutsBlockHandlerFactory
         $isContainer = $ini->hasVariable( $blockSection, 'IsContainer' ) ? (bool)$ini->variable( $blockSection, 'IsContainer' ) : false;
         $placeholders = $ini->hasVariable( $blockSection, 'Placeholders' ) ? $ini->variable( $blockSection, 'Placeholders' ) : array();
         $category = $ini->hasVariable( $blockSection, 'Category' ) ? $ini->variable( $blockSection, 'Category' ) : 'standard';
+        // Labels of the view types in the editor's View type select, as
+        // ViewTypeNames[<view type>]=<label>; a view type without one is shown
+        // by its identifier.
+        $viewTypeNames = $ini->hasVariable( $blockSection, 'ViewTypeNames' ) ? $ini->variable( $blockSection, 'ViewTypeNames' ) : array();
+        if ( !is_array( $viewTypeNames ) )
+            $viewTypeNames = array();
 
         return array(
             'identifier' => $definitionIdentifier,
             'name' => $name,
             'view_types' => $viewTypes,
+            'view_type_names' => $viewTypeNames,
             'has_collection' => $hasCollection,
             'is_container' => $isContainer,
             'placeholders' => $placeholders,

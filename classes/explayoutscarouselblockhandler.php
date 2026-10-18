@@ -39,11 +39,15 @@ class expLayoutsCarouselBlockHandler extends expLayoutsAbstractContentBlockHandl
             if ( $object )
             {
                 $dataMap = $object->attribute( 'data_map' );
-                if ( isset( $dataMap[$result['image_attribute']] ) )
+                if ( is_array( $dataMap ) && isset( $dataMap[$result['image_attribute']] ) )
                 {
                     $attr = $dataMap[$result['image_attribute']];
-                    $image = $attr->hasAttribute( 'content' ) ? $attr->attribute( 'content' ) : false;
-                    if ( $image )
+                    $image = is_object( $attr ) && $attr->hasAttribute( 'content' ) ? $attr->attribute( 'content' ) : false;
+                    // Only an image alias handler has an original: an attribute
+                    // of another type under the same identifier has an array as
+                    // content, and attribute() on it was "Call to a member
+                    // function attribute() on array".
+                    if ( is_object( $image ) && method_exists( $image, 'attribute' ) )
                     {
                         $original = $image->attribute( 'original' );
                         $url = is_array( $original ) && isset( $original['url'] ) ? (string)$original['url'] : '';

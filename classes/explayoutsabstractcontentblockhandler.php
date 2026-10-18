@@ -10,7 +10,8 @@ abstract class expLayoutsAbstractContentBlockHandler implements expLayoutsBlockH
      */
     protected function fetchItems( $parameters, $block = false )
     {
-        $result = $this->fetchItemsFromQuery( $parameters, $block );
+        $source = $this->itemSource( $parameters, $block );
+        $result = $this->fetchItemsFromSource( $parameters, $source );
         if ( class_exists( 'ezpHttpCacheListener' ) && is_array( $result ) )
         {
             $tags = array();
@@ -22,15 +23,7 @@ abstract class expLayoutsAbstractContentBlockHandler implements expLayoutsBlockH
                     $tags[] = 'c' . (int)$item->attribute( 'contentobject_id' );
                 }
             }
-            $queryType = isset( $parameters['query_type'] ) ? trim( $parameters['query_type'] ) : 'children';
-            $manual = $queryType === 'manual';
-            if ( is_array( $block ) && isset( $block['id'] ) )
-            {
-                $collection = expLayoutsCollection::fetchByBlock( (int)$block['id'] );
-                if ( $collection && $collection->attribute( 'collection_type' ) === 'dynamic' )
-                    $manual = false;
-            }
-            if ( !$manual )
+            if ( $source['query_type'] !== 'manual' )
             {
                 $tags[] = 'dq';
                 $parent = (int)( $parameters['parent_node_id'] ?? $parameters['node_id'] ?? 0 );
@@ -42,33 +35,81 @@ abstract class expLayoutsAbstractContentBlockHandler implements expLayoutsBlockH
         return $result;
     }
 
-    protected function fetchItemsFromQuery( $parameters, $block = false )
+    /**
+     * Where the block's items come from, worked out once per render: the
+     * block's collection (fetched once) and the query type - 'dynamic' for a
+     * dynamic collection, otherwise query_type, otherwise 'manual' for a
+     * manual collection with items when the block names no parent node (the
+     * editor gives every block with a collection a manual collection and adds
+     * its items there, but never sets query_type: the block ran the
+     * 'children' query of an empty parent and showed nothing), otherwise
+     * 'children'. A parent node comes first, as in the gallery blocks.
+     *
+     * @return array( 'query_type' => string, 'collection' => expLayoutsCollection|null[, 'items' => the manual
+     *               collection's items when they were fetched to decide] )
+     */
+    protected function itemSource( $parameters, $block = false )
     {
-        // Dynamic collections imported from Netgen Layouts carry their own query row;
-        // execute it ahead of the block-level query_type parameter.
+        $collection = null;
         if ( is_array( $block ) && isset( $block['id'] ) )
         {
-            $dynCollection = expLayoutsCollection::fetchByBlock( (int)$block['id'] );
-            if ( $dynCollection && $dynCollection->attribute( 'collection_type' ) === 'dynamic' )
+            $collection = expLayoutsCollection::fetchByBlock( (int)$block['id'] );
+            if ( !$collection )
+                $collection = null;
+        }
+
+        if ( $collection && $collection->attribute( 'collection_type' ) === 'dynamic' )
+            return array( 'query_type' => 'dynamic', 'collection' => $collection );
+
+        $queryType = isset( $parameters['query_type'] ) ? trim( (string)$parameters['query_type'] ) : '';
+        if ( $queryType === '' )
+        {
+            $parent = (int)( $parameters['parent_node_id'] ?? 0 );
+            $node = (int)( $parameters['node_id'] ?? 0 );
+            $queryType = 'children';
+            if ( $parent <= 0 && $node <= 0 && $collection && $collection->attribute( 'collection_type' ) === 'manual' )
             {
-                $dynResult = expLayoutsDynamicCollection::fetch( $dynCollection );
-                if ( $dynResult !== false )
-                    return $dynResult;
+                $items = expLayoutsCollectionItem::fetchByCollection( (int)$collection->attribute( 'id' ) );
+                if ( count( $items ) > 0 )
+                    return array( 'query_type' => 'manual', 'collection' => $collection, 'items' => $items );
             }
         }
 
-        $queryType = isset( $parameters['query_type'] ) ? trim( $parameters['query_type'] ) : 'children';
+        return array( 'query_type' => $queryType, 'collection' => $collection );
+    }
+
+    protected function fetchItemsFromQuery( $parameters, $block = false )
+    {
+        return $this->fetchItemsFromSource( $parameters, $this->itemSource( $parameters, $block ) );
+    }
+
+    protected function fetchItemsFromSource( $parameters, $source )
+    {
+        $collection = $source['collection'];
+        $queryType = $source['query_type'];
+
+        // Dynamic collections imported from Netgen Layouts carry their own query row;
+        // execute it ahead of the block-level query_type parameter.
+        if ( $queryType === 'dynamic' )
+        {
+            $dynResult = expLayoutsDynamicCollection::fetch( $collection );
+            if ( $dynResult !== false )
+                return $dynResult;
+            $queryType = isset( $parameters['query_type'] ) && trim( (string)$parameters['query_type'] ) !== '' ? trim( (string)$parameters['query_type'] ) : 'children';
+        }
+
         $handler = expLayoutsQueryHandlerFactory::get( $queryType );
 
         if ( $handler )
         {
             $params = $parameters;
 
-            if ( $queryType === 'manual' && is_array( $block ) && isset( $block['id'] ) )
+            if ( $queryType === 'manual' && $collection )
             {
-                $collection = expLayoutsCollection::fetchByBlock( (int)$block['id'] );
-                if ( $collection )
-                    $params['collection_id'] = (int)$collection->attribute( 'id' );
+                $params['collection_id'] = (int)$collection->attribute( 'id' );
+                // already fetched by itemSource(): handed on, not fetched again
+                if ( isset( $source['items'] ) )
+                    $params['collection_items'] = $source['items'];
             }
 
             if ( !isset( $params['node_id'] ) || (int)$params['node_id'] === 0 )

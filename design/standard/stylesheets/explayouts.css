@@ -246,6 +246,162 @@
     border-radius: 0.25rem;
 }
 
+/* With the number of thumbnails per row set (every gallery block renders the
+   class explayouts-cols-<n>), the gallery has exactly that many columns. */
+.slb-gallery[class*="explayouts-cols-"] .gallery-grid {
+    grid-template-columns: repeat(var(--explayouts-gallery-columns, 6), minmax(0, 1fr));
+}
+
+.slb-gallery[class*="explayouts-cols-"] img {
+    height: auto;
+    aspect-ratio: 4 / 3;
+}
+
+/* Gallery view types: the block's "Thumbnails per row/slide"
+   (number_of_thumbnails, 1 to 12) arrives as the class explayouts-cols-<n>
+   (no inline style: the administration's Content-Security-Policy forbids it). */
+.explayouts-cols-1 { --explayouts-gallery-columns: 1; }
+.explayouts-cols-2 { --explayouts-gallery-columns: 2; }
+.explayouts-cols-3 { --explayouts-gallery-columns: 3; }
+.explayouts-cols-4 { --explayouts-gallery-columns: 4; }
+.explayouts-cols-5 { --explayouts-gallery-columns: 5; }
+.explayouts-cols-6 { --explayouts-gallery-columns: 6; }
+.explayouts-cols-7 { --explayouts-gallery-columns: 7; }
+.explayouts-cols-8 { --explayouts-gallery-columns: 8; }
+.explayouts-cols-9 { --explayouts-gallery-columns: 9; }
+.explayouts-cols-10 { --explayouts-gallery-columns: 10; }
+.explayouts-cols-11 { --explayouts-gallery-columns: 11; }
+.explayouts-cols-12 { --explayouts-gallery-columns: 12; }
+
+.slb-grid-gallery .grid-gallery,
+.slb-thumb-gallery .thumb-gallery {
+    display: grid;
+    grid-template-columns: repeat(var(--explayouts-gallery-columns, 6), minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.slb-slider .slider,
+.slb-sushi-bar .sushi-bar {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - (var(--explayouts-gallery-columns, 6) - 1) * 0.75rem) / var(--explayouts-gallery-columns, 6));
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+.slb-slider .slide,
+.slb-sushi-bar .sushi-item {
+    scroll-snap-align: start;
+}
+
+.slb-grid-gallery img,
+.slb-thumb-gallery img,
+.slb-sushi-bar img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0.25rem;
+}
+
+.slb-slider img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 0.25rem;
+}
+
+@media (max-width: 575.98px) {
+    .slb-gallery[class*="explayouts-cols-"] .gallery-grid,
+    .slb-grid-gallery .grid-gallery,
+    .slb-thumb-gallery .thumb-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .slb-slider .slider,
+    .slb-sushi-bar .sushi-bar {
+        grid-auto-columns: calc((100% - 0.75rem) / 2);
+    }
+}
+
+/* Lightbox of the gallery blocks (javascript/explayouts_lightbox.js). */
+.explayouts-lightbox-dialog {
+    max-width: min(96vw, 80rem);
+    max-height: 96vh;
+    padding: 2.5rem 3rem 1rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: #111;
+    color: #f5f5f5;
+}
+
+.explayouts-lightbox-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.explayouts-lightbox-dialog figure {
+    margin: 0;
+}
+
+.explayouts-lightbox-dialog img {
+    display: block;
+    max-width: 100%;
+    max-height: calc(96vh - 6rem);
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+.explayouts-lightbox-dialog figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.5rem;
+}
+
+.explayouts-lightbox-dialog figcaption a {
+    color: inherit;
+}
+
+.explayouts-lightbox-dialog button {
+    position: absolute;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.explayouts-lightbox-dialog button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.explayouts-lightbox-close {
+    top: 0.25rem;
+    right: 0.75rem;
+}
+
+.explayouts-lightbox-previous,
+.explayouts-lightbox-next {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.explayouts-lightbox-previous {
+    left: 0.5rem;
+}
+
+.explayouts-lightbox-next {
+    right: 0.5rem;
+}
+
+.explayouts-lightbox-dialog [hidden] {
+    display: none;
+}
+
 .slb-image img {
     max-width: 100%;
     height: auto;
