@@ -82,6 +82,16 @@ class NetgenParityBlocksTest extends TestCase
             'attribute break' => array( '[x](https://a.example/"onmouseover="alert)' ),
             'image from another host' => array( '![x](https://tracker.example/pixel.png)' ),
             'protocol relative image' => array( '![x](//tracker.example/pixel.png)' ),
+            // the own parser's placeholder mark written into the text, in a title, in an address and nested
+            'placeholder in the text' => array( "\x1A0\x1A [a](https://a.example/ \"t\") \x1A1\x1A" ),
+            'placeholder in a title' => array( "`<b onmouseover=alert(1)>` [a](https://a.example/ \"\x1A0\x1A\")" ),
+            'code span in a title' => array( '[x](https://a.example/ "`"onmouseover="alert(1)`") [y](https://b.example/)' ),
+            'link in a title' => array( '[x](https://a.example/ "[y](javascript:alert(1))")' ),
+            'code span in an address' => array( '[x](https://a.example/`"onmouseover="alert(1)`)' ),
+            'escaped character in an address' => array( '[x](https://a.example/\\"onmouseover=alert(1))' ),
+            'nested placeholders' => array( "[`\x1A0\x1A`](https://a.example/) [\x1A\x1A1\x1A\x1A](https://b.example/ \"\x1A2\x1A\")" ),
+            'code span in an automatic link' => array( '<https://a.example/`"onmouseover="x`>' ),
+            'control characters' => array( "java\x00script: [x](java\x01script:alert(1))" ),
         );
     }
 
@@ -95,6 +105,27 @@ class NetgenParityBlocksTest extends TestCase
         $this->assertDoesNotMatchRegularExpression( '/\son[a-z]+="/i', $html );
         $this->assertDoesNotMatchRegularExpression( '/href="(?:javascript|data|&#)/i', $html );
         $this->assertDoesNotMatchRegularExpression( '/<img[^>]+src="(?:https?:)?\/\//i', $html, 'no image from another host' );
+        self::assertOnlyOwnMarkup( $html );
+    }
+
+    /**
+     * Every tag is one the parser writes, every attribute value is escaped text (no tag, no quote inside), and no
+     * control character or placeholder mark is left.
+     */
+    protected static function assertOnlyOwnMarkup( $html )
+    {
+        self::assertDoesNotMatchRegularExpression( '/[\x00-\x08\x0B\x0C\x0E-\x1F]/', $html, 'control character or placeholder mark' );
+        preg_match_all( '/<\/?([a-zA-Z0-9]+)((?:\s+[a-z]+="[^"<>]*")*)\s*\/?>/', $html, $tags );
+        self::assertSame( preg_match_all( '/</', $html ), count( $tags[0] ), "only well formed tags of the parser:\n$html" );
+        foreach ( $tags[1] as $i => $name )
+        {
+            self::assertContains( strtolower( $name ), array( 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'pre',
+                'code', 'em', 'strong', 'a', 'img', 'br', 'hr' ), $html );
+            preg_match_all( '/\s([a-z]+)="/', $tags[2][$i], $attributes );
+            foreach ( $attributes[1] as $attribute )
+                self::assertContains( $attribute, array( 'href', 'title', 'src', 'alt', 'start' ), $html );
+        }
+        self::assertDoesNotMatchRegularExpression( '/href="\s*(?:javascript|vbscript|data):/i', $html );
     }
 
     public function testAnImageOfTheSiteIsShownOneOfAnotherHostIsALink()
@@ -114,6 +145,7 @@ class NetgenParityBlocksTest extends TestCase
             $this->assertStringNotContainsString( '<script', $html );
             $this->assertDoesNotMatchRegularExpression( '/href="(?:javascript|data|&#)/i', $html );
             $this->assertDoesNotMatchRegularExpression( '/<img[^>]+src="(?:https?:)?\/\//i', $html );
+            self::assertOnlyOwnMarkup( $html );
         }
         $this->assertStringContainsString( '<h2>Heading</h2>', expLayoutsMarkdown::toHtml( '## Heading' ) );
     }

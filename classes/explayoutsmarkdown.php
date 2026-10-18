@@ -36,6 +36,9 @@ class expLayoutsMarkdown
         // invalid UTF-8 would make htmlspecialchars() return '' and the converter throw
         if ( function_exists( 'mb_convert_encoding' ) && !mb_check_encoding( $text, 'UTF-8' ) )
             $text = mb_convert_encoding( $text, 'UTF-8', 'UTF-8' );
+        // control characters other than tab and line breaks are no text; \x1A is the own parser's placeholder mark,
+        // which must never come from the text
+        $text = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text );
         if ( trim( $text ) === '' )
             return '';
 
@@ -300,7 +303,12 @@ class expLayoutsMarkdown
             $isImage = $m[1] === '!';
             $label = $m[2];
             $url = $m[3];
-            $title = isset( $m[4] ) && $m[4] !== '' ? ' title="' . self::escape( $m[4] ) . '"' : '';
+            $rawTitle = isset( $m[4] ) ? $m[4] : '';
+            // An attribute is built from the raw text only: an address or title holding a placeholder (a code span,
+            // an escaped character) is no link, its label stays text.
+            if ( strpos( $url . $rawTitle, "\x1A" ) !== false )
+                return $keep( ( $isImage ? '!' : '' ) . '[' . self::inlineText( $label, $tokens ) . ']' );
+            $title = $rawTitle !== '' ? ' title="' . self::escape( $rawTitle ) . '"' : '';
             if ( $isImage && self::isLocalPath( $url ) )
                 return $keep( '<img src="' . self::escape( $url ) . '" alt="' . self::escape( self::plain( $label, $tokens ) ) . '"' . $title . ' />' );
             if ( expLayoutsSafeValue::url( $url ) === '' )
@@ -309,7 +317,7 @@ class expLayoutsMarkdown
         }, $text );
 
         // automatic links <https://...>
-        $text = preg_replace_callback( '/<(https?:\/\/[^\s<>]+)>/i', function ( $m ) use ( $keep )
+        $text = preg_replace_callback( '/<(https?:\/\/[^\s<>\x1A]+)>/i', function ( $m ) use ( $keep )
         {
             return $keep( '<a href="' . self::escape( $m[1] ) . '">' . self::escape( $m[1] ) . '</a>' );
         }, $text );
@@ -328,14 +336,12 @@ class expLayoutsMarkdown
 
         if ( $tokens === null )
             return $text;
-        // pieces kept inside pieces (a code span in a link text) need more than one pass
-        for ( $pass = 0; $pass < 3 && strpos( $text, "\x1A" ) !== false; $pass++ )
+        // One pass: a kept piece is complete when it is kept (a link keeps its label with the pieces inside it put
+        // back), so nothing put back here is read again.
+        $text = preg_replace_callback( '/\x1A(\d+)\x1A/', function ( $m ) use ( $tokens )
         {
-            $text = preg_replace_callback( '/\x1A(\d+)\x1A/', function ( $m ) use ( $tokens )
-            {
-                return isset( $tokens[(int)$m[1]] ) ? $tokens[(int)$m[1]] : '';
-            }, $text );
-        }
+            return isset( $tokens[(int)$m[1]] ) ? $tokens[(int)$m[1]] : '';
+        }, $text );
         return str_replace( "\x1A", '', $text );
     }
 
