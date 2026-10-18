@@ -1,13 +1,18 @@
 <?php
 // @description List the collection items of a block: collection_list.php <block_id>
-if ( !isset( $argv[1] ) )
+// Run through bin/php/ezexec.php, which includes this file from inside a method: $argv is not in scope there, and
+// the arguments are in $options['arguments'], the first being this file. Run directly, $argv holds them.
+$scriptArguments = isset( $options['arguments'] ) && is_array( $options['arguments'] )
+    ? array_slice( $options['arguments'], 1 )
+    : ( isset( $argv ) && is_array( $argv ) ? array_slice( $argv, 1 ) : array() );
+if ( !isset( $scriptArguments[0] ) )
 {
     echo "Usage: collection_list.php <block_id>\n";
     if ( isset( $script ) ) $script->setExitCode( 1 );
     return;
 }
 
-$blockId = (int)$argv[1];
+$blockId = (int)$scriptArguments[0];
 $collection = expLayoutsCollection::fetchByBlock( $blockId );
 
 if ( !$collection )

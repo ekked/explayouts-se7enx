@@ -1,6 +1,8 @@
 {ezcss_load(array('netgen/layouts-admin.css','netgen/layouts-exponential.css','explayouts-ui.css'))}
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+{* only for users with explayouts/read, as the tab header (tabs/explayouts_header.tpl) *}
+{if fetch( 'user', 'has_access_to', hash( 'module', 'explayouts', 'function', 'read' ) )}
 {def $resolved = fetch('explayouts','layout_summary_for_node',hash('node_id',$node.node_id))}
 {def $rules = fetch('explayouts','rules_for_node',hash('node_id',$node.node_id))}
 {literal}<style>
@@ -144,3 +146,4 @@
         </div>
     </div>
 </div>
+{/if}

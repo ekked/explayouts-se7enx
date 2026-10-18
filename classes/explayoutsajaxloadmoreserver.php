@@ -114,14 +114,17 @@ class expLayoutsAjaxLoadMoreServer
      * next page was rendered under the admin siteaccess, with the admin design,
      * and came back empty. The same switch as the preview's is made here, only
      * for an admin siteaccess (an admin design): the public siteaccesses call
-     * this for their own pages and keep their own design.
+     * this for their own pages and keep their own design. Which public
+     * siteaccess: expLayoutsPreviewSiteAccess (not DefaultAccess, the default
+     * of the whole installation, which may be another site's); none found, the
+     * page is rendered as it is.
      */
     protected static function renderAsPublicSite()
     {
         $ini = eZINI::instance();
         if ( strpos( (string)$ini->variable( 'DesignSettings', 'SiteDesign' ), 'admin' ) !== 0 )
             return;
-        $siteAccess = $ini->variable( 'SiteSettings', 'DefaultAccess' );
+        $siteAccess = expLayoutsPreviewSiteAccess::resolve();
         $access = $GLOBALS['eZCurrentAccess'];
         if ( !$siteAccess || ( isset( $access['name'] ) && $access['name'] === $siteAccess ) )
             return;
