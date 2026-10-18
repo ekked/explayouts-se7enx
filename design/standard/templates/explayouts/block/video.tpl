@@ -5,6 +5,7 @@
         <figure class="video{if $block.values.service} video-{$block.values.service|wash}{/if}">
             {include uri='design:explayouts/block/parts/embed.tpl'
                      src=$block.values.video_url|explayouts_safe_embed_url
+                     host=first_set( $block.values.embed_host, '' )
                      kind='video'
                      title=cond( $block.values.caption|ne( '' ), $block.values.caption, 'Video'|i18n( 'design/standard/explayouts/block/video' ) )
                      width=$block.values.width

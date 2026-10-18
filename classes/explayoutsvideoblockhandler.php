@@ -87,14 +87,15 @@ class expLayoutsVideoBlockHandler implements expLayoutsBlockHandlerInterface
         // blocks that carry one.
         $url = self::serviceUrl( $service, $videoId );
         if ( $url === '' && isset( $params['video_url'] ) )
-            // the src of an iframe: http(s) or a path on this site, nothing a browser runs as script
-            $url = expLayoutsSafeValue::embedUrl( $params['video_url'] );
+            // the src of a frame of another host: http(s), nothing a browser runs as script, no page of this site
+            $url = expLayoutsSafeValue::externalEmbedUrl( $params['video_url'] );
 
         return array(
             'service' => $service,
             'video_id' => $videoId,
             'caption' => isset( $params['caption'] ) ? (string)$params['caption'] : '',
             'video_url' => $url,
+            'embed_host' => expLayoutsSafeValue::host( $url ),
             'width' => isset( $params['width'] ) ? $params['width'] : '100%',
             'height' => isset( $params['height'] ) && (int)$params['height'] > 0 ? (int)$params['height'] : 360,
             'autoplay' => isset( $params['autoplay'] ) ? (int)$params['autoplay'] : 0,

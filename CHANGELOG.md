@@ -25,8 +25,9 @@
 
 - **Markdown block renders Markdown** (the reference: `markdown_to_html`). With `league/commonmark` installed it is
   CommonMark with HTML in the text escaped, unsafe links dropped and the nesting limited; links with another scheme
-  than http, https, mailto and tel become text, images from other hosts become links. Without the library a small
-  parser of its own renders headings, paragraphs, lists, quotes, code, emphasis, links and images of the site
+  than http, https, mailto and tel become text, images from other hosts become links (inside a link: their text).
+  Without the library a scanner of its own (no backtracking patterns, linear in the text) renders headings,
+  paragraphs, lists, quotes, code, emphasis, links and images of the site the way CommonMark does
   (`expLayoutsMarkdown`). Suggested in `composer.json`.
 - **Two columns** has the view types `two_columns_50_50` (first, as in the reference), `_33_66` and `_66_33`;
   **three columns** `three_columns_33_33_33`, `_50_25_25`, `_25_50_25` and `_25_25_50` (a block stored as
@@ -39,13 +40,23 @@
   `[MapSettings] GoogleMapsApiKey` the map is Google's Maps Embed API, without it OpenStreetMap; the embed address
   stays for existing blocks.
 - Video and map load after a click in the standard templates (`javascript/explayouts_embed.js`): no request to the
-  other host before.
+  other host before. Their addresses are addresses of another host only: `//host/...` is read as https, a page of
+  this site is refused (it would sit in a frame with scripts and its own origin, outside any sandbox).
 - **Gallery blocks**: the reference's design parameters next/previous, pagination, infinite loop, transition,
-  autoplay with its time, thumbnails to move, details and details on hover, each for the reference's view types.
+  autoplay with its time, thumbnails to move, details and details on hover, each for the view types the reference
+  offers it for - with two deliberate exceptions: the autoplay time is offered for the slider too (the reference's
+  slider plays automatically but leaves the time out), and `number_of_thumbnails` and `enable_lightbox`, which this
+  port had before, stay offered for all five gallery view types (the reference limits the lightbox to the grid
+  gallery and the thumbnails to grid gallery and sushi bar).
 - Selects for the title's HTML tag (h1-h6, p, div), the button's style (default, highlighted, link) and target.
 - Heading level for the component blocks (hero, about, features, lead); features take a list of features
   (`Title|Text` per line, `expLayoutsFeaturesBlockHandler`).
 - Number fields carry min and max where the reference has them.
+- **Content and Design tab as in the reference**: `[BlockDefinition_<id>] ContentParameters[]` names the parameters
+  of the group "content" (the block's text, links, images, video, map); the layout editor shows them in the Content
+  tab with the block label and the collection, all others in the Design tab (`expLayoutsBlockHandlerFactory::
+  parameterGroup()`). A definition without the list keeps every parameter in the Design tab.
+- View type names for the list block.
 
 ### Fixed
 
@@ -54,6 +65,12 @@
 - The content component blocks `exp_component_*` have a standard template.
 
 ### Upgrade
+
+- **Markdown blocks stored before** were printed with `nl2br`: every line break was a break. CommonMark (and the
+  reference) joins the lines of a paragraph. Set `explayouts.ini [MarkdownSettings] HardBreaks=enabled` to keep the
+  old breaks for such blocks, or end a line with two spaces or a backslash where a break is meant.
+- Video and map blocks whose address is a path on this site show nothing any more; enter the address of the player
+  or map.
 
 - New classes (`expLayoutsSafeValue`, `expLayoutsPreviewSiteAccess`, `expLayoutsMarkdown`,
   `expLayoutsFeaturesBlockHandler`) and template operators: run

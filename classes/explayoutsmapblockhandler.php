@@ -148,8 +148,8 @@ class expLayoutsMapBlockHandler implements expLayoutsBlockHandlerInterface
         }
         elseif ( isset( $params['embed_url'] ) )
         {
-            // the src of an iframe: http(s) or a path on this site, nothing a browser runs as script
-            $embedUrl = expLayoutsSafeValue::embedUrl( $params['embed_url'] );
+            // the src of a frame of another host: http(s), nothing a browser runs as script, no page of this site
+            $embedUrl = expLayoutsSafeValue::externalEmbedUrl( $params['embed_url'] );
             $provider = $embedUrl !== '' ? 'embed' : '';
         }
 
@@ -161,6 +161,7 @@ class expLayoutsMapBlockHandler implements expLayoutsBlockHandlerInterface
             'show_marker' => $showMarker ? 1 : 0,
             'provider' => $provider,
             'embed_url' => $embedUrl,
+            'embed_host' => expLayoutsSafeValue::host( $embedUrl ),
             'width' => isset( $params['width'] ) ? $params['width'] : '100%',
             'height' => isset( $params['height'] ) && (int)$params['height'] > 0 ? (int)$params['height'] : 400,
         );

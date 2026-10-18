@@ -5,6 +5,7 @@
     {if $block.values.embed_url|explayouts_safe_embed_url}
         {include uri='design:explayouts/block/parts/embed.tpl'
                  src=$block.values.embed_url|explayouts_safe_embed_url
+                 host=first_set( $block.values.embed_host, '' )
                  kind='map'
                  title='Map'|i18n( 'design/standard/explayouts/block/map' )
                  width=$block.values.width

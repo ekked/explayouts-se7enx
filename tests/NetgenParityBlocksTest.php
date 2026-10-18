@@ -128,6 +128,84 @@ class NetgenParityBlocksTest extends TestCase
         self::assertDoesNotMatchRegularExpression( '/href="\s*(?:javascript|vbscript|data):/i', $html );
     }
 
+    public static function exactMarkdown()
+    {
+        return array(
+            'backslash in a code span' => array( '`a\*b`', '<p><code>a\*b</code></p>' ),
+            'escaped quote in a title' => array( '[x](/ok "a\"b")', '<p><a href="/ok" title="a&quot;b">x</a></p>' ),
+            'escaped character in an address' => array( '[x](https://a.example/\"onmouseover=alert(1))',
+                '<p><a href="https://a.example/%22onmouseover=alert(1)">x</a></p>' ),
+            'placeholder in the text' => array( "\x1A0\x1A [a](https://a.example/ \"t\") \x1A1\x1A",
+                '<p>0 <a href="https://a.example/" title="t">a</a> 1</p>' ),
+            'nested placeholders' => array( "[`\x1A0\x1A`](https://a.example/) [\x1A\x1A1\x1A\x1A](https://b.example/ \"\x1A2\x1A\")",
+                '<p><a href="https://a.example/"><code>0</code></a> <a href="https://b.example/" title="2">1</a></p>' ),
+            'code span in a title' => array( '[x](https://a.example/ "`<b>`")', '<p><a href="https://a.example/" title="`&lt;b&gt;`">x</a></p>' ),
+            'image of another host in a link' => array( '[![A](https://b.example/a.png)](https://a.example/)', '<p><a href="https://a.example/">A</a></p>' ),
+            'image of the site in a link' => array( '[![A](/a.png)](/x)', '<p><a href="/x"><img src="/a.png" alt="A" /></a></p>' ),
+            'nested emphasis' => array( '***a** b*', '<p><em><strong>a</strong> b</em></p>' ),
+            'intraword underscore' => array( 'snake_case_name', '<p>snake_case_name</p>' ),
+            'soft break' => array( "a\nb", "<p>a\nb</p>" ),
+            'hard break' => array( "a  \nb\\\nc", "<p>a<br />\nb<br />\nc</p>" ),
+        );
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider( 'exactMarkdown' )]
+    public function testTheOwnParserGivesWhatCommonMarkGives( $text, $expected )
+    {
+        expLayoutsMarkdown::$hardBreaks = false;
+        $this->assertSame( $expected, trim( expLayoutsMarkdown::toHtml( $text, false ) ) );
+        if ( expLayoutsMarkdown::hasLibrary() )
+            $this->assertSame( $expected, trim( expLayoutsMarkdown::toHtml( $text ) ), 'league/commonmark' );
+    }
+
+    public function testHardBreaksTurnEveryLineBreakIntoABreak()
+    {
+        expLayoutsMarkdown::$hardBreaks = true;
+        try
+        {
+            $this->assertSame( "<p>a<br />\nb</p>", trim( expLayoutsMarkdown::toHtml( "a\nb", false ) ) );
+            if ( expLayoutsMarkdown::hasLibrary() )
+                $this->assertSame( "<p>a<br />\nb</p>", trim( expLayoutsMarkdown::toHtml( "a\nb" ) ) );
+        }
+        finally
+        {
+            expLayoutsMarkdown::$hardBreaks = false;
+        }
+        $this->assertMatchesRegularExpression( '/^HardBreaks=disabled$/m', (string)self::group( 'MarkdownSettings' ) );
+    }
+
+    public static function slowMarkdown()
+    {
+        return array(
+            'strong' => array( str_repeat( '**a ', 25000 ) ),
+            'emphasis' => array( str_repeat( '*a ', 33000 ) ),
+            'underscore' => array( str_repeat( '_a ', 33000 ) ),
+            'brackets' => array( str_repeat( '[', 100000 ) ),
+            'link starts' => array( str_repeat( '[a](', 25000 ) ),
+            'backticks' => array( implode( 'a', array_map( function ( $n ) { return str_repeat( '`', $n % 50 + 1 ); }, range( 1, 4000 ) ) ) ),
+            'heading of spaces' => array( '# ' . str_repeat( ' ', 99990 ) . 'x' ),
+            'rule' => array( str_repeat( '- ', 50000 ) . 'x' ),
+            'automatic links' => array( str_repeat( '<https://a', 10000 ) ),
+        );
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider( 'slowMarkdown' )]
+    public function testNoTextMakesTheOwnParserSlow( $text )
+    {
+        $jit = ini_get( 'pcre.jit' );
+        ini_set( 'pcre.jit', '0' );
+        try
+        {
+            $start = microtime( true );
+            expLayoutsMarkdown::toHtml( $text, false );
+            $this->assertLessThan( 0.5, microtime( true ) - $start, strlen( $text ) . ' bytes' );
+        }
+        finally
+        {
+            ini_set( 'pcre.jit', $jit );
+        }
+    }
+
     public function testAnImageOfTheSiteIsShownOneOfAnotherHostIsALink()
     {
         $this->assertStringContainsString( '<img src="/var/storage/a.png" alt="A" />', expLayoutsMarkdown::toHtml( '![A](/var/storage/a.png)', false ) );
@@ -267,6 +345,59 @@ class NetgenParityBlocksTest extends TestCase
 
         $values = $handler->getValues( array( 'parameters' => array( 'embed_url' => 'https://www.openstreetmap.org/export/embed.html?bbox=1,2,3,4' ) ) );
         $this->assertSame( 'embed', $values['provider'], 'the address of an existing block stays' );
+    }
+
+    public function testVideoAndMapEmbedAddressesOfAnotherHostOnly()
+    {
+        $this->assertSame( 'https://a.example/x', expLayoutsSafeValue::externalEmbedUrl( '//a.example/x' ) );
+        $this->assertSame( 'http://a.example/x', expLayoutsSafeValue::externalEmbedUrl( 'http://a.example/x' ) );
+        foreach ( array( '/page', '/', 'page', 'javascript:alert(1)', '\\\\a.example/x', '' ) as $bad )
+            $this->assertSame( '', expLayoutsSafeValue::externalEmbedUrl( $bad ), $bad );
+        $this->assertSame( 'a.example', expLayoutsSafeValue::host( 'https://user@A.example:8080/p' ) );
+
+        $values = ( new expLayoutsVideoBlockHandler() )->getValues( array( 'parameters' => array( 'video_url' => '//player.example/v/1' ) ) );
+        $this->assertSame( 'https://player.example/v/1', $values['video_url'] );
+        $this->assertSame( 'player.example', $values['embed_host'] );
+        $this->assertSame( '', ( new expLayoutsVideoBlockHandler() )->getValues( array( 'parameters' => array( 'video_url' => '/content/view/full/2' ) ) )['video_url'] );
+        $map = ( new expLayoutsMapBlockHandler() )->getValues( array( 'parameters' => array( 'embed_url' => '/layouts' ) ) );
+        $this->assertSame( '', $map['embed_url'] );
+        $map = ( new expLayoutsMapBlockHandler() )->getValues( array( 'parameters' => array( 'latitude' => '1', 'longitude' => '2' ) ) );
+        $this->assertSame( 'www.openstreetmap.org', $map['embed_host'] );
+
+        $script = file_get_contents( dirname( __DIR__ ) . '/design/standard/javascript/explayouts_embed.js' );
+        $this->assertStringContainsString( "return /^https?:\\/\\/[^\\/\\\\]/i.test( src );", $script );
+        $this->assertStringContainsString( ".replace( /px$/i, '' )", $script );
+        $this->assertStringContainsString( 'hash( \'%host\', first_set( $host, \'\' ) )', file_get_contents( dirname( __DIR__ ) . '/design/standard/templates/explayouts/block/parts/embed.tpl' ) );
+    }
+
+    public function testEveryContentParameterIsAParameterOfItsBlock()
+    {
+        preg_match_all( '/^\[BlockDefinition_([a-z0-9_]+)\]\n(.*?)(?=^\[|\*\/)/ms', self::ini(), $groups, PREG_SET_ORDER );
+        $checked = 0;
+        foreach ( $groups as $group )
+        {
+            preg_match_all( '/^ContentParameters\[\]=(.+)$/m', $group[2], $listed );
+            if ( !$listed[1] )
+                continue;
+            $this->assertSame( 1, preg_match( '/^Handler=(\w+)$/m', $group[2], $handler ), $group[1] );
+            if ( !class_exists( $handler[1], false ) )
+            {
+                $file = dirname( __DIR__ ) . '/classes/' . strtolower( $handler[1] ) . '.php';
+                if ( !is_file( $file ) )
+                    continue;
+                require_once $file;
+            }
+            $parameters = ( new $handler[1]() )->getParameters();
+            foreach ( $listed[1] as $name )
+                $this->assertArrayHasKey( trim( $name ), $parameters, "{$group[1]}: $name" );
+            $checked++;
+        }
+        $this->assertGreaterThanOrEqual( 20, $checked );
+        // the reference's content parameters of its own blocks
+        $this->assertSame( array( 'title', 'use_link' ), self::listOf( 'BlockDefinition_title', 'ContentParameters' ) );
+        $this->assertSame( array( 'service', 'video_id', 'caption', 'video_url' ), self::listOf( 'BlockDefinition_video', 'ContentParameters' ) );
+        $this->assertSame( array(), self::listOf( 'BlockDefinition_gallery', 'ContentParameters' ), 'the gallery options are design, as in the reference' );
+        $this->assertSame( array(), self::listOf( 'BlockDefinition_list', 'ContentParameters' ) );
     }
 
     public function testTheStandardTemplatesLoadVideoAndMapAfterAClick()

@@ -5,9 +5,11 @@
    for the player, popups for its links, presentation for full screen; no navigation of the page) and with the
    origin as the only referrer. No inline handler, no inline style: the size is the class of the kind (video 16:9,
    map) and the iframe's width and height attributes.
-   Parameters: src, kind (video, map), title, width, height, allow, load_label. *}
+   Only addresses of another host come here (expLayoutsSafeValue::externalEmbedUrl(): http(s), //host as https, no
+   page of this site); host is the host the handler read from the address, for the note.
+   Parameters: src, host, kind (video, map), title, width, height, allow, load_label. *}
 <div class="explayouts-embed explayouts-embed-{$kind|wash}" data-explayouts-embed="{$src|wash}" data-embed-title="{$title|wash}" data-embed-allow="{first_set( $allow, '' )|wash}" data-embed-width="{$width|wash}" data-embed-height="{$height|wash}">
     <button type="button" class="explayouts-embed-load">{$load_label|wash}</button>
-    <p class="explayouts-embed-note">{'Loading it sends data to %host.'|i18n( 'design/standard/explayouts/block/embed', '', hash( '%host', $src|explode( '/' )|extract( 2, 1 )|implode( '' ) ) )|wash}</p>
+    <p class="explayouts-embed-note">{'Loading it sends data to %host.'|i18n( 'design/standard/explayouts/block/embed', '', hash( '%host', first_set( $host, '' ) ) )|wash}</p>
 </div>
 <script src={'javascript/explayouts_embed.js'|ezdesign} defer></script>

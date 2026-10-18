@@ -5,7 +5,7 @@
  * it sets itself up once per page.
  *
  * The placeholder carries the address (data-explayouts-embed, checked on the server; here only
- * http(s) addresses and paths on this site are taken) and the frame's title, allow, width and
+ * http(s) addresses of a host are taken) and the frame's title, allow, width and
  * height. The <iframe> is sandboxed (scripts and its own origin for the player, popups for its
  * links, presentation for full screen; no allow-top-navigation) and sends only the origin as the
  * referrer. The focus moves to the frame, so a keyboard user goes on from where they clicked.
@@ -20,12 +20,15 @@
 
     var SANDBOX = 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation';
 
+    // the server sends addresses of another host only (http(s), //host made https); a page of this site in a frame
+    // with scripts and its own origin would be outside every sandbox
     function allowed( src ) {
-        return /^https?:\/\//i.test( src ) || ( src.charAt( 0 ) === '/' && src.charAt( 1 ) !== '/' && src.charAt( 1 ) !== '\\' );
+        return /^https?:\/\/[^\/\\]/i.test( src );
     }
 
+    // "100%", "640" or "640px" (the width as the editor stores it); anything else: the fallback
     function size( value, fallback ) {
-        value = String( value || '' ).trim();
+        value = String( value || '' ).trim().replace( /px$/i, '' );
         if ( /^\d{1,4}%$/.test( value ) || /^\d{1,5}$/.test( value ) ) {
             return value;
         }

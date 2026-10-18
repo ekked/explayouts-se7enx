@@ -1,5 +1,10 @@
 <?php /* #?ini charset="utf-8"?
 
+# ContentParameters[] of a block definition: the parameters the layout editor shows in its Content tab (with the block
+# label and the collection), as the reference's parameters of the group "content" - the block's own text, links,
+# images, video and map. The others (view type, CSS class and ID, container, whitespace, the design options of the
+# galleries and lists) are in the Design tab, as is every parameter of a definition that lists none. A compound
+# parameter takes its children along.
 [BlockSettings]
 AvailableBlocks[]
 AvailableBlocks[]=title
@@ -70,36 +75,45 @@ Category=containers
 [BlockDefinition_tpl_block]
 Name=Template block
 Handler=expLayoutsTplBlockHandler
+ContentParameters[]=block_name
 ViewTypes[]=tpl_block
 
 Category=placeholders
 [BlockDefinition_text]
 Name=Text
 Handler=expLayoutsTextBlockHandler
+ContentParameters[]=content
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_title]
 Name=Title
 Handler=expLayoutsTitleBlockHandler
+ContentParameters[]=title
+ContentParameters[]=use_link
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_html]
 Name=HTML snippet
 Handler=expLayoutsHtmlBlockHandler
+ContentParameters[]=content
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_rich_text]
 Name=Rich text
 Handler=expLayoutsRichTextBlockHandler
+ContentParameters[]=content
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_image]
 Name=Image
 Handler=expLayoutsImageBlockHandler
+ContentParameters[]=image_url
+ContentParameters[]=alt
+ContentParameters[]=link
 ViewTypes[]=default
 
 Category=basic
@@ -112,18 +126,29 @@ ViewTypes[]=list_numbered
 ViewTypes[]=list_zigzag
 ViewTypes[]=list_accordion
 ViewTypes[]=grid_featured
+ViewTypeNames[list]=List
+ViewTypeNames[grid]=Grid
+ViewTypeNames[list_numbered]=Numbered list
+ViewTypeNames[list_zigzag]=Zig-zag
+ViewTypeNames[list_accordion]=Accordion
+ViewTypeNames[grid_featured]=Grid (first item large)
 HasCollection=1
 
 Category=listing
 [BlockDefinition_single]
 Name=Single content
 Handler=expLayoutsSingleBlockHandler
+ContentParameters[]=node_id
 ViewTypes[]=default
 
 Category=placeholders
 [BlockDefinition_button]
 Name=Button / Link
 Handler=expLayoutsButtonBlockHandler
+ContentParameters[]=text
+ContentParameters[]=use_link
+ContentParameters[]=label
+ContentParameters[]=url
 ViewTypes[]=default
 
 Category=basic
@@ -142,18 +167,25 @@ Category=basic
 [BlockDefinition_card]
 Name=Card
 Handler=expLayoutsCardBlockHandler
+ContentParameters[]=title
+ContentParameters[]=image_url
+ContentParameters[]=content
+ContentParameters[]=link_url
+ContentParameters[]=link_label
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_accordion]
 Name=Accordion
 Handler=expLayoutsAccordionBlockHandler
+ContentParameters[]=items
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_tabs]
 Name=Tabs
 Handler=expLayoutsTabsBlockHandler
+ContentParameters[]=items
 ViewTypes[]=default
 
 Category=basic
@@ -267,36 +299,54 @@ Category=listing
 [BlockDefinition_quote]
 Name=Quote
 Handler=expLayoutsQuoteBlockHandler
+ContentParameters[]=quote
+ContentParameters[]=author
+ContentParameters[]=source
 ViewTypes[]=default
 
 Category=components
 [BlockDefinition_alert]
 Name=Alert
 Handler=expLayoutsAlertBlockHandler
+ContentParameters[]=message
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_video]
 Name=External video
 Handler=expLayoutsVideoBlockHandler
+ContentParameters[]=service
+ContentParameters[]=video_id
+ContentParameters[]=caption
+ContentParameters[]=video_url
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_badge]
 Name=Badge
 Handler=expLayoutsBadgeBlockHandler
+ContentParameters[]=label
+ContentParameters[]=link
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_progress]
 Name=Progress bar
 Handler=expLayoutsProgressBlockHandler
+ContentParameters[]=value
+ContentParameters[]=label
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_map]
 Name=Map
 Handler=expLayoutsMapBlockHandler
+ContentParameters[]=latitude
+ContentParameters[]=longitude
+ContentParameters[]=zoom
+ContentParameters[]=map_type
+ContentParameters[]=show_marker
+ContentParameters[]=embed_url
 ViewTypes[]=default
 
 Category=basic
@@ -310,6 +360,7 @@ Category=gallery
 [BlockDefinition_markdown]
 Name=Markdown
 Handler=expLayoutsMarkdownBlockHandler
+ContentParameters[]=content
 ViewTypes[]=default
 
 Category=basic
@@ -325,24 +376,49 @@ Category=placeholders
 [BlockDefinition_hero]
 Name=Hero
 Handler=expLayoutsComponentBlockHandler
+ContentParameters[]=title
+ContentParameters[]=content
+ContentParameters[]=image_url
+ContentParameters[]=image_alt
+ContentParameters[]=link_text
+ContentParameters[]=link_url
 ViewTypes[]=default
 
 Category=components
 [BlockDefinition_about]
 Name=About
 Handler=expLayoutsComponentBlockHandler
+ContentParameters[]=title
+ContentParameters[]=content
+ContentParameters[]=image_url
+ContentParameters[]=image_alt
+ContentParameters[]=link_text
+ContentParameters[]=link_url
 ViewTypes[]=default
 
 Category=components
 [BlockDefinition_features]
 Name=Features
 Handler=expLayoutsFeaturesBlockHandler
+ContentParameters[]=title
+ContentParameters[]=content
+ContentParameters[]=items
+ContentParameters[]=image_url
+ContentParameters[]=image_alt
+ContentParameters[]=link_text
+ContentParameters[]=link_url
 ViewTypes[]=default
 
 Category=components
 [BlockDefinition_lead]
 Name=Lead
 Handler=expLayoutsComponentBlockHandler
+ContentParameters[]=title
+ContentParameters[]=content
+ContentParameters[]=image_url
+ContentParameters[]=image_alt
+ContentParameters[]=link_text
+ContentParameters[]=link_url
 ViewTypes[]=default
 
 Category=components
@@ -399,6 +475,7 @@ Category=containers
 [BlockDefinition_exp_component_hero]
 Name=Hero component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=hero_style_1
 ViewTypes[]=hero_style_2
 ViewTypes[]=hero_style_3
@@ -407,6 +484,7 @@ Category=components
 [BlockDefinition_exp_component_features]
 Name=Features component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=features_style_1
 ViewTypes[]=features_style_2
 ViewTypes[]=features_style_3
@@ -419,6 +497,7 @@ Category=components
 [BlockDefinition_exp_component_about]
 Name=About component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=about_style_1
 ViewTypes[]=about_style_2
 ViewTypes[]=about_style_3
@@ -429,6 +508,7 @@ Category=components
 [BlockDefinition_exp_component_logos]
 Name=Logos component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=logos_style_1
 ViewTypes[]=logos_style_2
 
@@ -436,12 +516,14 @@ Category=components
 [BlockDefinition_exp_component_quote]
 Name=Quote component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=quote_style_1
 
 Category=components
 [BlockDefinition_exp_component_lead]
 Name=Lead component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=lead_style_1
 ViewTypes[]=lead_style_2
 
@@ -960,6 +1042,12 @@ CacheMaxEntries=5000
 959=959
 1060=1060
 1061=1061
+
+[MarkdownSettings]
+# disabled: as in CommonMark (and the reference), a single line break inside a paragraph is a soft break; a hard
+# break takes two spaces or a backslash at the end of the line. enabled: every line break is a <br />, as the markdown
+# block printed its text (escaped, with nl2br) before it rendered Markdown - for blocks stored then.
+HardBreaks=disabled
 
 [MapSettings]
 # Key of the Maps Embed API of Google for the map block. Set: a map with a point (latitude, longitude) is Google's,
