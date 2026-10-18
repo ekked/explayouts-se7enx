@@ -9,6 +9,25 @@ class expLayoutsResolver
     /** Paths remembered at most: a list of nodes that each resolve their layout must not grow without end */
     const REMEMBERED_RESOLUTIONS = 100;
 
+    /** The target types ruleMatches() knows; the rule forms and the importers store no others */
+    const TARGET_TYPES = array( 'path', 'path_prefix', 'path_info_prefix', 'path_regex', 'node', 'subtree', 'route',
+                                'module', 'module_view' );
+
+    /** The condition types conditionMatches() knows; content_type is the older name of class */
+    const CONDITION_TYPES = array( 'siteaccess', 'class', 'content_type', 'query_parameter', 'route_parameter', 'time' );
+
+    /**
+     * Conditions whose answer is not given by the path and the siteaccess, the key of the resolver cache: the query
+     * string and the clock. A rule with one of them is evaluated on every request (see isRequestDependent()).
+     */
+    const REQUEST_CONDITION_TYPES = array( 'query_parameter', 'time' );
+
+    /** Entries the resolver cache keeps at most ([ResolverSettings] CacheMaxEntries overrides it) */
+    const CACHE_MAX_ENTRIES = 5000;
+
+    /** Paths longer than this are resolved but not cached: no rule names such a path, every 404 robot sends one */
+    const CACHE_MAX_PATH_LENGTH = 512;
+
     /** The request $resolutions belong to ($_SERVER['REQUEST_TIME_FLOAT']), null before the first one */
     private static $resolutionsRequest = null;
 
@@ -126,15 +145,22 @@ class expLayoutsResolver
         }
 
         $rules = expLayoutsRule::fetchEnabled();
+        // The cache is keyed by path and siteaccess. Once a rule with a condition on the query string or the clock
+        // has been looked at, the answer depends on more than that, whether the rule matched or not (a request
+        // without ?preview would otherwise fix the answer for the requests with it), and nothing is cached.
+        $requestDependent = false;
         foreach ( $rules as $rule )
         {
+            if ( self::isRequestDependent( $rule ) )
+                $requestDependent = true;
             if ( self::ruleMatches( $rule, $path ) )
             {
                 $layout = expLayoutsLayout::fetch( $rule->attribute( 'layout_id' ) );
                 // Admin layouts never reach the public site.
                 if ( $layout && (int)$layout->attribute( 'status' ) === 2 && !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
                 {
-                    self::writeCache( $path, $siteAccessName, (int)$rule->attribute( 'id' ), (int)$layout->attribute( 'id' ) );
+                    if ( !$requestDependent )
+                        self::writeCache( $path, $siteAccessName, (int)$rule->attribute( 'id' ), (int)$layout->attribute( 'id' ) );
                     eZDebug::writeDebug( 'Matched rule ' . $rule->attribute( 'id' ) . " for path '$path', layout=" . $layout->attribute( 'identifier' ), 'expLayoutsResolver' );
                     self::remember( $path, $siteAccessName, 'rule', $rule->attribute( 'id' ), $layout->attribute( 'id' ) );
                     return $layout;
@@ -150,14 +176,32 @@ class expLayoutsResolver
             $layout = expLayoutsLayout::fetchByIdentifier( $default, 2 );
             if ( $layout && !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
             {
-                self::writeCache( $path, $siteAccessName, 0, (int)$layout->attribute( 'id' ) );
+                if ( !$requestDependent )
+                    self::writeCache( $path, $siteAccessName, 0, (int)$layout->attribute( 'id' ) );
                 self::remember( $path, $siteAccessName, 'default', 0, $layout->attribute( 'id' ) );
                 return $layout;
             }
         }
 
-        self::writeCache( $path, $siteAccessName, 0, 0 );
+        if ( !$requestDependent )
+            self::writeCache( $path, $siteAccessName, 0, 0 );
         self::remember( $path, $siteAccessName, 'none', 0, 0 );
+        return false;
+    }
+
+    /**
+     * Whether a rule has a condition the path and the siteaccess do not decide (REQUEST_CONDITION_TYPES).
+     *
+     * @param expLayoutsRule $rule
+     * @return bool
+     */
+    static function isRequestDependent( $rule )
+    {
+        foreach ( $rule->conditions() as $condition )
+        {
+            if ( in_array( (string)$condition->attribute( 'condition_type' ), self::REQUEST_CONDITION_TYPES, true ) )
+                return true;
+        }
         return false;
     }
 
@@ -249,7 +293,60 @@ class expLayoutsResolver
         );
 
         self::$resolvedCache[$key] = $data;
+        // Every path asked for gets a file, also the made-up ones of a robot. A path no rule could name is not
+        // written, and the directory is pruned now and then (pruneCache()).
+        if ( strlen( $path ) > self::CACHE_MAX_PATH_LENGTH )
+            return;
         eZFile::create( $key . '.php', self::cacheDir(), '<?php return ' . var_export( $data, true ) . ';', true );
+        if ( mt_rand( 1, 50 ) === 1 )
+            self::pruneCache();
+    }
+
+    /**
+     * Keeps the resolver cache at [ResolverSettings] CacheMaxEntries files (CACHE_MAX_ENTRIES without it): expired
+     * entries go first, then the oldest. Returns the number of files removed.
+     *
+     * @param int|null $maxEntries
+     * @return int
+     */
+    public static function pruneCache( $maxEntries = null )
+    {
+        if ( $maxEntries === null )
+        {
+            $ini = eZINI::instance( 'explayouts.ini' );
+            $maxEntries = $ini->hasVariable( 'ResolverSettings', 'CacheMaxEntries' )
+                ? (int)$ini->variable( 'ResolverSettings', 'CacheMaxEntries' ) : self::CACHE_MAX_ENTRIES;
+            if ( $maxEntries <= 0 )
+                $maxEntries = self::CACHE_MAX_ENTRIES;
+        }
+        $files = glob( self::cacheDir() . '/*.php' );
+        if ( !is_array( $files ) || count( $files ) <= $maxEntries )
+            return 0;
+
+        $removed = 0;
+        $now = time();
+        $kept = array();
+        foreach ( $files as $file )
+        {
+            $data = @include( $file );
+            if ( !is_array( $data ) || !isset( $data['expires'] ) || $data['expires'] <= $now )
+            {
+                if ( @unlink( $file ) )
+                    $removed++;
+                continue;
+            }
+            $kept[$file] = (int)@filemtime( $file );
+        }
+        if ( count( $kept ) > $maxEntries )
+        {
+            asort( $kept );
+            foreach ( array_slice( array_keys( $kept ), 0, count( $kept ) - $maxEntries ) as $file )
+            {
+                if ( @unlink( $file ) )
+                    $removed++;
+            }
+        }
+        return $removed;
     }
 
     public static function clearCache()
@@ -428,12 +525,17 @@ class expLayoutsResolver
         $path = $module . '/' . $view;
         $found = false;
         $ruleId = 0;
+        // as for the site: once a rule with a condition on the query string or the clock was looked at, the answer
+        // is not one for the module and view alone and is not written to the cache
+        $requestDependent = false;
         foreach ( expLayoutsRule::fetchEnabled() as $rule )
         {
             $layout = expLayoutsLayout::fetch( $rule->attribute( 'layout_id' ) );
             if ( !$layout || (int)$layout->attribute( 'status' ) !== 2
                 || !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
                 continue;
+            if ( self::isRequestDependent( $rule ) )
+                $requestDependent = true;
             if ( self::ruleMatches( $rule, $path, $context ) )
             {
                 $found = $layout;
@@ -453,6 +555,8 @@ class expLayoutsResolver
             }
         }
 
+        if ( $requestDependent )
+            return $found;
         self::writeAdminCache( $module, $view, $siteAccessName, $generation, $ruleId, $found ? (int)$found->attribute( 'id' ) : 0 );
         return self::$adminMemo[$memoKey] = $found;
     }
@@ -494,8 +598,11 @@ class expLayoutsResolver
                 return false;
         }
 
+        // A rule without a target names no page. It used to match every one, so a rule saved before its targets,
+        // or whose targets were all left out as unknown, took over the whole site. The catch-all is a target of
+        // its own (path_info_prefix "/").
         if ( count( $targets ) === 0 )
-            return true;
+            return false;
 
         foreach ( $targets as $target )
         {
@@ -547,7 +654,7 @@ class expLayoutsResolver
             case 'path':
                 return $path === $value;
             case 'path_regex':
-                return (bool) preg_match( '/' . str_replace( '/', '\\/', $value ) . '/', $path );
+                return self::pathRegexMatches( $value, $path );
             case 'node':
                 return self::contentNodeMatches( $path, $value );
             case 'subtree':
@@ -556,6 +663,51 @@ class expLayoutsResolver
             default:
                 return false;
         }
+    }
+
+    /**
+     * Whether a path_regex target matches. The value is the pattern without delimiters, as the rule forms take it
+     * ("^news/\d+"). It is wrapped in the first delimiter it does not contain, so a pattern keeps its own escapes:
+     * replacing every "/" by "\/" made an escaped "\/" into "\\/", an escaped backslash and the end of the pattern.
+     * A pattern PCRE refuses matches nothing, without a PHP warning on every request (one debug line instead).
+     *
+     * @param string $pattern
+     * @param string $path
+     * @return bool
+     */
+    static function pathRegexMatches( $pattern, $path )
+    {
+        $pattern = (string)$pattern;
+        if ( $pattern === '' )
+            return false;
+        $delimiter = null;
+        foreach ( array( '#', '~', '%', '@', '!', ';', '`' ) as $candidate )
+        {
+            if ( strpos( $pattern, $candidate ) === false )
+            {
+                $delimiter = $candidate;
+                break;
+            }
+        }
+        if ( $delimiter === null )
+            return false;
+
+        set_error_handler( function() { return true; } );
+        try
+        {
+            $result = preg_match( $delimiter . $pattern . $delimiter, (string)$path );
+        }
+        finally
+        {
+            restore_error_handler();
+        }
+        if ( $result === false )
+        {
+            if ( class_exists( 'eZDebug', false ) )
+                eZDebug::writeDebug( "Invalid path_regex target '$pattern'", 'expLayoutsResolver' );
+            return false;
+        }
+        return $result === 1;
     }
 
     /**
@@ -800,7 +952,9 @@ class expLayoutsResolver
                 return true;
             }
             default:
-                return true;
+                // A condition the resolver does not know cannot be met: a rule restricted by it must not apply
+                // everywhere (it did, so a mistyped condition turned a narrow rule into a catch-all).
+                return false;
         }
     }
 

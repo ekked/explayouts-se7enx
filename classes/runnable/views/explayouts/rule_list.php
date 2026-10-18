@@ -37,6 +37,7 @@ class RuleList extends \Exponential\Runnable\ModuleView
                 foreach ( $rule->targets() as $t ) $t->remove();
                 foreach ( $rule->conditions() as $c ) $c->remove();
                 $rule->remove();
+                \expLayoutsResolver::clearCache();
                 $message = \ezpI18n::tr( 'design/admin/explayouts/rule_list', 'Rule deleted.' );
             }
             else
@@ -68,6 +69,7 @@ class RuleList extends \Exponential\Runnable\ModuleView
                     $newCondition->store();
                 }
 
+                \expLayoutsResolver::clearCache();
                 $message = \ezpI18n::tr( 'design/admin/explayouts/rule_list', 'Rule copied.' );
             }
             else
@@ -76,7 +78,9 @@ class RuleList extends \Exponential\Runnable\ModuleView
             }
         }
 
-        $rules = \expLayoutsRule::fetchEnabled();
+        // all rules: the template marks the disabled ones (a disabled rule was not listed, so it could not be
+        // found again to switch it back on)
+        $rules = \expLayoutsRule::fetchAll();
 
         $tpl = \eZTemplate::factory();
         $tpl->setVariable( 'rules', $rules );

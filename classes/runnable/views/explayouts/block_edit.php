@@ -51,7 +51,13 @@ class BlockEdit extends \Exponential\Runnable\ModuleView
         if ( $http->hasPostVariable( 'SaveBlock' ) )
         {
             $block->setAttribute( 'name', trim( $http->postVariable( 'Name' ) ) );
-            $block->setAttribute( 'view_type', trim( $http->postVariable( 'ViewType' ) ) );
+            // one of the view types of the block's definition (ViewTypes[]), else the block keeps its own
+            $viewTypes = isset( $blockInfo['view_types'] ) && is_array( $blockInfo['view_types'] ) ? $blockInfo['view_types'] : array( 'default' );
+            $viewType = is_string( $http->postVariable( 'ViewType' ) ) ? trim( $http->postVariable( 'ViewType' ) ) : '';
+            if ( in_array( $viewType, $viewTypes, true ) )
+                $block->setAttribute( 'view_type', $viewType );
+            else
+                $error = \ezpI18n::tr( 'design/admin/explayouts/block_edit', 'Unknown view type.' );
             $block->store();
 
             foreach ( $parameters as $name => $definition )

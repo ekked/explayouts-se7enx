@@ -111,7 +111,12 @@ class LayoutEdit extends \Exponential\Runnable\ModuleView
         {
             $layout->setAttribute( 'identifier', trim( $http->postVariable( 'Identifier' ) ) );
             $layout->setAttribute( 'name', trim( $http->postVariable( 'Name' ) ) );
-            $layout->setAttribute( 'layout_type', trim( $http->postVariable( 'LayoutType' ) ) );
+            // a layout type of the settings (LayoutType_*), else the layout keeps the one it has
+            $layoutType = is_string( $http->postVariable( 'LayoutType' ) ) ? trim( $http->postVariable( 'LayoutType' ) ) : '';
+            if ( \expLayoutsLayoutType::getTypeInfo( $layoutType ) !== false )
+                $layout->setAttribute( 'layout_type', $layoutType );
+            else
+                $error = \ezpI18n::tr( 'design/admin/explayouts/layout_edit', 'Unknown layout type.' );
             $layout->setAttribute( 'modified', time() );
             if ( (int)$layout->attribute( 'status' ) === 0 )
                 $layout->setAttribute( 'status', 1 );
@@ -124,7 +129,9 @@ class LayoutEdit extends \Exponential\Runnable\ModuleView
         {
             $layout->publish();
             expLayoutEnsureZones( $layout );
-            $message = 'Published.';
+            // the resolver caches which layout a path gets, by layout id: the published layout must be looked up again
+            \expLayoutsResolver::clearCache();
+            $message = \ezpI18n::tr( 'design/admin/explayouts/layout_edit', 'Published.' );
         }
 
         if ( $http->hasPostVariable( 'AddZone' ) )
@@ -159,7 +166,13 @@ class LayoutEdit extends \Exponential\Runnable\ModuleView
         if ( $http->hasPostVariable( 'AddBlock' ) )
         {
             $zoneId = (int)$http->postVariable( 'ZoneID' );
-            $definition = trim( $http->postVariable( 'DefinitionIdentifier' ) );
+            $definition = is_string( $http->postVariable( 'DefinitionIdentifier' ) ) ? trim( $http->postVariable( 'DefinitionIdentifier' ) ) : '';
+            // only a block of the settings (BlockDefinition_*): any other identifier made a block without a handler
+            if ( $definition !== '' && \expLayoutsBlockHandlerFactory::getBlockInfo( $definition ) === false )
+            {
+                $error = \ezpI18n::tr( 'design/admin/explayouts/layout_edit', 'Unknown block type.' );
+                $definition = '';
+            }
             if ( $zoneId > 0 && $definition !== '' )
             {
                 $zone = \expLayoutsZone::fetch( $zoneId );
