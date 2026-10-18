@@ -97,6 +97,10 @@
         <source>Item removed from collection.</source>
         <translation>הפריט הוסר מהאוסף.</translation>
     </message>
+    <message>
+        <source>Unknown view type.</source>
+        <translation>סוג תצוגה לא מוכר.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -331,6 +335,18 @@
         <source>Move up</source>
         <translation>העברה למעלה</translation>
     </message>
+    <message>
+        <source>Unknown layout type.</source>
+        <translation>סוג פריסה לא מוכר.</translation>
+    </message>
+    <message>
+        <source>Unknown block type.</source>
+        <translation>סוג בלוק לא מוכר.</translation>
+    </message>
+    <message>
+        <source>Published.</source>
+        <translation>פורסם.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -508,6 +524,14 @@
     <message>
         <source>Priority</source>
         <translation>עדיפות</translation>
+    </message>
+    <message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>סוגי יעד או תנאי לא מוכרים לא נשמרו: %types</translation>
+    </message>
+    <message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>כלל ללא יעד אינו חל על אף דף.</translation>
     </message>
 </context>
 <context>

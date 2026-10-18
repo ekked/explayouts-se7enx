@@ -98,6 +98,10 @@
         <source>Item removed from collection.</source>
         <translation>boSghachvo&apos; Doch teqlu&apos;ta&apos;.</translation>
     </message>
+    <message>
+        <source>Unknown view type.</source>
+        <translation>legh Segh Sovbe&apos;lu&apos;.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -332,6 +336,18 @@
         <source>Move up</source>
         <translation>Dung yIvIHmoH</translation>
     </message>
+    <message>
+        <source>Unknown layout type.</source>
+        <translation>nab Segh Sovbe&apos;lu&apos;.</translation>
+    </message>
+    <message>
+        <source>Unknown block type.</source>
+        <translation>ngogh Segh Sovbe&apos;lu&apos;.</translation>
+    </message>
+    <message>
+        <source>Published.</source>
+        <translation>lalu&apos;ta&apos;.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -509,6 +525,14 @@
     <message>
         <source>Priority</source>
         <translation>potlh mI&apos;</translation>
+    </message>
+    <message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>DoS Segh ghap ra&apos;meH Segh Sovbe&apos;lu&apos;bogh pollu&apos;be&apos;pu&apos;: %types</translation>
+    </message>
+    <message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>DoS Hutlhbogh chut&apos;e&apos; pagh nav HablI&apos; lo&apos;laH.</translation>
     </message>
 </context>
 <context>

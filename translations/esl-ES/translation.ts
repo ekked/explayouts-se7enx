@@ -95,6 +95,10 @@
         <source>Item removed from collection.</source>
         <translation>Elemento eliminado de la colección.</translation>
     </message>
+    <message>
+        <source>Unknown view type.</source>
+        <translation>Tipo de vista desconocido.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -329,6 +333,18 @@
         <source>Move up</source>
         <translation>Mover arriba</translation>
     </message>
+    <message>
+        <source>Unknown layout type.</source>
+        <translation>Tipo de diseño desconocido.</translation>
+    </message>
+    <message>
+        <source>Unknown block type.</source>
+        <translation>Tipo de bloque desconocido.</translation>
+    </message>
+    <message>
+        <source>Published.</source>
+        <translation>Publicado.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -506,6 +522,14 @@
     <message>
         <source>Priority</source>
         <translation>Prioridad</translation>
+    </message>
+    <message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>No se han guardado los tipos de destino o de condición desconocidos: %types</translation>
+    </message>
+    <message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>Una regla sin destino no se aplica a ninguna página.</translation>
     </message>
 </context>
 <context>

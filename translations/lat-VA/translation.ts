@@ -98,6 +98,10 @@
         <source>Item removed from collection.</source>
         <translation>Res e collectione remota est.</translation>
     </message>
+    <message>
+        <source>Unknown view type.</source>
+        <translation>Genus aspectus ignotum.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -332,6 +336,18 @@
         <source>Move up</source>
         <translation>Sursum movere</translation>
     </message>
+    <message>
+        <source>Unknown layout type.</source>
+        <translation>Genus dispositionis ignotum.</translation>
+    </message>
+    <message>
+        <source>Unknown block type.</source>
+        <translation>Genus partis ignotum.</translation>
+    </message>
+    <message>
+        <source>Published.</source>
+        <translation>Editum est.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -509,6 +525,14 @@
     <message>
         <source>Priority</source>
         <translation>Prioritas</translation>
+    </message>
+    <message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>Genera ignota scopi vel condicionis servata non sunt: %types</translation>
+    </message>
+    <message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>Norma sine scopo ad nullam paginam pertinet.</translation>
     </message>
 </context>
 <context>
