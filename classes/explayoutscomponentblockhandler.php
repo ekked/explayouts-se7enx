@@ -56,8 +56,9 @@ class expLayoutsComponentBlockHandler implements expLayoutsBlockHandlerInterface
             'image_url' => isset( $params['image_url'] ) ? $params['image_url'] : '',
             'image_alt' => isset( $params['image_alt'] ) ? $params['image_alt'] : '',
             'link_text' => isset( $params['link_text'] ) ? $params['link_text'] : '',
-            'link_url' => isset( $params['link_url'] ) ? $params['link_url'] : '',
-            'css_class' => isset( $params['css_class'] ) ? $params['css_class'] : '',
+            'link_url' => isset( $params['link_url'] ) ? expLayoutsSafeValue::url( $params['link_url'] ) : '',
+            // printed into class="...": class names only
+            'css_class' => isset( $params['css_class'] ) ? expLayoutsSafeValue::cssClass( $params['css_class'] ) : '',
             'css_id' => isset( $params['css_id'] ) ? $params['css_id'] : '',
         );
     }

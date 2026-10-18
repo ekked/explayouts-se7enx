@@ -9,7 +9,7 @@ $eZTemplateOperatorArray = array(
     array(
         "script" => "extension/explayouts/classes/explayoutssafevalue.php",
         "class" => "expLayoutsSafeValue",
-        "operator_names" => array( 'explayouts_safe_url', 'explayouts_safe_embed_url', 'explayouts_safe_color', 'explayouts_safe_tag', 'explayouts_safe_template_name' )
+        "operator_names" => array( 'explayouts_safe_url', 'explayouts_safe_embed_url', 'explayouts_safe_color', 'explayouts_safe_tag', 'explayouts_safe_template_name', 'explayouts_safe_css_class' )
     )
 );
 

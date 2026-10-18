@@ -14,6 +14,8 @@
  *  SV-06 - the handlers of title, video, map, image, card, badge, button, progress and template block hand the
  *          templates checked values; the link parameter checks the href after its suffix
  *  SV-07 - the standard templates check again with the template operators, and the operators are registered
+ *  SV-09 - class names: letters, digits, _ and - only; the component blocks (hero, features, lead, about) check
+ *          link_url and css_class, and their templates print the link unquoted through |ezurl and the text washed
  *  SV-08 - every include of a block template by its definition_identifier (zones, containers) checks the name first:
  *          a stored identifier is not validated (rows from before the block forms checked it, imports)
  */
@@ -31,7 +33,7 @@ $root = dirname( __DIR__ );
 require_once $root . '/classes/explayoutssafevalue.php';
 require_once $root . '/classes/explayoutsblockhandlerinterface.php';
 require_once $root . '/classes/explayoutslinkparameter.php';
-foreach ( array( 'title', 'video', 'map', 'image', 'card', 'badge', 'button', 'progress', 'tpl' ) as $kind )
+foreach ( array( 'title', 'video', 'map', 'image', 'card', 'badge', 'button', 'progress', 'tpl', 'component' ) as $kind )
     require_once $root . '/classes/explayouts' . $kind . 'blockhandler.php';
 
 // SV-01
@@ -40,7 +42,8 @@ foreach ( array( 'https://example.org/a?b=1#c', 'http://example.org', 'mailto:in
     svCheck( expLayoutsSafeValue::url( $kept ) === $kept, "SV-01 link kept: '$kept'" );
 foreach ( array( 'javascript:alert(1)', 'JavaScript:alert(1)', ' javascript:alert(1)', "java\tscript:alert(1)",
                  "java\nscript:alert(1)", "\x01javascript:alert(1)", 'data:text/html;base64,PHNjcmlwdD4=', 'vbscript:msgbox',
-                 'file:///etc/passwd', '\\\\evil.example/x', ':javascript' ) as $refused )
+                 'file:///etc/passwd', '\\\\evil.example/x', ':javascript', '&#106;avascript:alert(1)', 'jav&#x61;script:x',
+                 '&amp;#106;avascript:alert(1)', 'javascript&colon;alert(1)' ) as $refused )
     svCheck( expLayoutsSafeValue::url( $refused ) === '', 'SV-01 link refused: ' . json_encode( $refused ) );
 svCheck( expLayoutsSafeValue::url( array( 'x' ) ) === '', 'SV-01 a non-scalar is no link' );
 
@@ -51,9 +54,11 @@ foreach ( array( 'javascript:alert(1)', 'data:text/html,<script>alert(1)</script
     svCheck( expLayoutsSafeValue::embedUrl( $refused ) === '', 'SV-02 embed refused: ' . json_encode( $refused ) );
 
 // SV-03
-foreach ( array( '#38bdf8', '#fff', '#ffff', '#11223344', 'rgb(1, 2, 3)', 'rgba(1,2,3,0.5)', 'hsl(200 50% 40%)', 'red', 'transparent' ) as $kept )
+foreach ( array( '#38bdf8', '#fff', '#ffff', '#11223344', 'rgb(1, 2, 3)', 'rgba(1,2,3,0.5)', 'hsl(200 50% 40%)', 'hsla(200deg, 50%, 40%, .5)',
+                 'var(--brand-color)', 'red', 'transparent' ) as $kept )
     svCheck( expLayoutsSafeValue::color( $kept ) === $kept, "SV-03 colour kept: '$kept'" );
-foreach ( array( 'red;background:url(//evil)', '#38bdf8"onmouseover="x', 'expression(alert(1))', 'url(x)', '#12345', 'rgb(1,2,3);x:y' ) as $refused )
+foreach ( array( 'red;background:url(//evil)', '#38bdf8"onmouseover="x', 'expression(alert(1))', 'url(x)', '#12345', 'rgb(1,2,3);x:y',
+                 'var(--x);color:red', 'var(--x, url(y))', 'hsl(1 2 3)url(x)' ) as $refused )
     svCheck( expLayoutsSafeValue::color( $refused, '#38bdf8' ) === '#38bdf8', 'SV-03 colour refused, default instead: ' . json_encode( $refused ) );
 
 // SV-04
@@ -126,6 +131,22 @@ svCheck( $value === '', 'SV-07 explayouts_safe_url empties a script address' );
 $value = 'script';
 $operator->modify( null, 'explayouts_safe_tag', array(), '', '', $value, array( 'level' => 5 ) );
 svCheck( $value === 'h5', 'SV-07 explayouts_safe_tag falls back to the level' );
+
+// SV-09
+svCheck( expLayoutsSafeValue::cssClass( ' hero  is-dark_2 ' ) === 'hero is-dark_2', 'SV-09 class names kept, spaces normalised' );
+svCheck( expLayoutsSafeValue::cssClass( 'x" onmouseover="alert(1) y>z ok' ) === 'ok', 'SV-09 tokens with other characters dropped' );
+$component = $values( new expLayoutsComponentBlockHandler(), array( 'link_url' => 'javascript:alert(1)', 'css_class' => 'a" b', 'content' => '<b>x</b>' ) );
+svCheck( $component['link_url'] === '' && $component['css_class'] === 'b', 'SV-09 component handler: link and class names checked' );
+foreach ( array( 'hero', 'features', 'lead', 'about' ) as $name )
+{
+    $tpl = $read( $name );
+    svCheck( strpos( $tpl, 'href={$block.values.link_url|explayouts_safe_url|ezurl}' ) !== false && strpos( $tpl, 'href="{$block.values.link_url' ) === false,
+             "SV-09 $name.tpl: link checked, printed by ezurl without extra quotes" );
+    svCheck( strpos( $tpl, '{$block.values.css_class|explayouts_safe_css_class|wash}' ) !== false && strpos( $tpl, ' {$block.values.css_class}' ) === false,
+             "SV-09 $name.tpl: class names checked and washed" );
+}
+foreach ( array( 'hero', 'features', 'lead', 'about', 'text' ) as $name )
+    svCheck( strpos( $read( $name ), '|wash|nl2br' ) !== false && !preg_match( '/content\|nl2br/', $read( $name ) ), "SV-09 $name.tpl: plain text washed before nl2br" );
 
 // SV-08
 $unguarded = array();

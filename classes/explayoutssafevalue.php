@@ -12,6 +12,10 @@
  *   {$color|explayouts_safe_color}      a CSS colour, else ''
  *   {$tag|explayouts_safe_tag( 2 )}     h1-h6, p or div, else h<level> (h2 for a level outside 1-6)
  *   {$name|explayouts_safe_template_name}  letters, digits and _, else ''
+ *   {$class|explayouts_safe_css_class}  class names of letters, digits, _ and -, separated by single spaces
+ *
+ * A checked value is still printed escaped (|wash, or |ezurl in double quotes for a link): the check decides what a
+ * value may be, the escaping how it is written into the markup.
  *
  * @license GPL-2.0-or-later
  */
@@ -28,7 +32,9 @@ class expLayoutsSafeValue
 
     /**
      * A link address, or '' when it uses a scheme other than http, https, mailto and tel (javascript:, data:,
-     * vbscript:, ...). Relative addresses, #anchors and ?queries are kept.
+     * vbscript:, ...). Relative addresses, #anchors and ?queries are kept. HTML entities are decoded before the scheme
+     * is read ("&#106;avascript:" is javascript: once a browser has parsed an attribute printed unescaped); the value
+     * returned is the value given, and must still be escaped when it is printed.
      *
      * @param mixed $value
      * @return string
@@ -59,8 +65,9 @@ class expLayoutsSafeValue
             return '';
 
         // Browsers ignore control characters and white space inside a scheme ("java\tscript:"), so the scheme is
-        // read from the value without them.
-        $probe = preg_replace( '/[\x00-\x20\x7F]+/', '', $value );
+        // read from the value without them, and with its entities decoded (twice, for "&amp;#106;").
+        $probe = html_entity_decode( html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+        $probe = preg_replace( '/[\x00-\x20\x7F]+/', '', $probe );
         if ( preg_match( '#^([a-zA-Z][a-zA-Z0-9+.\-]*):#', $probe, $matches ) )
             return in_array( strtolower( $matches[1] ), $schemes, true ) ? $value : '';
 
@@ -80,8 +87,9 @@ class expLayoutsSafeValue
     }
 
     /**
-     * A CSS colour: #rgb, #rgba, #rrggbb, #rrggbbaa, rgb()/rgba()/hsl()/hsla() with numbers, or a colour name;
-     * $fallback for anything else (so nothing but a colour reaches a style attribute).
+     * A CSS colour: #rgb, #rgba, #rrggbb, #rrggbbaa, rgb()/rgba()/hsl()/hsla() with numbers, units and angles,
+     * var(--name), or a colour name; $fallback for anything else (so nothing but a colour reaches a style attribute:
+     * no url(, no ;, no quotes).
      *
      * @param mixed $value
      * @param string $fallback
@@ -93,7 +101,8 @@ class expLayoutsSafeValue
             return $fallback;
         $value = trim( (string)$value );
         if ( preg_match( '/^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value )
-             || preg_match( '/^(?:rgb|rgba|hsl|hsla)\(\s*[0-9.%\s,\/+\-]+\)$/i', $value )
+             || preg_match( '/^(?:rgb|rgba|hsl|hsla)\(\s*[0-9.%\s,\/+\-]*(?:deg|rad|grad|turn)?[0-9.%\s,\/+\-]*\)$/i', $value )
+             || preg_match( '/^var\(\s*--[A-Za-z0-9_\-]+\s*\)$/', $value )
              || preg_match( '/^[a-zA-Z]{3,30}$/', $value ) )
             return $value;
         return $fallback;
@@ -128,6 +137,26 @@ class expLayoutsSafeValue
         return preg_match( '/^[a-z0-9_]+$/', $name ) ? $name : '';
     }
 
+    /**
+     * Class names for a class attribute: the tokens of letters, digits, _ and - only, separated by single spaces;
+     * anything else is dropped (a quote or > closed the attribute).
+     *
+     * @param mixed $value
+     * @return string
+     */
+    public static function cssClass( $value )
+    {
+        if ( !is_scalar( $value ) )
+            return '';
+        $tokens = array();
+        foreach ( preg_split( '/\s+/', trim( (string)$value ) ) as $token )
+        {
+            if ( preg_match( '/^[A-Za-z0-9_\-]+$/', $token ) )
+                $tokens[] = $token;
+        }
+        return implode( ' ', $tokens );
+    }
+
     // ------------------------------------------------------------------
     // Template operators
     // ------------------------------------------------------------------
@@ -135,7 +164,7 @@ class expLayoutsSafeValue
     public function operatorList()
     {
         return array( 'explayouts_safe_url', 'explayouts_safe_embed_url', 'explayouts_safe_color', 'explayouts_safe_tag',
-                      'explayouts_safe_template_name' );
+                      'explayouts_safe_template_name', 'explayouts_safe_css_class' );
     }
 
     public function namedParameterPerOperator()
@@ -149,6 +178,7 @@ class expLayoutsSafeValue
             'explayouts_safe_url' => array(),
             'explayouts_safe_embed_url' => array(),
             'explayouts_safe_template_name' => array(),
+            'explayouts_safe_css_class' => array(),
             'explayouts_safe_color' => array( 'fallback' => array( 'type' => 'string', 'required' => false, 'default' => '' ) ),
             'explayouts_safe_tag' => array( 'level' => array( 'type' => 'integer', 'required' => false, 'default' => 2 ) ),
         );
@@ -166,6 +196,9 @@ class expLayoutsSafeValue
                 break;
             case 'explayouts_safe_color':
                 $operatorValue = self::color( $operatorValue, (string)$namedParameters['fallback'] );
+                break;
+            case 'explayouts_safe_css_class':
+                $operatorValue = self::cssClass( $operatorValue );
                 break;
             case 'explayouts_safe_template_name':
                 $operatorValue = self::templateName( $operatorValue );
