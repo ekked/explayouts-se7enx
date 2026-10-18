@@ -10,9 +10,11 @@ All `explayouts_*` tables: `explayouts_layout`, `explayouts_zone`, `explayouts_b
 
 ## How is the layout for a page chosen?
 
-`expLayoutsResolver::resolve()` walks all enabled rules (`expLayoutsRule::fetchEnabled()`) ordered by priority and returns the layout of the first rule whose targets match the request path or node. If no rule matches, the `ResolverSettings/DefaultLayout` identifier from `explayouts.ini` is used as fallback.
+`expLayoutsResolver::resolve()` walks all enabled rules (`expLayoutsRule::fetchEnabled()`) ordered by priority and returns the layout of the first rule whose conditions are all met and one of whose targets matches the request path or node. If no rule matches, the `ResolverSettings/DefaultLayout` identifier from `explayouts.ini` is used as fallback.
 
-Supported target types: `path`, `path_prefix`, `path_info_prefix`, `path_regex`, `node`, `subtree`. Supported condition types: `siteaccess` and `content_type` (unknown condition types match by default).
+Target types (`expLayoutsResolver::TARGET_TYPES`): `path`, `path_prefix`, `path_info_prefix`, `path_regex` (the pattern without delimiters), `node`, `subtree`, `route`, and `module` / `module_view` for the admin layouts. Condition types (`expLayoutsResolver::CONDITION_TYPES`): `siteaccess`, `class` (also read as `content_type` and `ibexa_content_type`), `query_parameter`, `route_parameter`, `time`.
+
+A rule without a target matches no page; the catch-all is the target `path_info_prefix` `/`. A condition of an unknown type is never met. Answers that depend on a `query_parameter` or `time` condition are not cached. `bin/php/check_rules.php` lists the rules this affects (read only).
 
 ## How do I add my own block type?
 
