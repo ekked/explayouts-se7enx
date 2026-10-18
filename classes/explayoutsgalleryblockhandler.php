@@ -10,6 +10,10 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
      */
     public static $viewTypes = array( 'gallery', 'slider', 'thumb_gallery', 'grid_gallery', 'sushi_bar' );
 
+    /** Seconds between two images with autoplay, as in the reference */
+    const MIN_AUTOPLAY_TIME = 1;
+    const MAX_AUTOPLAY_TIME = 12;
+
     public function getParameters()
     {
         return array(
@@ -42,6 +46,73 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
                 'type' => 'checkbox',
                 'default' => '',
                 'view_type' => 'gallery,slider,thumb_gallery,grid_gallery,sushi_bar',
+            ),
+            // The design parameters of the reference's gallery block, each limited to the view types the reference
+            // offers it for (valid_parameters in its block_definitions.yaml); the gallery view type of this port
+            // takes the ones of the grid gallery. Autoplay time is offered for the slider too, which the reference
+            // leaves out although its slider plays automatically.
+            'next_and_previous' => array(
+                'name' => 'Show next and previous buttons',
+                'type' => 'checkbox',
+                'default' => '1',
+                'view_type' => 'slider,thumb_gallery,sushi_bar',
+            ),
+            'show_pagination' => array(
+                'name' => 'Show pagination',
+                'type' => 'checkbox',
+                'default' => '',
+                'view_type' => 'slider,sushi_bar',
+            ),
+            'infinite_loop' => array(
+                'name' => 'Infinite loop',
+                'type' => 'checkbox',
+                'default' => '1',
+                'view_type' => 'slider,thumb_gallery,sushi_bar',
+            ),
+            'transition' => array(
+                'name' => 'Transition',
+                'type' => 'select',
+                'options' => array(
+                    'slide' => 'Slide',
+                    'fade' => 'Fade',
+                ),
+                'default' => 'slide',
+                'view_type' => 'slider,thumb_gallery',
+            ),
+            'autoplay' => array(
+                'name' => 'Autoplay',
+                'type' => 'compound_checkbox',
+                'default' => '',
+                'view_type' => 'slider,thumb_gallery,sushi_bar',
+                'children' => array(
+                    'autoplay_time' => array(
+                        'name' => 'Autoplay time (seconds, 1-12)',
+                        'type' => 'integer',
+                        'default' => 5,
+                        'min' => self::MIN_AUTOPLAY_TIME,
+                        'max' => self::MAX_AUTOPLAY_TIME,
+                    ),
+                ),
+            ),
+            'thumbnails_to_move' => array(
+                'name' => 'Thumbnails to move',
+                'type' => 'integer',
+                'default' => 1,
+                'min' => 1,
+                'view_type' => 'sushi_bar',
+            ),
+            'show_details' => array(
+                'name' => 'Show details',
+                'type' => 'compound_checkbox',
+                'default' => '',
+                'view_type' => 'thumb_gallery',
+                'children' => array(
+                    'show_details_on_hover' => array(
+                        'name' => 'Show details on hover',
+                        'type' => 'checkbox',
+                        'default' => '',
+                    ),
+                ),
             ),
             'image_attribute' => array(
                 'name' => 'Image attribute identifier',
@@ -169,8 +240,32 @@ class expLayoutsGalleryBlockHandler implements expLayoutsBlockHandlerInterface
             'thumbnail_size' => $thumbnailSize,
             'view_type' => self::galleryViewType( $block ),
             'number_of_thumbnails' => $numberOfThumbnails,
-            'enable_lightbox' => isset( $params['enable_lightbox'] ) && (string)$params['enable_lightbox'] !== '' && (string)$params['enable_lightbox'] !== '0',
+            'enable_lightbox' => self::isOn( $params, 'enable_lightbox', false ),
+            'next_and_previous' => self::isOn( $params, 'next_and_previous', true ),
+            'show_pagination' => self::isOn( $params, 'show_pagination', false ),
+            'infinite_loop' => self::isOn( $params, 'infinite_loop', true ),
+            'transition' => isset( $params['transition'] ) && $params['transition'] === 'fade' ? 'fade' : 'slide',
+            'autoplay' => self::isOn( $params, 'autoplay', false ),
+            'autoplay_time' => isset( $params['autoplay_time'] ) && is_numeric( $params['autoplay_time'] )
+                ? max( self::MIN_AUTOPLAY_TIME, min( self::MAX_AUTOPLAY_TIME, (int)$params['autoplay_time'] ) )
+                : 5,
+            'thumbnails_to_move' => isset( $params['thumbnails_to_move'] ) && (int)$params['thumbnails_to_move'] > 0
+                ? min( 12, (int)$params['thumbnails_to_move'] )
+                : 1,
+            'show_details' => self::isOn( $params, 'show_details', false ),
+            'show_details_on_hover' => self::isOn( $params, 'show_details_on_hover', false ),
         );
+    }
+
+    /**
+     * A checkbox: $default when the block has not stored it, off for '' and '0' (the stored value of an unchecked box).
+     */
+    protected static function isOn( array $params, $name, $default )
+    {
+        if ( !isset( $params[$name] ) )
+            return $default;
+        $value = (string)$params[$name];
+        return $value !== '' && $value !== '0';
     }
 
     /**

@@ -178,6 +178,44 @@ class GalleryBlocksTest extends TestCase
         $this->assertSame( 'gallery,slider,thumb_gallery,grid_gallery,sushi_bar', $parameters['enable_lightbox']['view_type'] );
     }
 
+    public function testTheDesignParametersOfTheReferenceForItsViewTypes()
+    {
+        $handler = new expLayoutsGalleryBlockHandler();
+        $parameters = $handler->getParameters();
+        // valid_parameters of the reference's gallery view types (the autoplay time also for the slider)
+        $expected = array(
+            'next_and_previous' => 'slider,thumb_gallery,sushi_bar',
+            'show_pagination' => 'slider,sushi_bar',
+            'infinite_loop' => 'slider,thumb_gallery,sushi_bar',
+            'transition' => 'slider,thumb_gallery',
+            'autoplay' => 'slider,thumb_gallery,sushi_bar',
+            'thumbnails_to_move' => 'sushi_bar',
+            'show_details' => 'thumb_gallery',
+        );
+        foreach ( $expected as $name => $viewTypes )
+            $this->assertSame( $viewTypes, $parameters[$name]['view_type'], $name );
+        $this->assertSame( array( 'slide', 'fade' ), array_keys( $parameters['transition']['options'] ) );
+        $this->assertSame( array( 1, 12 ), array( $parameters['autoplay']['children']['autoplay_time']['min'], $parameters['autoplay']['children']['autoplay_time']['max'] ) );
+        $this->assertArrayHasKey( 'show_details_on_hover', $parameters['show_details']['children'] );
+
+        $values = $handler->getValues( array( 'parameters' => array() ) );
+        $this->assertTrue( $values['next_and_previous'] );
+        $this->assertTrue( $values['infinite_loop'] );
+        $this->assertFalse( $values['autoplay'] );
+        $this->assertSame( 'slide', $values['transition'] );
+        $this->assertSame( 5, $values['autoplay_time'] );
+        $this->assertSame( 1, $values['thumbnails_to_move'] );
+
+        $values = $handler->getValues( array( 'parameters' => array( 'next_and_previous' => '0', 'transition' => 'fade"', 'autoplay' => '1',
+            'autoplay_time' => '40', 'thumbnails_to_move' => '3', 'show_details' => '1', 'show_details_on_hover' => '1' ) ) );
+        $this->assertFalse( $values['next_and_previous'] );
+        $this->assertSame( 'slide', $values['transition'], 'only slide or fade' );
+        $this->assertTrue( $values['autoplay'] );
+        $this->assertSame( 12, $values['autoplay_time'] );
+        $this->assertSame( 3, $values['thumbnails_to_move'] );
+        $this->assertTrue( $values['show_details_on_hover'] );
+    }
+
     public function testEveryGalleryDefinitionOffersAllGalleryViewTypesItsOwnFirst()
     {
         $ini = file_get_contents( dirname( __DIR__ ) . '/settings/explayouts.ini.append.php' );

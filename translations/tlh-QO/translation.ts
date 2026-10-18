@@ -981,6 +981,14 @@
         <source>No map configured.</source>
         <translation>pu&apos;jIn SeHlu&apos;be&apos;.</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <translation>pu'jIn</translation>
+    </message>
+    <message>
+        <source>Load map</source>
+        <translation>pu'jIn yInob</translation>
+    </message>
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -1022,6 +1030,14 @@
     <message>
         <source>No video configured.</source>
         <translation>vIghro&apos; mIllogh SeHlu&apos;be&apos;.</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation>mIllogh vIH</translation>
+    </message>
+    <message>
+        <source>Load video</source>
+        <translation>mIllogh vIH yInob</translation>
     </message>
 </context>
 <context>
@@ -1230,6 +1246,13 @@
     <message>
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>chut rurbe&apos;pu&apos;: motlh mIch mIw (wIvwI&apos; De&apos; polwI&apos;vo&apos;)</translation>
+    </message>
+</context>
+<context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>%host Daq De' ngeH nobmeH.</translation>
     </message>
 </context>
 </TS>

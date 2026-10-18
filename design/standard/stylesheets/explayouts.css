@@ -446,3 +446,41 @@ nav.ajax-navigation .ajax-load-more {
         grid-template-columns: 1fr;
     }
 }
+
+/* Video and map blocks: the placeholder until the click (templates/explayouts/block/parts/embed.tpl,
+   javascript/explayouts_embed.js) has the size the frame will have; the frame keeps it. */
+.slb .explayouts-embed {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: 1rem;
+    text-align: center;
+    background: #f1f3f5;
+    border: 1px solid #dee2e6;
+    border-radius: .25rem;
+}
+.slb .explayouts-embed-video,
+.slb .explayouts-embed-frame.explayouts-embed-video {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+}
+.slb .explayouts-embed-map {
+    width: 100%;
+    min-height: 20rem;
+}
+.slb .explayouts-embed-frame {
+    display: block;
+    max-width: 100%;
+    border: 0;
+}
+.slb .explayouts-embed-note {
+    margin: 0;
+    font-size: .875rem;
+}
+.slb .features-list {
+    list-style: none;
+    padding-left: 0;
+}

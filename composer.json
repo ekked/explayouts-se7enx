@@ -7,6 +7,9 @@
     "require": {
         "php": "^8.0 || ^8.1 || ^8.2 || ^8.3 || ^8.4"
     },
+    "suggest": {
+        "league/commonmark": "Renders the markdown block as CommonMark (^2.4); without it a small built-in parser renders the common part of Markdown"
+    },
     "extra": {
         "ezpublish-legacy-extension-name": "explayouts"
     },

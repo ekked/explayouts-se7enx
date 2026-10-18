@@ -978,6 +978,14 @@
         <source>No map configured.</source>
         <translation>No hay ningún mapa configurado.</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <translation>Mapa</translation>
+    </message>
+    <message>
+        <source>Load map</source>
+        <translation>Cargar mapa</translation>
+    </message>
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -1019,6 +1027,14 @@
     <message>
         <source>No video configured.</source>
         <translation>No hay ningún video configurado.</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation>Video</translation>
+    </message>
+    <message>
+        <source>Load video</source>
+        <translation>Cargar video</translation>
     </message>
 </context>
 <context>
@@ -1227,6 +1243,13 @@
     <message>
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>Ninguna regla coincidió: la disposición predeterminada (del caché del resolvedor)</translation>
+    </message>
+</context>
+<context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>Al cargarlo se envían datos a %host.</translation>
     </message>
 </context>
 </TS>

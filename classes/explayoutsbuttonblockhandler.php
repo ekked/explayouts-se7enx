@@ -19,14 +19,25 @@ class expLayoutsButtonBlockHandler implements expLayoutsBlockHandlerInterface
                 'type' => 'string',
                 'default' => '',
             ),
+            // the styles of the reference (block.button.style.*)
             'style' => array(
                 'name' => 'Style',
-                'type' => 'string',
+                'type' => 'select',
+                'options' => array(
+                    'default_button' => 'Default button',
+                    'highlighted_button' => 'Highlighted button',
+                    'link' => 'Link',
+                ),
                 'default' => 'default_button',
             ),
+            // the older way to open the link in a new window; the compound link has its own switch, which wins
             'target' => array(
                 'name' => 'Target',
-                'type' => 'string',
+                'type' => 'select',
+                'options' => array(
+                    '_self' => 'Same window',
+                    '_blank' => 'New window',
+                ),
                 'default' => '_self',
             ),
         );
@@ -68,7 +79,8 @@ class expLayoutsButtonBlockHandler implements expLayoutsBlockHandlerInterface
                 $class = 'link';
                 break;
             default:
-                $class = $style;
+                // a style stored before the select (free text): class names only
+                $class = expLayoutsSafeValue::cssClass( $style );
         }
 
         return array(
@@ -82,7 +94,7 @@ class expLayoutsButtonBlockHandler implements expLayoutsBlockHandlerInterface
             // free-text target, which stays for buttons that still carry one.
             'target' => $resolved['target'] !== ''
                 ? $resolved['target']
-                : ( isset( $params['target'] ) ? $params['target'] : '_self' ),
+                : ( isset( $params['target'] ) && $params['target'] === '_blank' ? '_blank' : '_self' ),
         );
     }
 }

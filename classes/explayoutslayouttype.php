@@ -13,7 +13,10 @@ class expLayoutsLayoutType
         'mosaic' => 'layout_6',
         'layout_1' => 'layout_1',
         'layout_2' => 'layout_2',
+        'layout_3' => 'layout_3',
         'layout_4' => 'layout_4',
+        'layout_5' => 'layout_5',
+        'layout_6' => 'layout_6',
     );
 
     const GROUP_SITE = 'site';

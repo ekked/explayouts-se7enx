@@ -978,6 +978,14 @@
         <source>No map configured.</source>
         <translation>No map configured.</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <translation>Map</translation>
+    </message>
+    <message>
+        <source>Load map</source>
+        <translation>Load map</translation>
+    </message>
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -1019,6 +1027,14 @@
     <message>
         <source>No video configured.</source>
         <translation>No video configured.</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation>Video</translation>
+    </message>
+    <message>
+        <source>Load video</source>
+        <translation>Load video</translation>
     </message>
 </context>
 <context>
@@ -1227,6 +1243,13 @@
     <message>
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>No rule matched: the default layout (from the resolver cache)</translation>
+    </message>
+</context>
+<context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>Loading it sends data to %host.</translation>
     </message>
 </context>
 </TS>

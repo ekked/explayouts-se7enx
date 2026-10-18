@@ -46,8 +46,14 @@ AvailableBlocks[]=single
 [BlockDefinition_two_columns]
 Name=Two columns
 Handler=expLayoutsContainerBlockHandler
-ViewTypes[]=two_columns_66_33
+# The view types of the reference, its first one first (a new block gets it). A block stored with another view type
+# (default) renders 50:50.
+ViewTypes[]=two_columns_50_50
 ViewTypes[]=two_columns_33_66
+ViewTypes[]=two_columns_66_33
+ViewTypeNames[two_columns_50_50]=50:50
+ViewTypeNames[two_columns_33_66]=33:66
+ViewTypeNames[two_columns_66_33]=66:33
 IsContainer=1
 Placeholders[]=left
 Placeholders[]=right
@@ -330,7 +336,7 @@ ViewTypes[]=default
 Category=components
 [BlockDefinition_features]
 Name=Features
-Handler=expLayoutsComponentBlockHandler
+Handler=expLayoutsFeaturesBlockHandler
 ViewTypes[]=default
 
 Category=components
@@ -350,7 +356,15 @@ Category=components
 [BlockDefinition_three_columns]
 Name=Three columns
 Handler=expLayoutsContainerBlockHandler
-ViewTypes[]=three_columns
+# The view types of the reference. A block stored with the former view type three_columns renders 33:33:33.
+ViewTypes[]=three_columns_33_33_33
+ViewTypes[]=three_columns_50_25_25
+ViewTypes[]=three_columns_25_50_25
+ViewTypes[]=three_columns_25_25_50
+ViewTypeNames[three_columns_33_33_33]=33:33:33
+ViewTypeNames[three_columns_50_25_25]=50:25:25
+ViewTypeNames[three_columns_25_50_25]=25:50:25
+ViewTypeNames[three_columns_25_25_50]=25:25:50
 IsContainer=1
 Placeholders[]=col_1
 Placeholders[]=col_2
@@ -361,6 +375,7 @@ Category=containers
 Name=Four columns
 Handler=expLayoutsContainerBlockHandler
 ViewTypes[]=four_columns
+ViewTypeNames[four_columns]=25:25:25:25
 IsContainer=1
 Placeholders[]=col_1
 Placeholders[]=col_2
@@ -760,23 +775,61 @@ Zones[]=c
 Zones[]=d
 Zones[]=e
 
+# The six layout types of the reference (netgen/layouts-standard, layout_types.yaml), with its zones and, in their
+# templates, its grid: layout_3 left 4/right 8 columns, layout_4 8/4, layout_5 6/6, layout_6 top and left/center in
+# 8 columns (8/4) beside right in 4.
 [LayoutType_layout_1]
 Name=Single zone
+Template=explayouts/layouts/layout_1.tpl
 Zones[]=main
 
 [LayoutType_layout_2]
 Name=Header / Main / Footer
+Template=explayouts/layouts/layout_2.tpl
 Zones[]=header
 Zones[]=post_header
 Zones[]=main
 Zones[]=pre_footer
 Zones[]=footer
 
-[LayoutType_layout_4]
-Name=Header / Left / Right / Footer
+[LayoutType_layout_3]
+Name=Header / Left 33 / Right 66 / Footer
+Template=explayouts/layouts/layout_3.tpl
 Zones[]=header
 Zones[]=post_header
 Zones[]=left
+Zones[]=right
+Zones[]=pre_footer
+Zones[]=footer
+
+[LayoutType_layout_4]
+Name=Header / Left 66 / Right 33 / Footer
+Template=explayouts/layouts/layout_4.tpl
+Zones[]=header
+Zones[]=post_header
+Zones[]=left
+Zones[]=right
+Zones[]=pre_footer
+Zones[]=footer
+
+[LayoutType_layout_5]
+Name=Header / Left 50 / Right 50 / Footer
+Template=explayouts/layouts/layout_5.tpl
+Zones[]=header
+Zones[]=post_header
+Zones[]=left
+Zones[]=right
+Zones[]=pre_footer
+Zones[]=footer
+
+[LayoutType_layout_6]
+Name=Header / Top, Left, Center / Right / Footer
+Template=explayouts/layouts/layout_6.tpl
+Zones[]=header
+Zones[]=post_header
+Zones[]=top
+Zones[]=left
+Zones[]=center
 Zones[]=right
 Zones[]=pre_footer
 Zones[]=footer
@@ -907,6 +960,13 @@ CacheMaxEntries=5000
 959=959
 1060=1060
 1061=1061
+
+[MapSettings]
+# Key of the Maps Embed API of Google for the map block. Set: a map with a point (latitude, longitude) is Google's,
+# as in the reference, with its map types roadmap and satellite. Empty: the map is OpenStreetMap's (one map type).
+# The key is part of the address of the embedded map, so restrict it to the site's addresses in Google's console.
+# Either way the map loads after a click in the standard templates and in cjw_bootstrap5.
+GoogleMapsApiKey=
 
 [PreviewSettings]
 # The public siteaccess an administration renders layouts in (the layout preview, Load more of a list block called
