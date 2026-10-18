@@ -3,8 +3,10 @@
  * Imports a layout export, the one of this extension (expLayoutsExporter, "version": 1, parameters as a map of name
  * and value) and the one of the layout editor (explayouts_ui_api, no version, parameters as a list of name/value
  * pairs, rules). The layout is always a draft; its layout type and the definitions of its blocks must be ones of the
- * settings; rules of an export are not imported (they would be live as soon as the draft is published). All in one
- * transaction: an import that fails halfway leaves nothing behind.
+ * settings; rules of an export come along disabled and with known target and condition types only (enabled, they
+ * would take pages over as soon as the draft is published). A zone is linked to a shared layout by its identifier
+ * only: a row id of another installation names an unrelated layout here. All in one transaction: an import that
+ * fails halfway leaves nothing behind. validate() is used by the layout editor's import as well.
  */
 class expLayoutsImporter
 {
@@ -29,33 +31,49 @@ class expLayoutsImporter
         if ( isset( $data['version'] ) && (int)$data['version'] !== 1 )
             return array( 'Unsupported export version. Only version 1 is supported.' );
 
-        $errors = array();
-        foreach ( array( 'identifier', 'name', 'layout_type', 'zones' ) as $key )
+        foreach ( array( 'identifier', 'name', 'layout_type' ) as $key )
         {
             if ( !isset( $data[$key] ) )
-                $errors[] = 'Missing required field: ' . $key;
+                return array( 'Missing required field: ' . $key );
+            if ( !is_scalar( $data[$key] ) || trim( (string)$data[$key] ) === '' )
+                return array( 'Invalid field: ' . $key );
         }
-        if ( $errors )
-            return $errors;
-
-        if ( !is_scalar( $data['identifier'] ) || !is_scalar( $data['name'] ) || !is_array( $data['zones'] ) )
-            return array( 'Invalid export: identifier and name must be text, zones a list.' );
+        if ( isset( $data['zones'] ) && !is_array( $data['zones'] ) )
+            return array( 'Invalid export: zones must be a list.' );
+        if ( isset( $data['rules'] ) && !is_array( $data['rules'] ) )
+            return array( 'Invalid export: rules must be a list.' );
         if ( !is_string( $data['layout_type'] ) || expLayoutsLayoutType::getTypeInfo( $data['layout_type'] ) === false )
-            return array( 'Unknown layout type: ' . ( is_scalar( $data['layout_type'] ) ? $data['layout_type'] : '?' ) );
+            return array( 'Unknown layout type: ' . $data['layout_type'] );
 
-        foreach ( $data['zones'] as $zoneData )
+        $errors = array();
+        $optionalText = function( array $item, $key ) { return !isset( $item[$key] ) || is_scalar( $item[$key] ); };
+        foreach ( isset( $data['zones'] ) ? $data['zones'] : array() as $zoneData )
         {
-            if ( !is_array( $zoneData ) || !isset( $zoneData['identifier'] ) || !is_scalar( $zoneData['identifier'] ) )
+            if ( !is_array( $zoneData ) || !isset( $zoneData['identifier'] ) || !is_scalar( $zoneData['identifier'] )
+                 || !$optionalText( $zoneData, 'position' ) || !$optionalText( $zoneData, 'linked_layout_identifier' )
+                 || !$optionalText( $zoneData, 'linked_zone_identifier' )
+                 || ( isset( $zoneData['blocks'] ) && !is_array( $zoneData['blocks'] ) ) )
             {
                 $errors[] = 'Invalid zone in export.';
                 continue;
             }
-            $blocks = isset( $zoneData['blocks'] ) && is_array( $zoneData['blocks'] ) ? $zoneData['blocks'] : array();
-            foreach ( $blocks as $blockData )
+            foreach ( isset( $zoneData['blocks'] ) ? $zoneData['blocks'] : array() as $blockData )
             {
                 $definition = is_array( $blockData ) && isset( $blockData['definition_identifier'] ) ? $blockData['definition_identifier'] : null;
                 if ( !is_string( $definition ) || expLayoutsBlockHandlerFactory::getBlockInfo( $definition ) === false )
+                {
                     $errors[] = 'Unknown block type: ' . ( is_scalar( $definition ) ? $definition : '?' );
+                    continue;
+                }
+                foreach ( array( 'name', 'view_type', 'position' ) as $key )
+                {
+                    if ( !$optionalText( $blockData, $key ) )
+                        $errors[] = "Invalid block field: $key";
+                }
+                if ( isset( $blockData['parameters'] ) && !is_array( $blockData['parameters'] ) )
+                    $errors[] = 'Invalid block field: parameters';
+                if ( isset( $blockData['collection'] ) && $blockData['collection'] !== false && !is_array( $blockData['collection'] ) )
+                    $errors[] = 'Invalid block field: collection';
             }
         }
         return array_values( array_unique( $errors ) );
@@ -95,13 +113,70 @@ class expLayoutsImporter
         {
             $result = self::write( $data );
         }
-        catch ( Exception $e )
+        catch ( Throwable $e )
         {
-            $db->rollback();
-            return array( 'error' => 'Import failed: ' . $e->getMessage() );
+            eZDebug::writeError( 'Layout import failed: ' . $e->getMessage(), __METHOD__ );
+            // a failed query may have ended the transaction already (eZDB rolls back on an error)
+            if ( $db->transactionCounter() > 0 )
+                $db->rollback();
+            return array( 'error' => 'Import failed.' );
         }
-        $db->commit();
+        if ( !$db->commit() )
+        {
+            eZDebug::writeError( 'Layout import failed: the transaction was not committed', __METHOD__ );
+            return array( 'error' => 'Import failed.' );
+        }
         return $result;
+    }
+
+    /**
+     * The id of the published shared layout an exported zone links to, by its identifier; 0 when there is none.
+     * The row id of the export is not used: on another installation it names an unrelated layout.
+     *
+     * @param array $zoneData
+     * @return int
+     */
+    static function linkedLayoutId( array $zoneData )
+    {
+        if ( !isset( $zoneData['linked_layout_identifier'] ) || !is_scalar( $zoneData['linked_layout_identifier'] )
+             || (string)$zoneData['linked_layout_identifier'] === '' )
+            return 0;
+        $linkedLayout = expLayoutsLayout::fetchByIdentifier( (string)$zoneData['linked_layout_identifier'], 2 );
+        return $linkedLayout ? (int)$linkedLayout->attribute( 'id' ) : 0;
+    }
+
+    /**
+     * Imports the rules of an export for $layoutId: disabled, with the target and condition types the resolver
+     * knows only.
+     *
+     * @param array $rules
+     * @param int $layoutId
+     */
+    static function importRules( array $rules, $layoutId )
+    {
+        foreach ( $rules as $ruleData )
+        {
+            if ( !is_array( $ruleData ) )
+                continue;
+            $rule = expLayoutsRule::create( $layoutId, isset( $ruleData['priority'] ) && is_numeric( $ruleData['priority'] ) ? (int)$ruleData['priority'] : null );
+            $rule->setAttribute( 'enabled', 0 );
+            $rule->store();
+            $ruleId = (int)$rule->attribute( 'id' );
+            foreach ( isset( $ruleData['targets'] ) && is_array( $ruleData['targets'] ) ? $ruleData['targets'] : array() as $target )
+            {
+                $type = is_array( $target ) && isset( $target['target_type'] ) && is_string( $target['target_type'] ) ? $target['target_type'] : '';
+                $value = is_array( $target ) && isset( $target['target_value'] ) && is_scalar( $target['target_value'] ) ? (string)$target['target_value'] : '';
+                if ( in_array( $type, expLayoutsResolver::TARGET_TYPES, true ) )
+                    expLayoutsRuleTarget::create( $ruleId, $type, $value )->store();
+            }
+            foreach ( isset( $ruleData['conditions'] ) && is_array( $ruleData['conditions'] ) ? $ruleData['conditions'] : array() as $condition )
+            {
+                $type = is_array( $condition ) && isset( $condition['condition_type'] ) && is_string( $condition['condition_type'] ) ? $condition['condition_type'] : '';
+                $value = is_array( $condition ) && isset( $condition['condition_value'] ) && is_scalar( $condition['condition_value'] ) ? (string)$condition['condition_value'] : '';
+                if ( in_array( $type, expLayoutsResolver::CONDITION_TYPES, true ) )
+                    expLayoutsRuleCondition::create( $ruleId, $type, $value )->store();
+            }
+        }
     }
 
     protected static function write( array $data )
@@ -125,24 +200,13 @@ class expLayoutsImporter
         $layoutId = (int)$layout->attribute( 'id' );
         $zoneMap = array();
 
-        foreach ( $data['zones'] as $zoneData )
+        foreach ( isset( $data['zones'] ) ? $data['zones'] : array() as $zoneData )
         {
             $zone = expLayoutsZone::create( $layoutId, (string)$zoneData['identifier'], 1 );
             if ( isset( $zoneData['position'] ) )
                 $zone->setAttribute( 'position', (int)$zoneData['position'] );
-            // Prefer the shared layout's identifier: an export read back on
-            // another installation will not find the same row ids, but the
-            // identifier is the same everywhere the layout was installed from
-            // the same package.
-            $linkedLayoutId = 0;
-            if ( isset( $zoneData['linked_layout_identifier'] ) && $zoneData['linked_layout_identifier'] !== null )
-            {
-                $linkedLayout = expLayoutsLayout::fetchByIdentifier( (string)$zoneData['linked_layout_identifier'], 2 );
-                if ( $linkedLayout )
-                    $linkedLayoutId = (int)$linkedLayout->attribute( 'id' );
-            }
-            if ( $linkedLayoutId === 0 && isset( $zoneData['linked_layout_id'] ) )
-                $linkedLayoutId = (int)$zoneData['linked_layout_id'];
+            // by the shared layout's identifier only (linkedLayoutId())
+            $linkedLayoutId = self::linkedLayoutId( $zoneData );
 
             if ( $linkedLayoutId > 0 )
             {
@@ -167,12 +231,16 @@ class expLayoutsImporter
             }
         }
 
+        if ( isset( $data['rules'] ) )
+            self::importRules( $data['rules'], $layoutId );
+
         return array( 'layout_id' => $layoutId, 'layout' => $layout );
     }
 
     static function importBlock( array $blockData, $zoneId, $layoutId )
     {
-        $name = isset( $blockData['name'] ) ? $blockData['name'] : ( isset( $blockData['definition_identifier'] ) ? $blockData['definition_identifier'] : 'block' );
+        $name = isset( $blockData['name'] ) && is_scalar( $blockData['name'] ) ? (string)$blockData['name']
+            : ( isset( $blockData['definition_identifier'] ) && is_string( $blockData['definition_identifier'] ) ? $blockData['definition_identifier'] : 'block' );
         $definition = isset( $blockData['definition_identifier'] ) ? $blockData['definition_identifier'] : 'text';
 
         $block = expLayoutsBlock::create( $zoneId, $layoutId, $definition, $name );
@@ -202,7 +270,7 @@ class expLayoutsImporter
         if ( isset( $blockData['collection'] ) && is_array( $blockData['collection'] ) && $blockData['collection'] )
         {
             $collectionData = $blockData['collection'];
-            $collection = expLayoutsCollection::create( $blockId, isset( $collectionData['collection_type'] ) ? $collectionData['collection_type'] : 'manual' );
+            $collection = expLayoutsCollection::create( $blockId, isset( $collectionData['collection_type'] ) && is_string( $collectionData['collection_type'] ) ? $collectionData['collection_type'] : 'manual' );
             if ( isset( $collectionData['offset_value'] ) )
                 $collection->setAttribute( 'offset_value', (int)$collectionData['offset_value'] );
             if ( isset( $collectionData['limit_value'] ) )
@@ -214,11 +282,13 @@ class expLayoutsImporter
             {
                 foreach ( $collectionData['items'] as $itemData )
                 {
+                    if ( !is_array( $itemData ) )
+                        continue;
                     $item = expLayoutsCollectionItem::create(
                         $collectionId,
                         isset( $itemData['value_id'] ) ? (int)$itemData['value_id'] : 0,
-                        isset( $itemData['value_type'] ) ? $itemData['value_type'] : 'ez_content',
-                        isset( $itemData['item_type'] ) ? $itemData['item_type'] : 'manual'
+                        isset( $itemData['value_type'] ) && is_string( $itemData['value_type'] ) ? $itemData['value_type'] : 'ez_content',
+                        isset( $itemData['item_type'] ) && is_string( $itemData['item_type'] ) ? $itemData['item_type'] : 'manual'
                     );
                     if ( isset( $itemData['position'] ) )
                         $item->setAttribute( 'position', (int)$itemData['position'] );
