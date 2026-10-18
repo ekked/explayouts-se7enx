@@ -170,7 +170,9 @@ class expLayoutsLinkParameter
             return '';
 
         $suffix = trim( (string)$suffix );
-        return $suffix === '' ? $href : $href . $suffix;
+        // Checked after the suffix is added: a value and a suffix may only together make a scheme
+        // ("java" + "script:..."). A link a browser would run as script is no link.
+        return expLayoutsSafeValue::url( $suffix === '' ? $href : $href . $suffix );
     }
 
     /**

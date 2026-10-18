@@ -39,7 +39,7 @@ class expLayoutsCardBlockHandler implements expLayoutsBlockHandlerInterface
             'title' => isset( $params['title'] ) ? $params['title'] : '',
             'image_url' => isset( $params['image_url'] ) ? $params['image_url'] : '',
             'content' => isset( $params['content'] ) ? $params['content'] : '',
-            'link_url' => isset( $params['link_url'] ) ? $params['link_url'] : '',
+            'link_url' => isset( $params['link_url'] ) ? expLayoutsSafeValue::url( $params['link_url'] ) : '',
             'link_label' => isset( $params['link_label'] ) ? $params['link_label'] : 'Read more',
         );
     }

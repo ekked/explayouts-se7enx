@@ -31,7 +31,8 @@ class expLayoutsVideoBlockHandler implements expLayoutsBlockHandlerInterface
     {
         $params = is_array( $block ) && isset( $block['parameters'] ) ? $block['parameters'] : array();
         return array(
-            'video_url' => isset( $params['video_url'] ) ? $params['video_url'] : '',
+            // the src of an iframe: http(s) or a path on this site, nothing a browser runs as script
+            'video_url' => isset( $params['video_url'] ) ? expLayoutsSafeValue::embedUrl( $params['video_url'] ) : '',
             'width' => isset( $params['width'] ) ? $params['width'] : '100%',
             'height' => isset( $params['height'] ) ? (int)$params['height'] : 360,
             'autoplay' => isset( $params['autoplay'] ) ? (int)$params['autoplay'] : 0,

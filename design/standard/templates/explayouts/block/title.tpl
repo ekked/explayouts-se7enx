@@ -1,17 +1,15 @@
 <div class="slb slb-title" data-block-id="{$block.id|wash}">
     {if $block.values.title}
-        {if $block.values.tag|ne('')}
-            {def $tag = $block.values.tag}
-        {else}
-            {def $tag = concat('h',$block.values.level)}
-        {/if}
+        {* only h1-h6, p or div; the handler checks the same (expLayoutsSafeValue::headingTag()) *}
+        {def $tag = $block.values.tag|explayouts_safe_tag( $block.values.level )
+             $title_link = $block.values.link|explayouts_safe_url}
         <{$tag} class="title">
-            {if and($block.values.use_link|eq(1), $block.values.link|ne(''))}
-                <a href={$block.values.link|ezurl}>{$block.values.title|wash}</a>
+            {if and($block.values.use_link|eq(1), $title_link|ne(''))}
+                <a href={$title_link|ezurl}>{$block.values.title|wash}</a>
             {else}
                 {$block.values.title|wash}
             {/if}
         </{$tag}>
-        {undef $tag}
+        {undef $tag $title_link}
     {/if}
 </div>
