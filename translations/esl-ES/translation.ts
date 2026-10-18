@@ -99,6 +99,10 @@
         <source>Unknown view type.</source>
         <translation>Tipo de vista desconocido.</translation>
     </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation>Entrada no válida.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -344,6 +348,10 @@
     <message>
         <source>Published.</source>
         <translation>Publicado.</translation>
+    </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation>Entrada no válida.</translation>
     </message>
 </context>
 <context>

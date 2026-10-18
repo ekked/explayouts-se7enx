@@ -102,6 +102,10 @@
         <source>Unknown view type.</source>
         <translation>Genus aspectus ignotum.</translation>
     </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation>Inscriptio irrita.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -347,6 +351,10 @@
     <message>
         <source>Published.</source>
         <translation>Editum est.</translation>
+    </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation>Inscriptio irrita.</translation>
     </message>
 </context>
 <context>

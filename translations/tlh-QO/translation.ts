@@ -102,6 +102,10 @@
         <source>Unknown view type.</source>
         <translation>legh Segh Sovbe&apos;lu&apos;.</translation>
     </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation>De&apos; lugh.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -347,6 +351,10 @@
     <message>
         <source>Published.</source>
         <translation>lalu&apos;ta&apos;.</translation>
+    </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation>De&apos; lugh.</translation>
     </message>
 </context>
 <context>

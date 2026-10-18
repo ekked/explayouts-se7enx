@@ -101,6 +101,10 @@
         <source>Unknown view type.</source>
         <translation>סוג תצוגה לא מוכר.</translation>
     </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation>קלט לא תקין.</translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -346,6 +350,10 @@
     <message>
         <source>Published.</source>
         <translation>פורסם.</translation>
+    </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation>קלט לא תקין.</translation>
     </message>
 </context>
 <context>

@@ -109,20 +109,26 @@ class LayoutEdit extends \Exponential\Runnable\ModuleView
 
         if ( $http->hasPostVariable( 'SaveDraft' ) )
         {
-            $layout->setAttribute( 'identifier', trim( $http->postVariable( 'Identifier' ) ) );
-            $layout->setAttribute( 'name', trim( $http->postVariable( 'Name' ) ) );
-            // a layout type of the settings (LayoutType_*), else the layout keeps the one it has
+            // a layout type of the settings (LayoutType_*) and text fields, else nothing is saved
             $layoutType = is_string( $http->postVariable( 'LayoutType' ) ) ? trim( $http->postVariable( 'LayoutType' ) ) : '';
-            if ( \expLayoutsLayoutType::getTypeInfo( $layoutType ) !== false )
-                $layout->setAttribute( 'layout_type', $layoutType );
-            else
+            $identifier = $http->postVariable( 'Identifier' );
+            $name = $http->postVariable( 'Name' );
+            if ( \expLayoutsLayoutType::getTypeInfo( $layoutType ) === false )
                 $error = \ezpI18n::tr( 'design/admin/explayouts/layout_edit', 'Unknown layout type.' );
-            $layout->setAttribute( 'modified', time() );
-            if ( (int)$layout->attribute( 'status' ) === 0 )
-                $layout->setAttribute( 'status', 1 );
-            $layout->store();
-            expLayoutEnsureZones( $layout );
-            $message = \ezpI18n::tr( 'design/admin/explayouts/layout_edit', 'Draft saved.' );
+            elseif ( !is_string( $identifier ) || !is_string( $name ) )
+                $error = \ezpI18n::tr( 'design/admin/explayouts/layout_edit', 'Invalid input.' );
+            else
+            {
+                $layout->setAttribute( 'identifier', trim( $identifier ) );
+                $layout->setAttribute( 'name', trim( $name ) );
+                $layout->setAttribute( 'layout_type', $layoutType );
+                $layout->setAttribute( 'modified', time() );
+                if ( (int)$layout->attribute( 'status' ) === 0 )
+                    $layout->setAttribute( 'status', 1 );
+                $layout->store();
+                expLayoutEnsureZones( $layout );
+                $message = \ezpI18n::tr( 'design/admin/explayouts/layout_edit', 'Draft saved.' );
+            }
         }
 
         if ( $http->hasPostVariable( 'Publish' ) )

@@ -43,50 +43,55 @@ class RuleEdit extends \Exponential\Runnable\ModuleView
             $priority = (int)$http->postVariable( 'Priority' );
             $enabled = $http->hasPostVariable( 'Enabled' ) ? 1 : 0;
 
-            $rule->setAttribute( 'layout_id', $layoutId );
-            $rule->setAttribute( 'priority', $priority );
-            $rule->setAttribute( 'enabled', $enabled );
-            $rule->store();
-
-            // remove old targets/conditions and re-create
-            foreach ( $rule->targets() as $t ) { $t->remove(); }
-            foreach ( $rule->conditions() as $c ) { $c->remove(); }
-
-            // Only the types the resolver knows (expLayoutsResolver::TARGET_TYPES, CONDITION_TYPES), and only lists of
-            // strings: a single posted value made count() throw a TypeError, an unknown type was stored and
-            // never matched (a target) or, before the resolver refused unknown conditions, always did.
+            // Validated before anything is written: only the types the resolver knows (expLayoutsResolver::
+            // TARGET_TYPES, CONDITION_TYPES), only lists of strings (a single posted value made count() throw a
+            // TypeError), and an enabled rule needs a target. A refused form saves nothing.
             $rejected = array();
             $targets = self::postedPairs( $http, 'TargetType', 'TargetValue', \expLayoutsResolver::TARGET_TYPES, $rejected );
-            foreach ( $targets as $pair )
-            {
-                $t = new \expLayoutsRuleTarget( array(
-                    'rule_id' => $rule->attribute( 'id' ),
-                    'target_type' => $pair[0],
-                    'target_value' => $pair[1],
-                ) );
-                $t->store();
-            }
-
             $conditions = self::postedPairs( $http, 'ConditionType', 'ConditionValue', \expLayoutsResolver::CONDITION_TYPES, $rejected );
-            foreach ( $conditions as $pair )
-            {
-                $c = new \expLayoutsRuleCondition( array(
-                    'rule_id' => $rule->attribute( 'id' ),
-                    'condition_type' => $pair[0],
-                    'condition_value' => $pair[1],
-                ) );
-                $c->store();
-            }
-
-            // the resolver caches its answers per path: a changed rule must be looked at again
-            \expLayoutsResolver::clearCache();
-
-            $message = \ezpI18n::tr( 'design/admin/explayouts/rule_edit', 'Rule saved.' );
             if ( $rejected )
                 $error = \ezpI18n::tr( 'design/admin/explayouts/rule_edit', 'Unknown target or condition types were not saved: %types', null,
                                        array( '%types' => implode( ', ', array_unique( $rejected ) ) ) );
             if ( !$targets && $enabled )
                 $error = trim( $error . ' ' . \ezpI18n::tr( 'design/admin/explayouts/rule_edit', 'A rule without a target applies to no page.' ) );
+
+            if ( $error === '' )
+            {
+                // the rule and its targets and conditions as one change
+                $db = \eZDB::instance();
+                $db->begin();
+                $rule->setAttribute( 'layout_id', $layoutId );
+                $rule->setAttribute( 'priority', $priority );
+                $rule->setAttribute( 'enabled', $enabled );
+                $rule->store();
+
+                foreach ( $rule->targets() as $t ) { $t->remove(); }
+                foreach ( $rule->conditions() as $c ) { $c->remove(); }
+                foreach ( $targets as $pair )
+                {
+                    $t = new \expLayoutsRuleTarget( array(
+                        'rule_id' => $rule->attribute( 'id' ),
+                        'target_type' => $pair[0],
+                        'target_value' => $pair[1],
+                    ) );
+                    $t->store();
+                }
+                foreach ( $conditions as $pair )
+                {
+                    $c = new \expLayoutsRuleCondition( array(
+                        'rule_id' => $rule->attribute( 'id' ),
+                        'condition_type' => $pair[0],
+                        'condition_value' => $pair[1],
+                    ) );
+                    $c->store();
+                }
+                $db->commit();
+
+                // the resolver caches its answers per path: a changed rule must be looked at again
+                \expLayoutsResolver::clearCache();
+
+                $message = \ezpI18n::tr( 'design/admin/explayouts/rule_edit', 'Rule saved.' );
+            }
         }
 
         $layouts = \expLayoutsLayout::fetchList( 2 );

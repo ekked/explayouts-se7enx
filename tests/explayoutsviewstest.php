@@ -9,10 +9,12 @@
  *
  *  VW-01 - every write of rule_edit, rule_list, layout_edit (Publish) and layout_list (Delete) empties the resolver
  *          cache (expLayoutsResolver::clearCache(), which renews the admin generation)
- *  VW-02 - rule_edit stores only target and condition types the resolver knows, takes a posted value that is not a
+ *  VW-02 - rule_edit saves nothing when a target or condition type is unknown or an enabled rule has no target (and
+ *          says why), saves rule, targets and conditions in one transaction otherwise, takes a posted value that is not a
  *          list without a TypeError, and says what it left out
  *  VW-03 - rule_list lists the disabled rules too
- *  VW-04 - layout_edit adds only blocks of the settings and keeps the layout type unless the posted one is known;
+ *  VW-04 - layout_edit adds only blocks of the settings and saves no draft with an unknown layout type; block_edit
+ *          saves nothing (no "saved" beside the error) for an unknown view type or a parameter posted as a list;
  *          block_edit keeps the view type unless the posted one is one of the block's
  *  VW-05 - the Layouts tab of the node view is drawn and filled only for users with explayouts/read
  *  VW-06 - the scripts under bin/php read their argument when run through bin/php/ezexec.php
@@ -46,6 +48,13 @@ class eZINI
     public static function instance( $name = 'site.ini' ) { return new self(); }
     public function variable( $group, $name ) { return isset( self::$values[$group][$name] ) ? self::$values[$group][$name] : false; }
     public function hasVariable( $group, $name ) { return isset( self::$values[$group][$name] ); }
+}
+class eZDB
+{
+    public static $log = array();
+    public static function instance() { return new self(); }
+    public function begin() { self::$log[] = 'begin'; }
+    public function commit() { self::$log[] = 'commit'; return true; }
 }
 class eZFile
 {
@@ -155,7 +164,10 @@ class expLayoutsCollection
 class expLayoutsBlockHandlerFactory
 {
     public static function getAvailableBlocks() { return array( 'title' ); }
-    public static function get( $identifier ) { return false; }
+    public static function get( $identifier )
+    {
+        return $identifier === 'title' ? new class { public function getParameters() { return array( 'title' => array( 'type' => 'string' ) ); } } : false;
+    }
     public static function getBlockInfo( $identifier )
     {
         return $identifier === 'title' ? array( 'identifier' => 'title', 'name' => 'Title', 'view_types' => array( 'title', 'title_big' ), 'has_collection' => false ) : false;
@@ -206,12 +218,21 @@ try
     $run( $ns . 'RuleEdit', array( 'RuleID' => 7 ), array( 'SaveRule' => 1, 'LayoutID' => 3, 'Priority' => 10, 'Enabled' => 1,
         'TargetType' => array( 'path', 'evil', 'path_regex' ), 'TargetValue' => array( 'news', 'x', '^a/b' ),
         'ConditionType' => array( 'siteaccess', 'sitacess' ), 'ConditionValue' => array( '["site"]', '["site"]' ) ) );
+    vwCheck( vwLog::$writes === array() && expLayoutsRuleTarget::$stored === array() && vwLog::$generationBumps === 0,
+             'VW-02 with an unknown type nothing is saved or removed' );
+    vwCheck( strpos( (string)eZTemplate::$last['error'], 'evil' ) !== false && strpos( (string)eZTemplate::$last['error'], 'sitacess' ) !== false
+             && (string)eZTemplate::$last['message'] === '', 'VW-02 the refused types are named, no "saved"' );
+    $run( $ns . 'RuleEdit', array( 'RuleID' => 7 ), array( 'SaveRule' => 1, 'LayoutID' => 3, 'Priority' => 10, 'Enabled' => 1 ) );
+    vwCheck( vwLog::$writes === array() && strpos( (string)eZTemplate::$last['error'], 'without a target' ) !== false, 'VW-02 an enabled rule without a target is not saved' );
+    eZDB::$log = array();
+    $run( $ns . 'RuleEdit', array( 'RuleID' => 7 ), array( 'SaveRule' => 1, 'LayoutID' => 3, 'Priority' => 10, 'Enabled' => 1,
+        'TargetType' => array( 'path', 'path_regex' ), 'TargetValue' => array( 'news', '^a/b' ),
+        'ConditionType' => array( 'siteaccess' ), 'ConditionValue' => array( '["site"]' ) ) );
     vwCheck( vwLog::$generationBumps === 1, 'VW-01 rule_edit Save empties the resolver cache' );
     $types = array_map( function( $t ) { return $t['target_type']; }, expLayoutsRuleTarget::$stored );
     $conditionTypes = array_map( function( $c ) { return $c['condition_type']; }, expLayoutsRuleCondition::$stored );
-    vwCheck( $types === array( 'path', 'path_regex' ) && $conditionTypes === array( 'siteaccess' ), 'VW-02 only known types are stored' );
-    vwCheck( strpos( (string)eZTemplate::$last['error'], 'evil' ) !== false && strpos( (string)eZTemplate::$last['error'], 'sitacess' ) !== false,
-             'VW-02 the types left out are named' );
+    vwCheck( $types === array( 'path', 'path_regex' ) && $conditionTypes === array( 'siteaccess' ) && eZDB::$log === array( 'begin', 'commit' ),
+             'VW-02 a valid form is saved in one transaction' );
     expLayoutsRuleTarget::$stored = array();
     $thrown = null;
     try
@@ -245,14 +266,19 @@ try
     $run( $ns . 'LayoutEdit', array( 'LayoutID' => 3 ), array( 'AddBlock' => 1, 'ZoneID' => 31, 'DefinitionIdentifier' => 'title' ) );
     vwCheck( expLayoutsBlock::$created === array( 'title' ), 'VW-04 layout_edit adds a block of the settings' );
     $run( $ns . 'LayoutEdit', array( 'LayoutID' => 3 ), array( 'SaveDraft' => 1, 'Identifier' => 'l3', 'Name' => 'L', 'LayoutType' => 'no_such_type' ) );
-    vwCheck( expLayoutsLayout::$layouts[3]->attribute( 'layout_type' ) === 'layout_1', 'VW-04 layout_edit keeps the layout type for an unknown one' );
+    vwCheck( expLayoutsLayout::$layouts[3]->attribute( 'layout_type' ) === 'layout_1' && vwLog::$writes === array()
+             && (string)eZTemplate::$last['message'] === '', 'VW-04 layout_edit saves no draft with an unknown layout type' );
     $run( $ns . 'LayoutEdit', array( 'LayoutID' => 3 ), array( 'SaveDraft' => 1, 'Identifier' => 'l3', 'Name' => 'L', 'LayoutType' => 'layout_2' ) );
     vwCheck( expLayoutsLayout::$layouts[3]->attribute( 'layout_type' ) === 'layout_2', 'VW-04 layout_edit takes a known layout type' );
 
     // VW-04: block_edit
     expLayoutsBlock::$blocks = array( 5 => new expLayoutsBlock( array( 'id' => 5, 'definition_identifier' => 'title', 'view_type' => 'title' ) ) );
     $run( $ns . 'BlockEdit', array( 'BlockID' => 5 ), array( 'SaveBlock' => 1, 'Name' => 'B', 'ViewType' => '../../x' ) );
-    vwCheck( expLayoutsBlock::$blocks[5]->attribute( 'view_type' ) === 'title', 'VW-04 block_edit keeps the view type for an unknown one' );
+    vwCheck( expLayoutsBlock::$blocks[5]->attribute( 'view_type' ) === 'title' && vwLog::$writes === array()
+             && (string)eZTemplate::$last['message'] === '', 'VW-04 block_edit saves nothing for an unknown view type' );
+    $run( $ns . 'BlockEdit', array( 'BlockID' => 5 ), array( 'SaveBlock' => 1, 'Name' => 'Changed', 'ViewType' => 'title_big', 'Parameter_title' => array( 'x' ) ) );
+    vwCheck( expLayoutsBlock::$blocks[5]->attribute( 'name' ) === null && vwLog::$writes === array() && (string)eZTemplate::$last['error'] !== '',
+             'VW-04 block_edit saves nothing for a parameter posted as a list' );
     $run( $ns . 'BlockEdit', array( 'BlockID' => 5 ), array( 'SaveBlock' => 1, 'Name' => 'B', 'ViewType' => 'title_big' ) );
     vwCheck( expLayoutsBlock::$blocks[5]->attribute( 'view_type' ) === 'title_big', 'VW-04 block_edit takes a view type of the block' );
 
