@@ -1,6 +1,6 @@
 {ezcss_load(array('netgen/layouts-admin.css','netgen/layouts-exponential.css','explayouts-ui.css'))}
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+{* Roboto and Material Icons come with layouts-admin.css (@font-face on the files of the design), so the tab loads no
+   stylesheet or font from another host and the administration's Content Security Policy needs none. *}
 {def $resolved = fetch('explayouts','layout_summary_for_node',hash('node_id',$node.node_id))}
 {def $rules = fetch('explayouts','rules_for_node',hash('node_id',$node.node_id))}
 <div class="ng-layouts-app row exp-node-layout-tab">
