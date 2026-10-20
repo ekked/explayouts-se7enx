@@ -756,11 +756,10 @@ Zones[]=footer
 [LayoutType_admin_full]
 Name=Admin: main only
 Group=admin
+# no main_top and main_bottom: admin4l draws those zones only inside #maincolumn, which this type does not have
 Zones[]=header
 Zones[]=topmenu
-Zones[]=main_top
 Zones[]=main
-Zones[]=main_bottom
 Zones[]=footer
 
 # The Exp Layouts panel of the Exp Debug bar (settings/debugbar.ini.append.php). Its links into the administration
