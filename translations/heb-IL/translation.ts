@@ -980,6 +980,14 @@
         <source>No map configured.</source>
         <translation>לא הוגדרה מפה.</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <translation>מפה</translation>
+    </message>
+    <message>
+        <source>Load map</source>
+        <translation>טעינת המפה</translation>
+    </message>
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -1021,6 +1029,14 @@
     <message>
         <source>No video configured.</source>
         <translation>לא הוגדר סרטון.</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation>וידאו</translation>
+    </message>
+    <message>
+        <source>Load video</source>
+        <translation>טעינת הווידאו</translation>
     </message>
 </context>
 <context>
@@ -1229,6 +1245,13 @@
     <message>
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>אף כלל לא התאים: פריסת ברירת המחדל (ממטמון המפענח)</translation>
+    </message>
+</context>
+<context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>הטעינה שולחת נתונים אל %host.</translation>
     </message>
 </context>
 </TS>

@@ -1,5 +1,10 @@
 <?php /* #?ini charset="utf-8"?
 
+# ContentParameters[] of a block definition: the parameters the layout editor shows in its Content tab (with the block
+# label and the collection), as the reference's parameters of the group "content" - the block's own text, links,
+# images, video and map. The others (view type, CSS class and ID, container, whitespace, the design options of the
+# galleries and lists) are in the Design tab, as is every parameter of a definition that lists none. A compound
+# parameter takes its children along.
 [BlockSettings]
 AvailableBlocks[]
 AvailableBlocks[]=title
@@ -46,8 +51,14 @@ AvailableBlocks[]=single
 [BlockDefinition_two_columns]
 Name=Two columns
 Handler=expLayoutsContainerBlockHandler
-ViewTypes[]=two_columns_66_33
+# The view types of the reference, its first one first (a new block gets it). A block stored with another view type
+# (default) renders 50:50.
+ViewTypes[]=two_columns_50_50
 ViewTypes[]=two_columns_33_66
+ViewTypes[]=two_columns_66_33
+ViewTypeNames[two_columns_50_50]=50:50
+ViewTypeNames[two_columns_33_66]=33:66
+ViewTypeNames[two_columns_66_33]=66:33
 IsContainer=1
 Placeholders[]=left
 Placeholders[]=right
@@ -64,36 +75,45 @@ Category=containers
 [BlockDefinition_tpl_block]
 Name=Template block
 Handler=expLayoutsTplBlockHandler
+ContentParameters[]=block_name
 ViewTypes[]=tpl_block
 
 Category=placeholders
 [BlockDefinition_text]
 Name=Text
 Handler=expLayoutsTextBlockHandler
+ContentParameters[]=content
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_title]
 Name=Title
 Handler=expLayoutsTitleBlockHandler
+ContentParameters[]=title
+ContentParameters[]=use_link
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_html]
 Name=HTML snippet
 Handler=expLayoutsHtmlBlockHandler
+ContentParameters[]=content
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_rich_text]
 Name=Rich text
 Handler=expLayoutsRichTextBlockHandler
+ContentParameters[]=content
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_image]
 Name=Image
 Handler=expLayoutsImageBlockHandler
+ContentParameters[]=image_url
+ContentParameters[]=alt
+ContentParameters[]=link
 ViewTypes[]=default
 
 Category=basic
@@ -106,18 +126,29 @@ ViewTypes[]=list_numbered
 ViewTypes[]=list_zigzag
 ViewTypes[]=list_accordion
 ViewTypes[]=grid_featured
+ViewTypeNames[list]=List
+ViewTypeNames[grid]=Grid
+ViewTypeNames[list_numbered]=Numbered list
+ViewTypeNames[list_zigzag]=Zig-zag
+ViewTypeNames[list_accordion]=Accordion
+ViewTypeNames[grid_featured]=Grid (first item large)
 HasCollection=1
 
 Category=listing
 [BlockDefinition_single]
 Name=Single content
 Handler=expLayoutsSingleBlockHandler
+ContentParameters[]=node_id
 ViewTypes[]=default
 
 Category=placeholders
 [BlockDefinition_button]
 Name=Button / Link
 Handler=expLayoutsButtonBlockHandler
+ContentParameters[]=text
+ContentParameters[]=use_link
+ContentParameters[]=label
+ContentParameters[]=url
 ViewTypes[]=default
 
 Category=basic
@@ -136,18 +167,25 @@ Category=basic
 [BlockDefinition_card]
 Name=Card
 Handler=expLayoutsCardBlockHandler
+ContentParameters[]=title
+ContentParameters[]=image_url
+ContentParameters[]=content
+ContentParameters[]=link_url
+ContentParameters[]=link_label
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_accordion]
 Name=Accordion
 Handler=expLayoutsAccordionBlockHandler
+ContentParameters[]=items
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_tabs]
 Name=Tabs
 Handler=expLayoutsTabsBlockHandler
+ContentParameters[]=items
 ViewTypes[]=default
 
 Category=basic
@@ -261,36 +299,54 @@ Category=listing
 [BlockDefinition_quote]
 Name=Quote
 Handler=expLayoutsQuoteBlockHandler
+ContentParameters[]=quote
+ContentParameters[]=author
+ContentParameters[]=source
 ViewTypes[]=default
 
 Category=components
 [BlockDefinition_alert]
 Name=Alert
 Handler=expLayoutsAlertBlockHandler
+ContentParameters[]=message
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_video]
 Name=External video
 Handler=expLayoutsVideoBlockHandler
+ContentParameters[]=service
+ContentParameters[]=video_id
+ContentParameters[]=caption
+ContentParameters[]=video_url
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_badge]
 Name=Badge
 Handler=expLayoutsBadgeBlockHandler
+ContentParameters[]=label
+ContentParameters[]=link
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_progress]
 Name=Progress bar
 Handler=expLayoutsProgressBlockHandler
+ContentParameters[]=value
+ContentParameters[]=label
 ViewTypes[]=default
 
 Category=basic
 [BlockDefinition_map]
 Name=Map
 Handler=expLayoutsMapBlockHandler
+ContentParameters[]=latitude
+ContentParameters[]=longitude
+ContentParameters[]=zoom
+ContentParameters[]=map_type
+ContentParameters[]=show_marker
+ContentParameters[]=embed_url
 ViewTypes[]=default
 
 Category=basic
@@ -304,6 +360,7 @@ Category=gallery
 [BlockDefinition_markdown]
 Name=Markdown
 Handler=expLayoutsMarkdownBlockHandler
+ContentParameters[]=content
 ViewTypes[]=default
 
 Category=basic
@@ -319,24 +376,49 @@ Category=placeholders
 [BlockDefinition_hero]
 Name=Hero
 Handler=expLayoutsComponentBlockHandler
+ContentParameters[]=title
+ContentParameters[]=content
+ContentParameters[]=image_url
+ContentParameters[]=image_alt
+ContentParameters[]=link_text
+ContentParameters[]=link_url
 ViewTypes[]=default
 
 Category=components
 [BlockDefinition_about]
 Name=About
 Handler=expLayoutsComponentBlockHandler
+ContentParameters[]=title
+ContentParameters[]=content
+ContentParameters[]=image_url
+ContentParameters[]=image_alt
+ContentParameters[]=link_text
+ContentParameters[]=link_url
 ViewTypes[]=default
 
 Category=components
 [BlockDefinition_features]
 Name=Features
-Handler=expLayoutsComponentBlockHandler
+Handler=expLayoutsFeaturesBlockHandler
+ContentParameters[]=title
+ContentParameters[]=content
+ContentParameters[]=items
+ContentParameters[]=image_url
+ContentParameters[]=image_alt
+ContentParameters[]=link_text
+ContentParameters[]=link_url
 ViewTypes[]=default
 
 Category=components
 [BlockDefinition_lead]
 Name=Lead
 Handler=expLayoutsComponentBlockHandler
+ContentParameters[]=title
+ContentParameters[]=content
+ContentParameters[]=image_url
+ContentParameters[]=image_alt
+ContentParameters[]=link_text
+ContentParameters[]=link_url
 ViewTypes[]=default
 
 Category=components
@@ -350,7 +432,15 @@ Category=components
 [BlockDefinition_three_columns]
 Name=Three columns
 Handler=expLayoutsContainerBlockHandler
-ViewTypes[]=three_columns
+# The view types of the reference. A block stored with the former view type three_columns renders 33:33:33.
+ViewTypes[]=three_columns_33_33_33
+ViewTypes[]=three_columns_50_25_25
+ViewTypes[]=three_columns_25_50_25
+ViewTypes[]=three_columns_25_25_50
+ViewTypeNames[three_columns_33_33_33]=33:33:33
+ViewTypeNames[three_columns_50_25_25]=50:25:25
+ViewTypeNames[three_columns_25_50_25]=25:50:25
+ViewTypeNames[three_columns_25_25_50]=25:25:50
 IsContainer=1
 Placeholders[]=col_1
 Placeholders[]=col_2
@@ -361,6 +451,7 @@ Category=containers
 Name=Four columns
 Handler=expLayoutsContainerBlockHandler
 ViewTypes[]=four_columns
+ViewTypeNames[four_columns]=25:25:25:25
 IsContainer=1
 Placeholders[]=col_1
 Placeholders[]=col_2
@@ -384,6 +475,7 @@ Category=containers
 [BlockDefinition_exp_component_hero]
 Name=Hero component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=hero_style_1
 ViewTypes[]=hero_style_2
 ViewTypes[]=hero_style_3
@@ -392,6 +484,7 @@ Category=components
 [BlockDefinition_exp_component_features]
 Name=Features component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=features_style_1
 ViewTypes[]=features_style_2
 ViewTypes[]=features_style_3
@@ -404,6 +497,7 @@ Category=components
 [BlockDefinition_exp_component_about]
 Name=About component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=about_style_1
 ViewTypes[]=about_style_2
 ViewTypes[]=about_style_3
@@ -414,6 +508,7 @@ Category=components
 [BlockDefinition_exp_component_logos]
 Name=Logos component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=logos_style_1
 ViewTypes[]=logos_style_2
 
@@ -421,12 +516,14 @@ Category=components
 [BlockDefinition_exp_component_quote]
 Name=Quote component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=quote_style_1
 
 Category=components
 [BlockDefinition_exp_component_lead]
 Name=Lead component
 Handler=expLayoutsContentComponentBlockHandler
+ContentParameters[]=content
 ViewTypes[]=lead_style_1
 ViewTypes[]=lead_style_2
 
@@ -760,23 +857,61 @@ Zones[]=c
 Zones[]=d
 Zones[]=e
 
+# The six layout types of the reference (netgen/layouts-standard, layout_types.yaml), with its zones and, in their
+# templates, its grid: layout_3 left 4/right 8 columns, layout_4 8/4, layout_5 6/6, layout_6 top and left/center in
+# 8 columns (8/4) beside right in 4.
 [LayoutType_layout_1]
 Name=Single zone
+Template=explayouts/layouts/layout_1.tpl
 Zones[]=main
 
 [LayoutType_layout_2]
 Name=Header / Main / Footer
+Template=explayouts/layouts/layout_2.tpl
 Zones[]=header
 Zones[]=post_header
 Zones[]=main
 Zones[]=pre_footer
 Zones[]=footer
 
-[LayoutType_layout_4]
-Name=Header / Left / Right / Footer
+[LayoutType_layout_3]
+Name=Header / Left 33 / Right 66 / Footer
+Template=explayouts/layouts/layout_3.tpl
 Zones[]=header
 Zones[]=post_header
 Zones[]=left
+Zones[]=right
+Zones[]=pre_footer
+Zones[]=footer
+
+[LayoutType_layout_4]
+Name=Header / Left 66 / Right 33 / Footer
+Template=explayouts/layouts/layout_4.tpl
+Zones[]=header
+Zones[]=post_header
+Zones[]=left
+Zones[]=right
+Zones[]=pre_footer
+Zones[]=footer
+
+[LayoutType_layout_5]
+Name=Header / Left 50 / Right 50 / Footer
+Template=explayouts/layouts/layout_5.tpl
+Zones[]=header
+Zones[]=post_header
+Zones[]=left
+Zones[]=right
+Zones[]=pre_footer
+Zones[]=footer
+
+[LayoutType_layout_6]
+Name=Header / Top, Left, Center / Right / Footer
+Template=explayouts/layouts/layout_6.tpl
+Zones[]=header
+Zones[]=post_header
+Zones[]=top
+Zones[]=left
+Zones[]=center
 Zones[]=right
 Zones[]=pre_footer
 Zones[]=footer
@@ -907,6 +1042,19 @@ CacheMaxEntries=5000
 959=959
 1060=1060
 1061=1061
+
+[MarkdownSettings]
+# disabled: as in CommonMark (and the reference), a single line break inside a paragraph is a soft break; a hard
+# break takes two spaces or a backslash at the end of the line. enabled: every line break is a <br />, as the markdown
+# block printed its text (escaped, with nl2br) before it rendered Markdown - for blocks stored then.
+HardBreaks=disabled
+
+[MapSettings]
+# Key of the Maps Embed API of Google for the map block. Set: a map with a point (latitude, longitude) is Google's,
+# as in the reference, with its map types roadmap and satellite. Empty: the map is OpenStreetMap's (one map type).
+# The key is part of the address of the embedded map, so restrict it to the site's addresses in Google's console.
+# Either way the map loads after a click in the standard templates and in cjw_bootstrap5.
+GoogleMapsApiKey=
 
 [PreviewSettings]
 # The public siteaccess an administration renders layouts in (the layout preview, Load more of a list block called

@@ -981,6 +981,14 @@
         <source>No map configured.</source>
         <translation>Nulla charta geographica configurata.</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <translation>Tabula</translation>
+    </message>
+    <message>
+        <source>Load map</source>
+        <translation>Tabulam onerare</translation>
+    </message>
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -1022,6 +1030,14 @@
     <message>
         <source>No video configured.</source>
         <translation>Nulla pellicula configurata.</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation>Pellicula</translation>
+    </message>
+    <message>
+        <source>Load video</source>
+        <translation>Pelliculam onerare</translation>
     </message>
 </context>
 <context>
@@ -1230,6 +1246,13 @@
     <message>
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>Nulla norma congruit: dispositio praedefinita (ex promptuario resolutoris)</translation>
+    </message>
+</context>
+<context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>Onerando data ad %host mittuntur.</translation>
     </message>
 </context>
 </TS>

@@ -56,6 +56,32 @@ class expLayoutsSafeValue
         return self::checkedUrl( $value, self::EMBED_SCHEMES, false );
     }
 
+    /**
+     * The address of a frame of another host (the video and map blocks): an http(s) address, a protocol relative one
+     * as https; '' for anything else, also a path on this site (a page of the site in a frame with scripts and its own
+     * origin would be outside every sandbox).
+     *
+     * @param mixed $value
+     * @return string
+     */
+    public static function externalEmbedUrl( $value )
+    {
+        $url = self::embedUrl( $value );
+        if ( $url === '' )
+            return '';
+        $url = trim( $url );
+        if ( substr( $url, 0, 2 ) === '//' )
+            return 'https:' . $url;
+        return preg_match( '#^https?://#i', $url ) ? $url : '';
+    }
+
+    /** The host of an address (without user, port and path), lower case; '' when it has none */
+    public static function host( $url )
+    {
+        $host = is_scalar( $url ) ? parse_url( (string)$url, PHP_URL_HOST ) : null;
+        return is_string( $host ) ? strtolower( $host ) : '';
+    }
+
     protected static function checkedUrl( $value, array $schemes, $allowRelative )
     {
         if ( !is_scalar( $value ) )

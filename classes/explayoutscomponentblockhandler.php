@@ -9,6 +9,22 @@ class expLayoutsComponentBlockHandler implements expLayoutsBlockHandlerInterface
                 'type' => 'text',
                 'default' => '',
             ),
+            // The heading of the title, h1-h6. Empty: the one of the block's template (h1 for a hero, h2 for the
+            // others; a design may set its own, as cjw_bootstrap5 does with HeroHeadingLevel).
+            'level' => array(
+                'name' => 'Heading level',
+                'type' => 'select',
+                'options' => array(
+                    '' => 'Default of the design',
+                    '1' => 'Heading 1',
+                    '2' => 'Heading 2',
+                    '3' => 'Heading 3',
+                    '4' => 'Heading 4',
+                    '5' => 'Heading 5',
+                    '6' => 'Heading 6',
+                ),
+                'default' => '',
+            ),
             'content' => array(
                 'name' => 'Content',
                 'type' => 'textarea',
@@ -52,6 +68,8 @@ class expLayoutsComponentBlockHandler implements expLayoutsBlockHandlerInterface
         $params = is_array( $block ) && isset( $block['parameters'] ) ? $block['parameters'] : array();
         return array(
             'title' => isset( $params['title'] ) ? $params['title'] : '',
+            // 1-6, or 0: the template's own heading
+            'level' => isset( $params['level'] ) && in_array( (int)$params['level'], array( 1, 2, 3, 4, 5, 6 ), true ) ? (int)$params['level'] : 0,
             'content' => isset( $params['content'] ) ? $params['content'] : '',
             'image_url' => isset( $params['image_url'] ) ? $params['image_url'] : '',
             'image_alt' => isset( $params['image_alt'] ) ? $params['image_alt'] : '',

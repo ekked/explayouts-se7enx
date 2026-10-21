@@ -15,11 +15,12 @@ class expLayoutsMarkdownBlockHandler implements expLayoutsBlockHandlerInterface
     public function getValues( $block )
     {
         $params = is_array( $block ) && isset( $block['parameters'] ) ? $block['parameters'] : array();
-        $content = isset( $params['content'] ) ? $params['content'] : '';
-        $html = nl2br( htmlspecialchars( $content, ENT_QUOTES, 'UTF-8' ), false );
+        $content = isset( $params['content'] ) ? (string)$params['content'] : '';
         return array(
             'content' => $content,
-            'html' => $html,
+            // rendered as the reference renders it (markdown_to_html), with HTML in the text escaped and unsafe links
+            // dropped (expLayoutsMarkdown): the templates print it as it is
+            'html' => expLayoutsMarkdown::toHtml( $content ),
         );
     }
 }

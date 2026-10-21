@@ -13,10 +13,25 @@ class expLayoutsTitleBlockHandler implements expLayoutsBlockHandlerInterface
                 'name' => 'Heading level (1-6)',
                 'type' => 'integer',
                 'default' => 2,
+                'min' => 1,
+                'max' => 6,
             ),
+            // The reference offers h1, h2 and h3 (block.title.tag.*); the element printed may be any of
+            // expLayoutsSafeValue::HEADING_TAGS. Empty: the heading of the level above.
             'tag' => array(
                 'name' => 'HTML tag',
-                'type' => 'string',
+                'type' => 'select',
+                'options' => array(
+                    '' => 'From the heading level',
+                    'h1' => 'Heading 1',
+                    'h2' => 'Heading 2',
+                    'h3' => 'Heading 3',
+                    'h4' => 'Heading 4',
+                    'h5' => 'Heading 5',
+                    'h6' => 'Heading 6',
+                    'p' => 'Paragraph',
+                    'div' => 'Division (div)',
+                ),
                 'default' => '',
             ),
         );
