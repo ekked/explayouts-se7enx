@@ -29,6 +29,19 @@ $FunctionList['resolve_layout'] = array(
     )
 );
 
+// The layout of a page other than a content page, only when a rule with a route target (a module view) chose it
+$FunctionList['resolve_route_layout'] = array(
+    'name' => 'resolve_route_layout',
+    'operation_types' => array( 'read' ),
+    'call_method' => array(
+        'include_file' => 'extension/explayouts/modules/explayouts/functioncollection.php',
+        'class' => 'expLayoutsFunctionCollection',
+        'method' => 'resolveRouteLayout'
+    ),
+    'parameter_type' => 'standard',
+    'parameters' => array()
+);
+
 $FunctionList['resolve_admin_layout'] = array(
     'name' => 'resolve_admin_layout',
     'operation_types' => array( 'read' ),

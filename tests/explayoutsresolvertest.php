@@ -9,12 +9,16 @@
  *  RS-01 - a condition the resolver does not know is not met (it was, so a mistyped condition made a catch-all)
  *  RS-02 - a rule without a target matches no page
  *  RS-03 - path_regex keeps the escapes of its pattern ("\/", "#"), refuses a broken pattern without a PHP warning
- *  RS-04 - a rule with a condition on the query string or the clock is not cached: the next request with another
- *          query string gets its own answer, for a match as for a non-match
+ *  RS-04 - a rule with a condition on the query string is not cached: the next request with another query string
+ *          gets its own answer, for a match as for a non-match; a time rule whose range lies in the past is cached
  *  RS-05 - rules on the path alone are cached as before
  *  RS-06 - over CacheMaxEntries the cache loses its expired files (by modification time), then the oldest down to
  *          80 %; paths longer than CACHE_MAX_PATH_LENGTH are not written
  *  RS-08 - only a request-dependent rule whose targets name the page keeps the answer out of the cache
+ *  RS-09 - a time rule naming the page: the answer is cached until its next start or end, not for CacheTTL, and the
+ *          page caches are told to keep the page no longer (keepPageUntil(), on a hit too)
+ *  RS-10 - a route target names the module view the path addresses: content/search, content/* for a URL alias of a
+ *          content page, the front page by IndexPage, a leading siteaccess segment dropped
  *  RS-07 - the type lists name every type ruleMatches()/conditionMatches() know, also ibexa_content_type of the
  *          shipped media site data (a condition the resolver did not know was ignored, now it would never be met)
  */
@@ -38,6 +42,16 @@ class eZINI
 class eZSiteAccess
 {
     public static function current() { return array( 'name' => 'site' ); }
+}
+class eZURLAliasML
+{
+    public static $aliases = array();
+    public static function translate( &$uri ) { if ( isset( self::$aliases[$uri] ) ) { $uri = self::$aliases[$uri]; return true; } return false; }
+}
+class ezpRequestRuleKernel
+{
+    public static $calls = 0;
+    public static function keepOutOfSharedCaches() { self::$calls++; }
 }
 class eZSys
 {
@@ -161,7 +175,7 @@ try
     expLayoutsRule::$rules = array(
         new expLayoutsRule( 3, 30, array( array( 'path', 'sale' ) ), array( array( 'time', '{"from":"2000-01-01","to":"2001-01-01"}' ) ) ),
     );
-    rsCheck( expLayoutsResolver::resolve( 'sale' ) === false && $cachedFiles() === 0, 'RS-04 a non-match after a time rule is not cached either' );
+    rsCheck( expLayoutsResolver::resolve( 'sale' ) === false && $cachedFiles() === 1, 'RS-04 a time rule whose range is over decides nothing new: cached' );
 
     // RS-05
     expLayoutsResolver::clearCache();
@@ -195,7 +209,45 @@ try
     rsCheck( $layoutId( expLayoutsResolver::resolve( 'about' ) ) === 10 && $cachedFiles() === 1,
              'RS-08 a time rule for another page does not keep this page from being cached' );
     expLayoutsResolver::clearCache();
-    rsCheck( expLayoutsResolver::resolve( 'campaign' ) === false && $cachedFiles() === 0, 'RS-08 the page the time rule names is not cached' );
+    rsCheck( expLayoutsResolver::resolve( 'campaign' ) === false && $cachedFiles() === 1, 'RS-08 the page of a time rule that is over is cached' );
+
+    // RS-09
+    expLayoutsResolver::clearCache();
+    $start = time() + 120;
+    expLayoutsRule::$rules = array(
+        new expLayoutsRule( 5, 50, array( array( 'path', 'spring' ) ), array( array( 'time', json_encode( array( 'from' => date( 'Y-m-d H:i:s', $start ), 'to' => null ) ) ) ) ),
+        new expLayoutsRule( 1, 10, array( array( 'path', 'spring' ) ) ),
+    );
+    ezpRequestRuleKernel::$calls = 0;
+    rsCheck( $layoutId( expLayoutsResolver::resolve( 'spring' ) ) === 10 && $cachedFiles() === 1, 'RS-09 before the start: the regular rule, cached' );
+    $files = glob( $cacheDir . '/*.php' );
+    $entry = include $files[0];
+    rsCheck( $entry['expires'] === $start && $entry['changes'] === $start, 'RS-09 the entry expires at the start of the time condition, not after CacheTTL' );
+    rsCheck( ezpRequestRuleKernel::$calls === 1, 'RS-09 the page caches keep the page no longer than the start' );
+    $_SERVER['REQUEST_TIME_FLOAT'] = microtime( true ) + 1;
+    rsCheck( $layoutId( expLayoutsResolver::resolve( 'spring' ) ) === 10 && ezpRequestRuleKernel::$calls === 2, 'RS-09 a cache hit tells the page caches too' );
+    $rule = new expLayoutsRule( 6, 60, array( array( 'path', 'x' ) ), array( array( 'time', '{"from":"2000-01-01 00:00:00","to":"' . date( 'Y-m-d H:i:s', $start ) . '"}' ) ) );
+    rsCheck( expLayoutsResolver::nextConditionChange( $rule, time() ) === $start + 1, 'RS-09 a range ends a second after its "to"' );
+    expLayoutsResolver::clearCache();
+    $far = time() + 30 * 86400;
+    expLayoutsRule::$rules = array(
+        new expLayoutsRule( 5, 50, array( array( 'path', 'summer' ) ), array( array( 'time', json_encode( array( 'from' => date( 'Y-m-d H:i:s', $far ) ) ) ) ) ),
+    );
+    ezpRequestRuleKernel::$calls = 0;
+    expLayoutsResolver::resolve( 'summer' );
+    rsCheck( ezpRequestRuleKernel::$calls === 0, 'RS-09 a start further away than the page cache keeps a page leaves the page caches alone' );
+    unset( $_SERVER['REQUEST_TIME_FLOAT'] );
+
+    // RS-10
+    eZINI::$values['SiteSettings'] = array( 'IndexPage' => '/content/view/full/2' );
+    eZINI::$values['SiteAccessSettings'] = array( 'AvailableSiteAccessList' => array( 'site', 'admin' ) );
+    eZURLAliasML::$aliases = array( 'fitness/running' => 'content/view/full/80' );
+    $route = function( $value, $path ) { return expLayoutsResolver::ruleMatches( new expLayoutsRule( 1, 5, array( array( 'route', $value ) ) ), $path ); };
+    rsCheck( $route( 'content/search', 'content/search' ) && !$route( 'content/search', 'content/view/full/2' ), 'RS-10 content/search names the search page only' );
+    rsCheck( $route( 'content/view', 'fitness/running' ) && $route( '/content/*', 'fitness/running' ), 'RS-10 a URL alias is the content view it stands for' );
+    rsCheck( $route( 'content/view', 'home' ) && $route( 'content/view', '' ), 'RS-10 the front page is its IndexPage' );
+    rsCheck( $route( 'user/*', 'site/user/login' ) && !$route( 'user/*', 'fitness/running' ), 'RS-10 a siteaccess segment is dropped' );
+    rsCheck( !$route( '', 'content/search' ) && $route( '*', 'content/search' ), 'RS-10 an empty value names nothing, * every module' );
 
     // RS-07
     foreach ( array( 'path', 'path_prefix', 'path_info_prefix', 'path_regex', 'node', 'subtree', 'route', 'module', 'module_view' ) as $type )

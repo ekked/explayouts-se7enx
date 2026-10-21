@@ -25,6 +25,31 @@ class expLayoutsFunctionCollection
     }
 
     /**
+     * The layout of a page that is not a content page (search, user, a module of an extension), only when a rule
+     * with a route target chose it: route targets name module views (expLayoutsResolver::routeMatches()). A
+     * pagelayout that lays out only content pages asks this on its other pages, so the catch-all and the path rules
+     * keep away from them and a route mapping still applies. False otherwise.
+     */
+    function resolveRouteLayout()
+    {
+        $path = eZSys::requestURI();
+        $layout = expLayoutsResolver::resolve( $path );
+        if ( !$layout )
+            return array( 'result' => false );
+        $resolution = expLayoutsResolver::pageResolution();
+        $rule = ( is_array( $resolution ) && (int)$resolution['rule_id'] > 0 ) ? expLayoutsRule::fetch( (int)$resolution['rule_id'] ) : false;
+        if ( !$rule instanceof expLayoutsRule )
+            return array( 'result' => false );
+        foreach ( $rule->targets() as $target )
+        {
+            if ( (string)$target->attribute( 'target_type' ) === 'route'
+                 && expLayoutsResolver::routeMatches( $target->attribute( 'target_value' ), (string)$resolution['path'] ) )
+                return array( 'result' => expLayoutsRenderer::prepareLayout( $layout, 2 ) );
+        }
+        return array( 'result' => false );
+    }
+
+    /**
      * The admin layout for a module and view (default: the request being
      * served), prepared like resolveLayout(); false when the admin layouts
      * are off, the siteaccess is not an admin one, or nothing resolves.

@@ -35,7 +35,12 @@ class expLayoutsResolver
 
     /**
      * Conditions whose answer is not given by the path and the siteaccess, the key of the resolver cache: the query
-     * string and the clock. A rule with one of them is evaluated on every request (see isRequestDependent()).
+     * string and the clock (see isRequestDependent()). Once a rule that names the page has one of them:
+     * - query_parameter: the answer is not cached, the rule is evaluated on every request (the same address answers
+     *   with and without the parameter);
+     * - time: the answer is cached until the next start or end of a time condition of those rules at the latest
+     *   (nextConditionChange()), and a page cache (the HTTP page cache, Velocity's response cache) is told not to keep
+     *   the page when that moment comes before its own lifetime ends (keepPageUntil()).
      */
     const REQUEST_CONDITION_TYPES = array( 'query_parameter', 'time' );
 
@@ -143,6 +148,9 @@ class expLayoutsResolver
         $cached = self::readCache( $path, $siteAccessName );
         if ( $cached !== false )
         {
+            // the answer changes at a start or end of a time condition: no page cache may keep the page past it
+            if ( !empty( $cached['changes'] ) )
+                self::keepPageUntil( (int)$cached['changes'] );
             if ( (int)$cached['layout_id'] > 0 )
             {
                 $layout = expLayoutsLayout::fetch( $cached['layout_id'] );
@@ -162,23 +170,34 @@ class expLayoutsResolver
         }
 
         $rules = expLayoutsRule::fetchEnabled();
-        // The cache is keyed by path and siteaccess. Once a rule with a condition on the query string or the clock
-        // has been looked at, the answer depends on more than that, whether the rule matched or not (a request
-        // without ?preview would otherwise fix the answer for the requests with it), and nothing is cached.
+        // The cache is keyed by path and siteaccess. Once a rule with a condition on the query string has been looked
+        // at, the answer depends on more than that, whether the rule matched or not (a request without ?preview would
+        // otherwise fix the answer for the requests with it), and nothing is cached. A condition on the clock changes
+        // its answer at known moments: the answer is cached until the first of them ($changes).
         $requestDependent = false;
+        $changes = null;
+        $now = time();
         foreach ( $rules as $rule )
         {
             // only a rule that names this page can make its answer depend on the request
             if ( self::isRequestDependent( $rule ) && self::targetsMatch( $rule, $path ) )
-                $requestDependent = true;
+            {
+                if ( self::isQueryDependent( $rule ) )
+                    $requestDependent = true;
+                $next = self::nextConditionChange( $rule, $now );
+                if ( $next !== null && ( $changes === null || $next < $changes ) )
+                    $changes = $next;
+            }
             if ( self::ruleMatches( $rule, $path ) )
             {
                 $layout = expLayoutsLayout::fetch( $rule->attribute( 'layout_id' ) );
                 // Admin layouts never reach the public site.
                 if ( $layout && (int)$layout->attribute( 'status' ) === 2 && !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
                 {
+                    if ( $changes !== null )
+                        self::keepPageUntil( $changes );
                     if ( !$requestDependent )
-                        self::writeCache( $path, $siteAccessName, (int)$rule->attribute( 'id' ), (int)$layout->attribute( 'id' ) );
+                        self::writeCache( $path, $siteAccessName, (int)$rule->attribute( 'id' ), (int)$layout->attribute( 'id' ), $changes );
                     eZDebug::writeDebug( 'Matched rule ' . $rule->attribute( 'id' ) . " for path '$path', layout=" . $layout->attribute( 'identifier' ), 'expLayoutsResolver' );
                     self::remember( $path, $siteAccessName, 'rule', $rule->attribute( 'id' ), $layout->attribute( 'id' ) );
                     return $layout;
@@ -186,6 +205,8 @@ class expLayoutsResolver
             }
         }
         eZDebug::writeDebug( "No rule matched for path '$path'", 'expLayoutsResolver' );
+        if ( $changes !== null )
+            self::keepPageUntil( $changes );
 
         $ini = eZINI::instance( 'explayouts.ini' );
         $default = $ini->variable( 'ResolverSettings', 'DefaultLayout' );
@@ -195,14 +216,14 @@ class expLayoutsResolver
             if ( $layout && !expLayoutsLayoutType::isAdminType( $layout->attribute( 'layout_type' ) ) )
             {
                 if ( !$requestDependent )
-                    self::writeCache( $path, $siteAccessName, 0, (int)$layout->attribute( 'id' ) );
+                    self::writeCache( $path, $siteAccessName, 0, (int)$layout->attribute( 'id' ), $changes );
                 self::remember( $path, $siteAccessName, 'default', 0, $layout->attribute( 'id' ) );
                 return $layout;
             }
         }
 
         if ( !$requestDependent )
-            self::writeCache( $path, $siteAccessName, 0, 0 );
+            self::writeCache( $path, $siteAccessName, 0, 0, $changes );
         self::remember( $path, $siteAccessName, 'none', 0, 0 );
         return false;
     }
@@ -221,6 +242,78 @@ class expLayoutsResolver
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Whether a rule has a query_parameter condition: its answer depends on the query string, which the resolver
+     * cache does not key.
+     *
+     * @param expLayoutsRule $rule
+     * @return bool
+     */
+    static function isQueryDependent( $rule )
+    {
+        foreach ( $rule->conditions() as $condition )
+        {
+            if ( (string)$condition->attribute( 'condition_type' ) === 'query_parameter' )
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * The next moment after $now at which a time condition of the rule starts or ends (its from or to), or null
+     * when none lies ahead: until then the answer of the condition stays what it is now.
+     *
+     * @param expLayoutsRule $rule
+     * @param int $now
+     * @return int|null
+     */
+    static function nextConditionChange( $rule, $now )
+    {
+        $next = null;
+        foreach ( $rule->conditions() as $condition )
+        {
+            if ( (string)$condition->attribute( 'condition_type' ) !== 'time' )
+                continue;
+            $range = json_decode( (string)$condition->attribute( 'condition_value' ), true );
+            if ( !is_array( $range ) )
+                continue;
+            foreach ( array( 'from', 'to' ) as $end )
+            {
+                $timestamp = self::conditionTimeToTimestamp( isset( $range[$end] ) ? $range[$end] : null );
+                // "to" is inclusive (conditionMatches() compares $now > $to): the answer changes a second after it
+                if ( $timestamp !== null && $end === 'to' )
+                    $timestamp++;
+                if ( $timestamp !== null && $timestamp > $now && ( $next === null || $timestamp < $next ) )
+                    $next = $timestamp;
+            }
+        }
+        return $next;
+    }
+
+    /**
+     * Keeps the page being rendered out of the page caches when it may only be kept until $until (the next start or
+     * end of a time condition) and a cache would keep it longer: the HTTP page cache keeps a page up to
+     * [HttpCacheSettings] MaxAge seconds, Velocity's response cache as long as Cache-Control allows. Pages whose next
+     * change is further away than that are cached as before. Does nothing without the kernel's request rules
+     * (ezpRequestRuleKernel::keepOutOfSharedCaches(), which also sends Cache-Control: private, no-store).
+     *
+     * @param int $until
+     */
+    static function keepPageUntil( $until )
+    {
+        $maxAge = 3600;
+        if ( class_exists( 'eZINI' ) && method_exists( 'eZINI', 'exists' ) && eZINI::exists( 'httpcache.ini' ) )
+        {
+            $httpCacheIni = eZINI::instance( 'httpcache.ini' );
+            if ( $httpCacheIni->hasVariable( 'HttpCacheSettings', 'MaxAge' ) && (int)$httpCacheIni->variable( 'HttpCacheSettings', 'MaxAge' ) > 0 )
+                $maxAge = (int)$httpCacheIni->variable( 'HttpCacheSettings', 'MaxAge' );
+        }
+        if ( (int)$until - time() > $maxAge )
+            return;
+        if ( class_exists( 'ezpRequestRuleKernel' ) && method_exists( 'ezpRequestRuleKernel', 'keepOutOfSharedCaches' ) )
+            ezpRequestRuleKernel::keepOutOfSharedCaches();
     }
 
     private static function cacheKey( $path, $siteAccessName )
@@ -348,7 +441,15 @@ class expLayoutsResolver
         return (int)$db->errorNumber() === 0;
     }
 
-    private static function writeCache( $path, $siteAccessName, $ruleId, $layoutId )
+    /**
+     * @param string $path
+     * @param string $siteAccessName
+     * @param int $ruleId
+     * @param int $layoutId
+     * @param int|null $changes the next start or end of a time condition of the rules that name the path: the entry
+     *        expires then at the latest, and every hit tells the page caches (keepPageUntil())
+     */
+    private static function writeCache( $path, $siteAccessName, $ruleId, $layoutId, $changes = null )
     {
         $ini = eZINI::instance( 'explayouts.ini' );
         $ttl = (int)$ini->variable( 'ResolverSettings', 'CacheTTL' );
@@ -376,6 +477,13 @@ class expLayoutsResolver
             'layout_id' => $layoutId,
             'expires' => time() + $ttl,
         );
+        if ( $changes !== null )
+        {
+            $data['expires'] = min( $data['expires'], (int)$changes );
+            $data['changes'] = (int)$changes;
+        }
+        if ( $data['expires'] <= time() )
+            return;
 
         // Every path asked for gets a file, also the made-up ones of a robot. A path no rule could name is not
         // written, and the directory is pruned now and then (pruneCache()).
@@ -791,9 +899,80 @@ class expLayoutsResolver
             case 'subtree':
                 return self::subtreeMatches( $path, $value );
             case 'route':
+                return self::routeMatches( $value, $path );
             default:
                 return false;
         }
+    }
+
+    /**
+     * Whether a route target names the page. Exponential's routes are its module views: the value is a module/view
+     * pattern as moduleViewMatches() reads it ("content/search", "user/*", "content/view" for every content page,
+     * "*"), with or without a leading slash. The route of a path is the module view the path addresses (routeOfPath()),
+     * so the answer is decided by the path alone and may be cached.
+     *
+     * @param string $value
+     * @param string $path
+     * @return bool
+     */
+    static function routeMatches( $value, $path )
+    {
+        $pattern = trim( (string)$value );
+        if ( $pattern !== '*' )
+            $pattern = trim( $pattern, '/' );
+        if ( $pattern === '' )
+            return false;
+        $route = self::routeOfPath( $path );
+        if ( $route === false )
+            return false;
+        return self::moduleViewMatches( $pattern, $route[0], $route[1] );
+    }
+
+    /**
+     * The module and view a path addresses: a URL alias is translated to its system URL (content/view/full/N), the
+     * front page ("" or "home") is the IndexPage, a leading siteaccess segment is dropped. False when the path names
+     * no module.
+     *
+     * @param string $path
+     * @return array|false array( module, view )
+     */
+    static function routeOfPath( $path )
+    {
+        $path = self::withoutSiteAccessSegment( ltrim( (string)$path, '/' ) );
+        if ( $path === '' || $path === 'home' )
+        {
+            $uri = trim( (string)eZINI::instance( 'site.ini' )->variable( 'SiteSettings', 'IndexPage' ), '/' );
+        }
+        else
+        {
+            $uri = $path;
+            if ( class_exists( 'eZURLAliasML' ) )
+                eZURLAliasML::translate( $uri );
+            if ( !is_string( $uri ) )
+                $uri = $path;
+        }
+        $parts = explode( '/', trim( explode( '?', $uri, 2 )[0], '/' ) );
+        if ( !isset( $parts[0] ) || $parts[0] === '' )
+            return false;
+        return array( $parts[0], isset( $parts[1] ) ? $parts[1] : '' );
+    }
+
+    /**
+     * The path without a leading segment that names a declared siteaccess (MatchOrder "uri" reaches the same page as
+     * /running and as /site/running). A real path that starts with a similar word is left alone.
+     *
+     * @param string $path without the leading slash
+     * @return string
+     */
+    private static function withoutSiteAccessSegment( $path )
+    {
+        if ( $path === '' )
+            return $path;
+        $first = strtok( $path, '/' );
+        $siteAccessList = eZINI::instance( 'site.ini' )->variable( 'SiteAccessSettings', 'AvailableSiteAccessList' );
+        if ( is_array( $siteAccessList ) && in_array( $first, $siteAccessList, true ) )
+            return ltrim( (string)substr( $path, strlen( $first ) ), '/' );
+        return $path;
     }
 
     /**
