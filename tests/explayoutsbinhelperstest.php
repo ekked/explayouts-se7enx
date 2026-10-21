@@ -21,7 +21,7 @@ function check( $condition, $message )
     }
 }
 
-$guard = "if ( !isset( \$script ) ) { require __DIR__ . '/inc/standalone.php'; return; }";
+$guard = "if ( !isset( \$script ) && !isset( \$options ) ) { require __DIR__ . '/inc/standalone.php'; return; }";
 $dir = dirname( __DIR__ ) . '/bin/php';
 $helpers = glob( $dir . '/*.php' );
 check( count( $helpers ) > 10, 'the helpers are found' );

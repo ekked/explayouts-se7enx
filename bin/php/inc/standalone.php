@@ -6,9 +6,10 @@
  * The helpers were written for bin/php/ezexec.php, which starts Exponential and then includes them. Run on their own,
  * nothing was started and the first class a helper used was not found. A helper therefore begins with
  *
- *   if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+ *   if ( !isset( $script ) && !isset( $options ) ) { require __DIR__ . '/inc/standalone.php'; return; }
  *
- * Under ezexec $script is set and the line does nothing. On its own, this file starts Exponential the way ezexec does,
+ * Under ezexec $script and $options are set and the line does nothing (a test that sets $options runs the helper
+ * inline too). On its own, this file starts Exponential the way ezexec does,
  * runs the helper once more (now with $script, $cli and $options set, as under ezexec: $options['arguments'] starts with
  * the helper's file, followed by the arguments given) and shuts down with the exit code the helper set
  * ($script->setExitCode()). A helper ends with return, never exit: an exit skips the shutdown.

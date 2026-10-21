@@ -1,6 +1,6 @@
 <?php
 // @description Install the explayouts test data (development only)
-if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+if ( !isset( $script ) && !isset( $options ) ) { require __DIR__ . '/inc/standalone.php'; return; }
 
 require_once __DIR__ . '/../../classes/explayoutsfixtures.php';
 

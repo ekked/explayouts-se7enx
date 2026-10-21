@@ -1,6 +1,6 @@
 <?php
 // @description List all layouts with id, identifier, name, type and status
-if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+if ( !isset( $script ) && !isset( $options ) ) { require __DIR__ . '/inc/standalone.php'; return; }
 
 $service = new expLayoutsCoreLayoutService();
 $layouts = $service->listAll();

@@ -5,7 +5,7 @@
 //   php bin/php/ezexec.php -s <siteaccess> extension/explayouts/bin/php/check_rules.php
 // A rule without a target matches no page, and a condition of an unknown type is never met (see doc/FAQ.md).
 
-if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+if ( !isset( $script ) && !isset( $options ) ) { require __DIR__ . '/inc/standalone.php'; return; }
 
 $problems = 0;
 foreach ( expLayoutsRule::fetchAll() as $rule )

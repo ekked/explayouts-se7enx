@@ -1,6 +1,6 @@
 <?php
 // @description Install the default homepage layout and its base data, unless already installed
-if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+if ( !isset( $script ) && !isset( $options ) ) { require __DIR__ . '/inc/standalone.php'; return; }
 
 require_once __DIR__ . '/../../classes/explayoutsfixtures.php';
 

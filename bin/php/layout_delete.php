@@ -2,7 +2,7 @@
 // @description Delete a layout: layout_delete.php <layout_id>
 // Run through bin/php/ezexec.php, which includes this file from inside a method: $argv is not in scope there, and
 // the arguments are in $options['arguments'], the first being this file. Run directly, $argv holds them.
-if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+if ( !isset( $script ) && !isset( $options ) ) { require __DIR__ . '/inc/standalone.php'; return; }
 
 $scriptArguments = isset( $options['arguments'] ) && is_array( $options['arguments'] )
     ? array_slice( $options['arguments'], 1 )
