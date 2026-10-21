@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.4.41 (2026-10-20)
 
 ### Changed (check before upgrading)
 
@@ -57,12 +57,19 @@
   tab with the block label and the collection, all others in the Design tab (`expLayoutsBlockHandlerFactory::
   parameterGroup()`). A definition without the list keeps every parameter in the Design tab.
 - View type names for the list block.
+- Gallery blocks show their items, offer the gallery view types and open a lightbox (`javascript/explayouts_lightbox.js`).
+- `bin/php/install_admin_layouts.php` installs the explayouts tables, the base layout and the admin layouts of admin4l
+  into the database of one siteaccess (MySQL/MariaDB; `DRY=1` for a dry run).
+- Translations: French, Ukrainian, Arabic, Persian, Pashto and Kurdish (Kurmanji); more messages for Polish, Turkish,
+  Italian, Brazilian Portuguese, Swedish, Dutch, Czech, Norwegian, Danish and Croatian.
 
 ### Fixed
 
 - The export of the layout list failed: the class is `expLayoutsExporter` again (the old name stays as an alias).
 - The scripts under `bin/php` read their arguments when run through `bin/php/ezexec.php`.
 - The content component blocks `exp_component_*` have a standard template.
+- The layout type `admin_full` declares no `main_top` and `main_bottom` zones, and the admin layout seed carries no
+  zones or breadcrumb block that it no longer declares.
 
 ### Upgrade
 
