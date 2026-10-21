@@ -1043,10 +1043,11 @@ CacheMaxEntries=5000
 1061=1061
 
 [MarkdownSettings]
+# enabled (the default, so markdown blocks stored before keep their look): every line break is a <br />.
 # disabled: as in CommonMark (and the reference), a single line break inside a paragraph is a soft break; a hard
 # break takes two spaces or a backslash at the end of the line. enabled: every line break is a <br />, as the markdown
 # block printed its text (escaped, with nl2br) before it rendered Markdown - for blocks stored then.
-HardBreaks=disabled
+HardBreaks=enabled
 
 [MapSettings]
 # Key of the Maps Embed API of Google for the map block. Set: a map with a point (latitude, longitude) is Google's,

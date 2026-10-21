@@ -171,7 +171,7 @@ class NetgenParityBlocksTest extends TestCase
         {
             expLayoutsMarkdown::$hardBreaks = false;
         }
-        $this->assertMatchesRegularExpression( '/^HardBreaks=disabled$/m', (string)self::group( 'MarkdownSettings' ) );
+        $this->assertMatchesRegularExpression( '/^HardBreaks=enabled$/m', (string)self::group( 'MarkdownSettings' ) );
     }
 
     public static function slowMarkdown()

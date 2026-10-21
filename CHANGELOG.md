@@ -16,7 +16,7 @@
 - The classic views save nothing when a form is refused (unknown types, values of the wrong kind) and clear the
   resolver cache after every write; the rule list shows disabled rules too.
 - The Layouts tab of the node view is drawn and filled only for users with `explayouts/read`.
-- Block values that reach markup are checked: links (http, https, mailto, tel or relative), embeds, colours, CSS
+- Block values that reach markup are checked: links (http, https, mailto, tel or relative), embeds, colors, CSS
   classes, the element of a title, template names of the template block and of included block templates.
 - The layout preview and Load more from the administration render in the administration's public siteaccess
   (`expLayoutsPreviewSiteAccess`, `[PreviewSettings] SiteAccess`), never in one with another database.
@@ -66,9 +66,10 @@
 
 ### Upgrade
 
-- **Markdown blocks stored before** were printed with `nl2br`: every line break was a break. CommonMark (and the
-  reference) joins the lines of a paragraph. Set `explayouts.ini [MarkdownSettings] HardBreaks=enabled` to keep the
-  old breaks for such blocks, or end a line with two spaces or a backslash where a break is meant.
+- **Markdown blocks stored before** were printed with `nl2br`: every line break was a break. To keep their look,
+  `explayouts.ini [MarkdownSettings] HardBreaks` is `enabled` by default. CommonMark (and the reference) joins the
+  lines of a paragraph; set `HardBreaks=disabled` for that, and end a line with two spaces or a backslash where a
+  break is meant.
 - Video and map blocks whose address is a path on this site show nothing any more; enter the address of the player
   or map.
 
