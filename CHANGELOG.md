@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.4.42 (2026-10-21)
+
+### Fixed
+
+- **Route targets match on the site.** A route target names the module view a page addresses: `content/search`,
+  `user/*`, `content/view` (every content page), `*`. A URL alias counts as the content view it stands for, the front
+  page as its `IndexPage`; a leading siteaccess segment is dropped. The path decides the answer, so it is cached like a
+  path target. `fetch( 'explayouts', 'resolve_route_layout', hash() )` gives a pagelayout that lays out only content
+  pages the layout a route rule chose for its other pages (the media design uses it).
+- **Time conditions switch at their start and end.** An answer that depends on a `time` condition of a rule naming the
+  page is cached until the next `from` or `to` of that condition (not for `CacheTTL`), and when that moment comes
+  before the page cache's `[HttpCacheSettings] MaxAge`, the page is kept out of the page caches
+  (`ezpRequestRuleKernel::keepOutOfSharedCaches()`, `Cache-Control: private, no-store`); on a cache hit too. A range
+  that is over is cached as before. `query_parameter` answers stay uncached, so one address can be A/B tested
+  (`/page` and `/page?variant=b`).
+- **An extension's `AvailableBlocks[]` is kept wherever the extension is listed.** The lists other extensions add to
+  (`AvailableBlocks[]` of `[BlockSettings]` and `[AdminBlockSettings]`, `AvailableQueries[]`, `SiteAccessMatch[]`,
+  `AllowedTemplateRoots[]`) start without a reset line; the reset emptied what every extension read before explayouts
+  had added (the media design's `product_highlight` block was never offered). A block listed twice is offered once.
+  To replace a list, put the reset line in `settings/override/` or a siteaccess.
+- **The `ext:explayouts:*` helpers run on their own.** `./console ext:explayouts:block_list`, `layout_info`,
+  `collection_list`, `layout_copy`, `layout_list`, `rule_list`, `share_create` and the other helpers of `bin/php/`
+  ended with `Class "..." not found`: they were written for `bin/php/ezexec.php`. Each now starts Exponential through
+  `bin/php/inc/standalone.php` when it is not run through ezexec (`-s <siteaccess>` works); under ezexec nothing
+  changes.
+
 ## 1.4.41 (2026-10-20)
 
 ### Changed (check before upgrading)

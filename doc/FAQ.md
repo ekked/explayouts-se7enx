@@ -14,11 +14,15 @@ All `explayouts_*` tables: `explayouts_layout`, `explayouts_zone`, `explayouts_b
 
 Target types (`expLayoutsResolver::TARGET_TYPES`): `path`, `path_prefix`, `path_info_prefix`, `path_regex` (the pattern without delimiters), `node`, `subtree`, `route`, and `module` / `module_view` for the admin layouts. Condition types (`expLayoutsResolver::CONDITION_TYPES`): `siteaccess`, `class` (also read as `content_type` and `ibexa_content_type`), `query_parameter`, `route_parameter`, `time`.
 
-A rule without a target matches no page; the catch-all is the target `path_info_prefix` `/`. A condition of an unknown type is never met. Answers that depend on a `query_parameter` or `time` condition are not cached. `bin/php/check_rules.php` lists the rules this affects (read only).
+A rule without a target matches no page; the catch-all is the target `path_info_prefix` `/`. A condition of an unknown type is never met. `bin/php/check_rules.php` lists the rules this affects (read only).
+
+A `route` target names a module view, Exponential's routes: `content/search`, `user/*`, `content/view` for every content page, `*` for all. The route of a page is the module view its address stands for (a URL alias is `content/view`, the front page its `IndexPage`). The media design lays out only content pages with the regular rules; on its other pages it asks `fetch( 'explayouts', 'resolve_route_layout', hash() )`, which answers only for a rule with a route target.
+
+Answers that depend on a `query_parameter` condition are not cached: `/page` and `/page?variant=b` each get their own answer (the page cache does not keep an address with a query parameter it does not know, `[HttpCacheSettings] QueryStringParameters`). An answer that depends on a `time` condition is cached until the condition's next start or end, and the page caches do not keep the page past that moment.
 
 ## How do I add my own block type?
 
-Write a class implementing `expLayoutsBlockHandlerInterface` (methods `getParameters()` and `getValues( $block )`), then declare it in an `explayouts.ini` override with an `AvailableBlocks[]` entry and a `BlockDefinition_<identifier>` section pointing `Handler=` at your class. See USAGE.md for a full example.
+Write a class implementing `expLayoutsBlockHandlerInterface` (methods `getParameters()` and `getValues( $block )`), then declare it in an `explayouts.ini` override with an `AvailableBlocks[]` entry (in your extension's settings, wherever it is listed in `ActiveExtensions[]`: explayouts' list has no reset line) and a `BlockDefinition_<identifier>` section pointing `Handler=` at your class. See USAGE.md for a full example.
 
 ## What are draft and published statuses?
 

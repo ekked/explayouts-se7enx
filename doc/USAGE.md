@@ -23,7 +23,10 @@ if ( $layout instanceof expLayoutsLayout )
 ### The resolver cache
 
 Each answer is kept in `var/<site>/cache/explayouts/resolver/<md5 of path|siteaccess>.php` for
-`[ResolverSettings] CacheTTL` seconds (default 3600; "no rule matched" and the default layout at most 300).
+`[ResolverSettings] CacheTTL` seconds (default 3600; "no rule matched" and the default layout at most 300). An answer
+that depends on a `query_parameter` condition of a rule naming the page is not cached; one that depends on a `time`
+condition expires at the condition's next start or end (`changes` in the entry), and when that comes within the page
+cache's `[HttpCacheSettings] MaxAge` the page is kept out of the page caches, so the switch shows on time.
 `expLayoutsResolver::clearCache()` removes every entry and bumps the admin generation; publishing a layout and
 changing a rule run it. Deleting the directory by hand clears it as well.
 
@@ -148,9 +151,12 @@ directory followed by the first plain name of `[AdminLayoutSettings] SiteAccessM
 
 ## CLI
 
-Helper scripts under `bin/php/`, e.g.:
+Helper scripts under `bin/php/`. Each runs on its own, through `./console ext:explayouts:<name>` or `php`, and
+through `bin/php/ezexec.php`; `-s <siteaccess>` chooses the siteaccess. For example:
 
 ```bash
+./console ext:explayouts:layout_list
+./console ext:explayouts:block_list <layout_id>
 php extension/explayouts/bin/php/layout_list.php
 php extension/explayouts/bin/php/layout_publish.php
 php extension/explayouts/bin/php/diagnose.php
@@ -220,7 +226,7 @@ Examples (place in `settings/override/explayouts.ini.append.php` or a siteaccess
 DefaultLayout=homepage
 
 [BlockSettings]
-# Add your own block
+# Add your own block (also from your extension's settings, wherever it is listed in ActiveExtensions[])
 AvailableBlocks[]=my_block
 
 [BlockDefinition_my_block]
