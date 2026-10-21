@@ -1,5 +1,7 @@
 <?php
 // @description Check whether the database driver runs SET @var statements (development only)
+if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+
 ini_set( 'display_errors', 1 );
 error_reporting( E_ALL );
 

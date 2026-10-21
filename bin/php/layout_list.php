@@ -1,12 +1,14 @@
 <?php
 // @description List all layouts with id, identifier, name, type and status
+if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+
 $service = new expLayoutsCoreLayoutService();
 $layouts = $service->listAll();
 
 if ( !is_array( $layouts ) || count( $layouts ) === 0 )
 {
     echo "No layouts found.\n";
-    exit( 0 );
+    return;
 }
 
 foreach ( $layouts as $layout )

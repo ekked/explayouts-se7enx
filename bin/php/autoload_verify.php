@@ -1,5 +1,7 @@
 <?php
 // @description Check that the explayouts service and content browser classes can be autoloaded
+if ( !isset( $script ) ) { require __DIR__ . '/inc/standalone.php'; return; }
+
 $classes = array(
     'expLayoutsCoreLayoutService',
     'expLayoutsCoreRuleService',
