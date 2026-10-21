@@ -27,7 +27,8 @@ $script = eZScript::instance( array( 'description' => 'explayouts: install table
                                      'user' => false ) );
 $script->startup();
 $options = $script->getOptions( '', '', array(), false, array( 'siteaccess' => true ) );
-$script->setUseSiteAccess( $options['siteaccess'] ? $options['siteaccess'] : 'exponential' );
+if ( $options['siteaccess'] )
+    $script->setUseSiteAccess( $options['siteaccess'] );
 $script->initialize();
 
 $cli = eZCLI::instance();
@@ -51,8 +52,11 @@ foreach ( $matches as $stmt )
         continue;
     }
     $cli->output( "table $table: missing, create" );
-    if ( !$dry )
-        $db->query( $stmt[0] );
+    if ( !$dry && $db->query( $stmt[0] ) === false )
+    {
+        $cli->error( "table $table could not be created: " . $db->errorMessage() );
+        $script->shutdown( 1 );
+    }
 }
 if ( $dry )
 {
@@ -76,6 +80,8 @@ foreach ( $data as $table => $t )
     $ids = array();
     foreach ( $t['rows'] as $row )
         $ids[] = (int)$row[$idIndex];
+    if ( !$ids )
+        continue;
     $probe = $db->arrayQuery( "SELECT COUNT(*) AS c FROM $table WHERE id IN (" . implode( ',', $ids ) . ')' );
     if ( (int)$probe[0]['c'] > 0 )
     {
@@ -103,8 +109,9 @@ try
                     ? 'NULL'
                     : "'" . $db->escapeString( (string)$value ) . "'";
             }
-            if ( !$dry )
-                $db->query( "INSERT INTO $table (" . implode( ',', $t['fields'] ) . ') VALUES (' . implode( ',', $values ) . ')' );
+            // eZDB answers false instead of throwing: a failed row rolls the whole import back
+            if ( $db->query( "INSERT INTO $table (" . implode( ',', $t['fields'] ) . ') VALUES (' . implode( ',', $values ) . ')' ) === false )
+                throw new RuntimeException( "a row of $table was refused: " . $db->errorMessage() );
         }
         $cli->output( "admin layouts, $table: " . count( $t['rows'] ) . ' rows' );
     }
