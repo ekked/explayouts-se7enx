@@ -94,7 +94,16 @@
     <message>
         <source>Item removed from collection.</source>
         <translation>Položka byla odebrána z kolekce.</translation>
+    </message><message>
+        <source>Unknown view type.</source>
+        <translation>Neznámý typ zobrazení.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Neplatné zadání.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -328,7 +337,34 @@
     <message>
         <source>Move up</source>
         <translation>Posunout nahoru</translation>
+    </message><message>
+        <source>Unknown layout type.</source>
+        <translation>Neznámý typ rozvržení.</translation>
+    </message><message>
+        <source>Unknown block type.</source>
+        <translation>Neznámý typ bloku.</translation>
+    </message><message>
+        <source>Published.</source>
+        <translation>Publikováno.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Neplatné zadání.</translation>
     </message>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -506,7 +542,16 @@
     <message>
         <source>Priority</source>
         <translation>Priorita</translation>
+    </message><message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>Neznámé typy cílů nebo podmínek nebyly uloženy: %types</translation>
+    </message><message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>Pravidlo bez cíle se nevztahuje na žádnou stránku.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/rule_list</name>
@@ -945,7 +990,16 @@
     <message>
         <source>No map configured.</source>
         <translation>Není nastavena žádná mapa.</translation>
+    </message><message>
+        <source>Map</source>
+        <translation>Mapa</translation>
+    </message><message>
+        <source>Load map</source>
+        <translation>Načíst mapu</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -987,7 +1041,16 @@
     <message>
         <source>No video configured.</source>
         <translation>Není nastaveno žádné video.</translation>
+    </message><message>
+        <source>Video</source>
+        <translation>Video</translation>
+    </message><message>
+        <source>Load video</source>
+        <translation>Načíst video</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>explayouts/block</name>
@@ -1196,5 +1259,12 @@
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>Žádné pravidlo neodpovídá: výchozí rozvržení (z mezipaměti resolveru)</translation>
     </message>
+</context><context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>Načtením se odešlou data na %host.</translation>
+    </message>
 </context>
+
 </TS>

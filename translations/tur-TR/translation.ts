@@ -94,7 +94,16 @@
     <message>
         <source>Item removed from collection.</source>
         <translation>Öğe koleksiyondan kaldırıldı.</translation>
+    </message><message>
+        <source>Unknown view type.</source>
+        <translation>Bilinmeyen görünüm türü.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Geçersiz giriş.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -328,7 +337,34 @@
     <message>
         <source>Move up</source>
         <translation>Yukarı taşı</translation>
+    </message><message>
+        <source>Unknown layout type.</source>
+        <translation>Bilinmeyen düzen türü.</translation>
+    </message><message>
+        <source>Unknown block type.</source>
+        <translation>Bilinmeyen blok türü.</translation>
+    </message><message>
+        <source>Published.</source>
+        <translation>Yayımlandı.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Geçersiz giriş.</translation>
     </message>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -506,7 +542,16 @@
     <message>
         <source>Priority</source>
         <translation>Öncelik</translation>
+    </message><message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>Bilinmeyen hedef veya koşul türleri kaydedilmedi: %types</translation>
+    </message><message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>Hedefi olmayan bir kural hiçbir sayfaya uygulanmaz.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/rule_list</name>
@@ -945,7 +990,16 @@
     <message>
         <source>No map configured.</source>
         <translation>Harita yapılandırılmamış.</translation>
+    </message><message>
+        <source>Map</source>
+        <translation>Harita</translation>
+    </message><message>
+        <source>Load map</source>
+        <translation>Haritayı yükle</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -987,7 +1041,16 @@
     <message>
         <source>No video configured.</source>
         <translation>Video yapılandırılmamış.</translation>
+    </message><message>
+        <source>Video</source>
+        <translation>Video</translation>
+    </message><message>
+        <source>Load video</source>
+        <translation>Videoyu yükle</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>explayouts/block</name>
@@ -1196,5 +1259,12 @@
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>Hiçbir kural eşleşmedi: varsayılan düzen (çözümleyici önbelleğinden)</translation>
     </message>
+</context><context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>Yüklenmesi %host adresine veri gönderir.</translation>
+    </message>
 </context>
+
 </TS>

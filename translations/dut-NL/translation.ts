@@ -94,7 +94,16 @@
     <message>
         <source>Item removed from collection.</source>
         <translation>Item uit collectie verwijderd.</translation>
+    </message><message>
+        <source>Unknown view type.</source>
+        <translation>Onbekend weergavetype.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Ongeldige invoer.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -328,7 +337,34 @@
     <message>
         <source>Move up</source>
         <translation>Omhoog verplaatsen</translation>
+    </message><message>
+        <source>Unknown layout type.</source>
+        <translation>Onbekend layouttype.</translation>
+    </message><message>
+        <source>Unknown block type.</source>
+        <translation>Onbekend bloktype.</translation>
+    </message><message>
+        <source>Published.</source>
+        <translation>Gepubliceerd.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Ongeldige invoer.</translation>
     </message>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -506,7 +542,16 @@
     <message>
         <source>Priority</source>
         <translation>Prioriteit</translation>
+    </message><message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>Onbekende doel- of voorwaardetypen zijn niet opgeslagen: %types</translation>
+    </message><message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>Een regel zonder doel geldt voor geen enkele pagina.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/rule_list</name>
@@ -945,7 +990,16 @@
     <message>
         <source>No map configured.</source>
         <translation>Geen kaart ingesteld.</translation>
+    </message><message>
+        <source>Map</source>
+        <translation>Kaart</translation>
+    </message><message>
+        <source>Load map</source>
+        <translation>Kaart laden</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -987,7 +1041,16 @@
     <message>
         <source>No video configured.</source>
         <translation>Geen video ingesteld.</translation>
+    </message><message>
+        <source>Video</source>
+        <translation>Video</translation>
+    </message><message>
+        <source>Load video</source>
+        <translation>Video laden</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>explayouts/block</name>
@@ -1196,5 +1259,12 @@
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>Geen regel kwam overeen: de standaardlayout (uit de resolvercache)</translation>
     </message>
+</context><context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>Laden verstuurt gegevens naar %host.</translation>
+    </message>
 </context>
+
 </TS>

@@ -94,7 +94,16 @@
     <message>
         <source>Item removed from collection.</source>
         <translation>Elementet er fjernet fra samlingen.</translation>
+    </message><message>
+        <source>Unknown view type.</source>
+        <translation>Ukjent visningstype.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Ugyldig inndata.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -328,7 +337,34 @@
     <message>
         <source>Move up</source>
         <translation>Flytt opp</translation>
+    </message><message>
+        <source>Unknown layout type.</source>
+        <translation>Ukjent layouttype.</translation>
+    </message><message>
+        <source>Unknown block type.</source>
+        <translation>Ukjent blokktype.</translation>
+    </message><message>
+        <source>Published.</source>
+        <translation>Publisert.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Ugyldig inndata.</translation>
     </message>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -506,7 +542,16 @@
     <message>
         <source>Priority</source>
         <translation>Prioritet</translation>
+    </message><message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>Ukjente mål- eller betingelsestyper ble ikke lagret: %types</translation>
+    </message><message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>En regel uten mål gjelder for ingen side.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/rule_list</name>
@@ -945,7 +990,16 @@
     <message>
         <source>No map configured.</source>
         <translation>Ingen kart er konfigurert.</translation>
+    </message><message>
+        <source>Map</source>
+        <translation>Kart</translation>
+    </message><message>
+        <source>Load map</source>
+        <translation>Last inn kart</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -987,7 +1041,16 @@
     <message>
         <source>No video configured.</source>
         <translation>Ingen video er konfigurert.</translation>
+    </message><message>
+        <source>Video</source>
+        <translation>Video</translation>
+    </message><message>
+        <source>Load video</source>
+        <translation>Last inn video</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>explayouts/block</name>
@@ -1196,5 +1259,12 @@
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>Ingen regel passet: standardlayouten (fra resolverens hurtigbuffer)</translation>
     </message>
+</context><context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>Når den lastes, sendes data til %host.</translation>
+    </message>
 </context>
+
 </TS>

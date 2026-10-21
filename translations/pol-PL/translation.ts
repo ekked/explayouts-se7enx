@@ -94,7 +94,16 @@
     <message>
         <source>Item removed from collection.</source>
         <translation>Element został usunięty z kolekcji.</translation>
+    </message><message>
+        <source>Unknown view type.</source>
+        <translation>Nieznany typ widoku.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Nieprawidłowe dane.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -328,7 +337,34 @@
     <message>
         <source>Move up</source>
         <translation>Przesuń w górę</translation>
+    </message><message>
+        <source>Unknown layout type.</source>
+        <translation>Nieznany typ układu.</translation>
+    </message><message>
+        <source>Unknown block type.</source>
+        <translation>Nieznany typ bloku.</translation>
+    </message><message>
+        <source>Published.</source>
+        <translation>Opublikowano.</translation>
+    </message><message>
+        <source>Invalid input.</source>
+        <translation>Nieprawidłowe dane.</translation>
     </message>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -506,7 +542,16 @@
     <message>
         <source>Priority</source>
         <translation>Priorytet</translation>
+    </message><message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation>Nieznane typy celów lub warunków nie zostały zapisane: %types</translation>
+    </message><message>
+        <source>A rule without a target applies to no page.</source>
+        <translation>Reguła bez celu nie dotyczy żadnej strony.</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/admin/explayouts/rule_list</name>
@@ -945,7 +990,16 @@
     <message>
         <source>No map configured.</source>
         <translation>Nie skonfigurowano mapy.</translation>
+    </message><message>
+        <source>Map</source>
+        <translation>Mapa</translation>
+    </message><message>
+        <source>Load map</source>
+        <translation>Wczytać mapę</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>design/standard/explayouts/block/single</name>
@@ -987,7 +1041,16 @@
     <message>
         <source>No video configured.</source>
         <translation>Nie skonfigurowano wideo.</translation>
+    </message><message>
+        <source>Video</source>
+        <translation>Wideo</translation>
+    </message><message>
+        <source>Load video</source>
+        <translation>Wczytać wideo</translation>
     </message>
+
+
+
 </context>
 <context>
     <name>explayouts/block</name>
@@ -1196,5 +1259,12 @@
         <source>No rule matched: the default layout (from the resolver cache)</source>
         <translation>Żadna reguła nie pasuje: układ domyślny (z pamięci podręcznej resolvera)</translation>
     </message>
+</context><context>
+    <name>design/standard/explayouts/block/embed</name>
+    <message>
+        <source>Loading it sends data to %host.</source>
+        <translation>Wczytanie powoduje wysłanie danych do %host.</translation>
+    </message>
 </context>
+
 </TS>
