@@ -3,6 +3,8 @@
    script: Edit layout carries the page to return to in data-explayouts-return-to, javascript/explayouts_admin4.js
    keeps it for the layouts editor. *}
 {ezscript_require( 'explayouts_admin4.js' )}
+{* only for users with explayouts/read, as the tab header (tabs/explayouts_header.tpl) *}
+{if fetch( 'user', 'has_access_to', hash( 'module', 'explayouts', 'function', 'read' ) )}
 {def $resolved = fetch( 'explayouts', 'layout_summary_for_node', hash( 'node_id', $node.node_id ) )
      $rules = fetch( 'explayouts', 'rules_for_node', hash( 'node_id', $node.node_id ) )}
 <div class="a4-page a4-stack">
@@ -64,3 +66,4 @@
 
 </div>
 {undef $resolved $rules}
+{/if}

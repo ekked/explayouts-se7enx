@@ -47,6 +47,7 @@ class LayoutList extends \Exponential\Runnable\ModuleView
                     $zone->remove();
                 }
                 $layout->remove();
+                \expLayoutsResolver::clearCache();
                 $message = \ezpI18n::tr( 'design/admin/explayouts/layout_list', 'Layout deleted.' );
             }
             else

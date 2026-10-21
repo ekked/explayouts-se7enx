@@ -28,7 +28,7 @@ class expLayoutsImageBlockHandler implements expLayoutsBlockHandlerInterface
         return array(
             'image_url' => isset( $params['image_url'] ) ? $params['image_url'] : '',
             'alt' => isset( $params['alt'] ) ? $params['alt'] : '',
-            'link' => isset( $params['link'] ) ? $params['link'] : '',
+            'link' => isset( $params['link'] ) ? expLayoutsSafeValue::url( $params['link'] ) : '',
         );
     }
 }

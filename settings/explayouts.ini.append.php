@@ -818,6 +818,9 @@ AllowNewTemplates=disabled
 [ResolverSettings]
 DefaultLayout=1d96945167435ac185b86cc0f9ef7084
 CacheTTL=3600
+# Entries the resolver cache (var/<vardir>/cache/explayouts/resolver) keeps at most: every path asked for gets one,
+# also the made-up paths of robots. Expired entries are removed first, then the oldest.
+CacheMaxEntries=5000
 
 # Maps a location id from the reference site onto content in this
 # installation. Values are REMOTE IDS, not node ids.
@@ -853,5 +856,14 @@ CacheTTL=3600
 959=959
 1060=1060
 1061=1061
+
+[PreviewSettings]
+# The public siteaccess an administration renders layouts in (the layout preview, Load more of a list block called
+# from the administration). Set it in the settings of the administration siteaccess. Empty: the administration's
+# site.ini [SiteSettings] FrontSiteAccess, else the first of its RelatedSiteAccessList[] that is not an
+# administration, else DefaultAccess. The siteaccess must use the same database as the administration; if it does
+# not, the preview says so instead of rendering. Not set here: a value in an extension's global settings would win
+# over the one of the administration siteaccess.
+#SiteAccess=
 
 */ ?>

@@ -1,6 +1,8 @@
 {ezcss_load(array('netgen/layouts-admin.css','netgen/layouts-exponential.css','explayouts-ui.css'))}
 {* Roboto and Material Icons come with layouts-admin.css (@font-face on the files of the design), so the tab loads no
    stylesheet or font from another host and the administration's Content Security Policy needs none. *}
+{* only for users with explayouts/read, as the tab header (tabs/explayouts_header.tpl) *}
+{if fetch( 'user', 'has_access_to', hash( 'module', 'explayouts', 'function', 'read' ) )}
 {def $resolved = fetch('explayouts','layout_summary_for_node',hash('node_id',$node.node_id))}
 {def $rules = fetch('explayouts','rules_for_node',hash('node_id',$node.node_id))}
 <div class="ng-layouts-app row exp-node-layout-tab">
@@ -74,3 +76,4 @@
     </div>
 </div>
 {ezscript( array( 'explayouts_admin.js' ) )}
+{/if}

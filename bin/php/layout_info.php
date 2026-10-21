@@ -1,13 +1,18 @@
 <?php
 // @description Show the details of a layout: layout_info.php <layout_id>
-if ( !isset( $argv[1] ) )
+// Run through bin/php/ezexec.php, which includes this file from inside a method: $argv is not in scope there, and
+// the arguments are in $options['arguments'], the first being this file. Run directly, $argv holds them.
+$scriptArguments = isset( $options['arguments'] ) && is_array( $options['arguments'] )
+    ? array_slice( $options['arguments'], 1 )
+    : ( isset( $argv ) && is_array( $argv ) ? array_slice( $argv, 1 ) : array() );
+if ( !isset( $scriptArguments[0] ) )
 {
     echo "Usage: layout_info.php <layout_id>\n";
     if ( isset( $script ) ) $script->setExitCode( 1 );
     return;
 }
 
-$layoutId = (int)$argv[1];
+$layoutId = (int)$scriptArguments[0];
 $service = new expLayoutsCoreLayoutService();
 $layout = $service->load( $layoutId );
 

@@ -26,7 +26,8 @@ class expLayoutsMapBlockHandler implements expLayoutsBlockHandlerInterface
     {
         $params = is_array( $block ) && isset( $block['parameters'] ) ? $block['parameters'] : array();
         return array(
-            'embed_url' => isset( $params['embed_url'] ) ? $params['embed_url'] : '',
+            // the src of an iframe: http(s) or a path on this site, nothing a browser runs as script
+            'embed_url' => isset( $params['embed_url'] ) ? expLayoutsSafeValue::embedUrl( $params['embed_url'] ) : '',
             'width' => isset( $params['width'] ) ? $params['width'] : '100%',
             'height' => isset( $params['height'] ) ? (int)$params['height'] : 400,
         );

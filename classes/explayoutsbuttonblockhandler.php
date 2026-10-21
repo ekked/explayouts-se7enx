@@ -51,7 +51,7 @@ class expLayoutsButtonBlockHandler implements expLayoutsBlockHandlerInterface
         $resolved = expLayoutsLinkParameter::resolve( $params );
         $link = $resolved['href'];
         if ( $link === '' && isset( $params['url'] ) )
-            $link = (string)$params['url'];
+            $link = expLayoutsSafeValue::url( $params['url'] );
 
         $style = isset( $params['style'] ) ? $params['style'] : 'default_button';
         $class = '';

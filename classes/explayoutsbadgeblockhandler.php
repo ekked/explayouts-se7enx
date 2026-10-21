@@ -28,7 +28,7 @@ class expLayoutsBadgeBlockHandler implements expLayoutsBlockHandlerInterface
         return array(
             'label' => isset( $params['label'] ) ? $params['label'] : '',
             'style' => isset( $params['style'] ) ? $params['style'] : 'primary',
-            'link' => isset( $params['link'] ) ? $params['link'] : '',
+            'link' => isset( $params['link'] ) ? expLayoutsSafeValue::url( $params['link'] ) : '',
         );
     }
 }

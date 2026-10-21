@@ -16,7 +16,8 @@ class expLayoutsTplBlockHandler implements expLayoutsBlockHandlerInterface
     {
         $params = is_array( $block ) && isset( $block['parameters'] ) ? $block['parameters'] : array();
         return array(
-            'block_name' => isset( $params['block_name'] ) ? (string)$params['block_name'] : '',
+            // the name of design:explayouts/tpl_block/<block_name>.tpl: letters, digits and _ only, no path
+            'block_name' => isset( $params['block_name'] ) ? expLayoutsSafeValue::templateName( $params['block_name'] ) : '',
         );
     }
 }

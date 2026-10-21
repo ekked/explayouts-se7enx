@@ -24,6 +24,15 @@ class expLayoutsRule extends eZPersistentObject
             array( 'priority' => 'desc', 'id' => 'desc' ), null, $asObject );
     }
 
+    /**
+     * Every rule, enabled or not, in the order the resolver tries them (the rule list shows the disabled ones too).
+     */
+    static function fetchAll( $asObject = true )
+    {
+        return eZPersistentObject::fetchObjectList( self::definition(), null, null,
+            array( 'priority' => 'desc', 'id' => 'desc' ), null, $asObject );
+    }
+
     static function fetch( $id, $asObject = true )
     {
         return eZPersistentObject::fetchObject( self::definition(), null,

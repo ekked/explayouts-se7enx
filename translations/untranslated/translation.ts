@@ -95,6 +95,14 @@
         <source>Item removed from collection.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unknown view type.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/dashboard</name>
@@ -329,6 +337,22 @@
         <source>Move up</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unknown layout type.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown block type.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Published.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid input.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>design/admin/explayouts/layout_list</name>
@@ -505,6 +529,14 @@
     </message>
     <message>
         <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown target or condition types were not saved: %types</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A rule without a target applies to no page.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

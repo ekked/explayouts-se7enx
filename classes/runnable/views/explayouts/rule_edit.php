@@ -43,46 +43,55 @@ class RuleEdit extends \Exponential\Runnable\ModuleView
             $priority = (int)$http->postVariable( 'Priority' );
             $enabled = $http->hasPostVariable( 'Enabled' ) ? 1 : 0;
 
-            $rule->setAttribute( 'layout_id', $layoutId );
-            $rule->setAttribute( 'priority', $priority );
-            $rule->setAttribute( 'enabled', $enabled );
-            $rule->store();
+            // Validated before anything is written: only the types the resolver knows (expLayoutsResolver::
+            // TARGET_TYPES, CONDITION_TYPES), only lists of strings (a single posted value made count() throw a
+            // TypeError), and an enabled rule needs a target. A refused form saves nothing.
+            $rejected = array();
+            $targets = self::postedPairs( $http, 'TargetType', 'TargetValue', \expLayoutsResolver::TARGET_TYPES, $rejected );
+            $conditions = self::postedPairs( $http, 'ConditionType', 'ConditionValue', \expLayoutsResolver::CONDITION_TYPES, $rejected );
+            if ( $rejected )
+                $error = \ezpI18n::tr( 'design/admin/explayouts/rule_edit', 'Unknown target or condition types were not saved: %types', null,
+                                       array( '%types' => implode( ', ', array_unique( $rejected ) ) ) );
+            if ( !$targets && $enabled )
+                $error = trim( $error . ' ' . \ezpI18n::tr( 'design/admin/explayouts/rule_edit', 'A rule without a target applies to no page.' ) );
 
-            // remove old targets/conditions and re-create
-            foreach ( $rule->targets() as $t ) { $t->remove(); }
-            foreach ( $rule->conditions() as $c ) { $c->remove(); }
-
-            $targetTypes = $http->hasPostVariable( 'TargetType' ) ? $http->postVariable( 'TargetType' ) : array();
-            $targetValues = $http->hasPostVariable( 'TargetValue' ) ? $http->postVariable( 'TargetValue' ) : array();
-            for ( $i = 0; $i < count( $targetTypes ); $i++ )
+            if ( $error === '' )
             {
-                $type = trim( $targetTypes[$i] );
-                $value = trim( $targetValues[$i] );
-                if ( $type === '' ) continue;
-                $t = new \expLayoutsRuleTarget( array(
-                    'rule_id' => $rule->attribute( 'id' ),
-                    'target_type' => $type,
-                    'target_value' => $value,
-                ) );
-                $t->store();
-            }
+                // the rule and its targets and conditions as one change
+                $db = \eZDB::instance();
+                $db->begin();
+                $rule->setAttribute( 'layout_id', $layoutId );
+                $rule->setAttribute( 'priority', $priority );
+                $rule->setAttribute( 'enabled', $enabled );
+                $rule->store();
 
-            $conditionTypes = $http->hasPostVariable( 'ConditionType' ) ? $http->postVariable( 'ConditionType' ) : array();
-            $conditionValues = $http->hasPostVariable( 'ConditionValue' ) ? $http->postVariable( 'ConditionValue' ) : array();
-            for ( $i = 0; $i < count( $conditionTypes ); $i++ )
-            {
-                $type = trim( $conditionTypes[$i] );
-                $value = trim( $conditionValues[$i] );
-                if ( $type === '' ) continue;
-                $c = new \expLayoutsRuleCondition( array(
-                    'rule_id' => $rule->attribute( 'id' ),
-                    'condition_type' => $type,
-                    'condition_value' => $value,
-                ) );
-                $c->store();
-            }
+                foreach ( $rule->targets() as $t ) { $t->remove(); }
+                foreach ( $rule->conditions() as $c ) { $c->remove(); }
+                foreach ( $targets as $pair )
+                {
+                    $t = new \expLayoutsRuleTarget( array(
+                        'rule_id' => $rule->attribute( 'id' ),
+                        'target_type' => $pair[0],
+                        'target_value' => $pair[1],
+                    ) );
+                    $t->store();
+                }
+                foreach ( $conditions as $pair )
+                {
+                    $c = new \expLayoutsRuleCondition( array(
+                        'rule_id' => $rule->attribute( 'id' ),
+                        'condition_type' => $pair[0],
+                        'condition_value' => $pair[1],
+                    ) );
+                    $c->store();
+                }
+                $db->commit();
 
-            $message = \ezpI18n::tr( 'design/admin/explayouts/rule_edit', 'Rule saved.' );
+                // the resolver caches its answers per path: a changed rule must be looked at again
+                \expLayoutsResolver::clearCache();
+
+                $message = \ezpI18n::tr( 'design/admin/explayouts/rule_edit', 'Rule saved.' );
+            }
         }
 
         $layouts = \expLayoutsLayout::fetchList( 2 );
@@ -106,6 +115,59 @@ class RuleEdit extends \Exponential\Runnable\ModuleView
         return $this->viewResult( isset( $Result ) ? $Result : null,  $Result );
 
         return $this->viewResult( isset( $Result ) ? $Result : null, null );
+    }
+
+    /**
+     * The posted type/value pairs of a rule form ($typeField[] and $valueField[] by the same index): empty types are
+     * skipped, types not in $known and values that are not strings are left out and their types added to $rejected.
+     *
+     * @param \eZHTTPTool $http
+     * @param string $typeField
+     * @param string $valueField
+     * @param string[] $known
+     * @param string[] &$rejected
+     * @return array list of array( type, value )
+     */
+    public static function postedPairs( $http, $typeField, $valueField, array $known, array &$rejected )
+    {
+        $types = $http->hasPostVariable( $typeField ) ? $http->postVariable( $typeField ) : array();
+        $values = $http->hasPostVariable( $valueField ) ? $http->postVariable( $valueField ) : array();
+        return self::pairs( $types, $values, $known, $rejected );
+    }
+
+    /**
+     * See postedPairs(), on the posted values themselves.
+     *
+     * @param mixed $types
+     * @param mixed $values
+     * @param string[] $known
+     * @param string[] &$rejected
+     * @return array list of array( type, value )
+     */
+    public static function pairs( $types, $values, array $known, array &$rejected )
+    {
+        $types = is_array( $types ) ? array_values( $types ) : array();
+        $values = is_array( $values ) ? array_values( $values ) : array();
+        $pairs = array();
+        foreach ( $types as $i => $type )
+        {
+            $value = isset( $values[$i] ) ? $values[$i] : '';
+            if ( !is_string( $type ) || !is_string( $value ) )
+            {
+                $rejected[] = is_string( $type ) ? $type : '?';
+                continue;
+            }
+            $type = trim( $type );
+            if ( $type === '' )
+                continue;
+            if ( !in_array( $type, $known, true ) )
+            {
+                $rejected[] = $type;
+                continue;
+            }
+            $pairs[] = array( $type, trim( $value ) );
+        }
+        return $pairs;
     }
 }
 

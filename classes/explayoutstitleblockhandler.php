@@ -34,7 +34,7 @@ class expLayoutsTitleBlockHandler implements expLayoutsBlockHandlerInterface
             'title' => isset( $params['title'] ) ? $params['title'] : '',
             'level' => isset( $params['level'] ) ? (int)$params['level'] : 2,
             'tag' => isset( $params['tag'] ) ? trim( $params['tag'] ) : '',
-            'link' => isset( $params['link'] ) ? $params['link'] : '',
+            'link' => isset( $params['link'] ) ? expLayoutsSafeValue::url( $params['link'] ) : '',
             'use_link' => isset( $params['use_link'] ) ? (int)$params['use_link'] : 0,
         );
 
@@ -42,6 +42,11 @@ class expLayoutsTitleBlockHandler implements expLayoutsBlockHandlerInterface
         // differs from an internal path, nor how to read a value still held in
         // the old JSON shape.
         $link = expLayoutsLinkParameter::resolve( $params );
+        // The element is printed as <{$tag}>: only h1-h6, p and div, else the heading of the level (h2 for a level
+        // outside 1-6). A free text here was markup of the editor's choosing.
+        $values['tag'] = expLayoutsSafeValue::headingTag( $values['tag'], $values['level'] );
+        if ( $values['level'] < 1 || $values['level'] > 6 )
+            $values['level'] = 2;
         $values['link_href'] = $link['href'];
         $values['link_target'] = $link['target'];
         $values['has_link'] = $link['enabled'];

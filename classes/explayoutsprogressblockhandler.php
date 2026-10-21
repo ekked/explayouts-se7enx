@@ -34,7 +34,8 @@ class expLayoutsProgressBlockHandler implements expLayoutsBlockHandlerInterface
         return array(
             'value' => $value,
             'label' => isset( $params['label'] ) ? $params['label'] : '',
-            'color' => isset( $params['color'] ) ? $params['color'] : '#38bdf8',
+            // printed into a style attribute: a colour or the default, never other declarations
+            'color' => isset( $params['color'] ) ? expLayoutsSafeValue::color( $params['color'], '#38bdf8' ) : '#38bdf8',
         );
     }
 }

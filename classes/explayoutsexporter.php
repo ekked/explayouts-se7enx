@@ -1,5 +1,10 @@
 <?php
-class expLayoutsExponentialorter
+/**
+ * The export of a layout (version 1). The class was named expLayoutsExponentialorter by a search and replace of
+ * "Exp" over "Exporter"; the layout list calls expLayoutsExporter, so the export answered with a fatal error. The
+ * old name stays as an alias at the end of this file.
+ */
+class expLayoutsExporter
 {
     static function exportLayout( $layoutId )
     {
@@ -98,3 +103,7 @@ class expLayoutsExponentialorter
         );
     }
 }
+
+// the name the class had, for code that found it under that name
+if ( !class_exists( 'expLayoutsExponentialorter', false ) )
+    class_alias( 'expLayoutsExporter', 'expLayoutsExponentialorter' );
