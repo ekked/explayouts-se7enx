@@ -36,7 +36,8 @@ class expLayoutsBlockHandlerFactory
         if ( !$ini->hasVariable( 'BlockSettings', 'AvailableBlocks' ) )
             return array();
 
-        return $ini->variable( 'BlockSettings', 'AvailableBlocks' );
+        // an extension may list a block explayouts lists too: offered once
+        return array_values( array_unique( (array)$ini->variable( 'BlockSettings', 'AvailableBlocks' ) ) );
     }
 
     /**

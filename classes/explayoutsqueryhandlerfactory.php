@@ -20,6 +20,6 @@ class expLayoutsQueryHandlerFactory
         $ini = eZINI::instance( 'explayouts.ini' );
         if ( !$ini->hasVariable( 'QuerySettings', 'AvailableQueries' ) )
             return array();
-        return $ini->variable( 'QuerySettings', 'AvailableQueries' );
+        return array_values( array_unique( (array)$ini->variable( 'QuerySettings', 'AvailableQueries' ) ) );
     }
 }

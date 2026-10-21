@@ -1,12 +1,20 @@
 <?php /* #?ini charset="utf-8"?
 
+# The lists other extensions add to -- AvailableBlocks[] ([BlockSettings] and [AdminBlockSettings]), AvailableQueries[],
+# SiteAccessMatch[] and AllowedTemplateRoots[] -- start here without a reset line (Name[] alone). The settings of the
+# extensions are read in the reverse order of ActiveExtensions[], so a reset here emptied what every extension read
+# before this file had added: an extension's AvailableBlocks[]=myblock survived only when the extension came before
+# explayouts in ActiveExtensions[]. Without it, an extension adds a block wherever it is listed, and a block both list
+# is offered once. To replace a list rather than add to it, write the reset line where it is read after every
+# extension: settings/override/explayouts.ini.append.php or settings/siteaccess/<siteaccess>/explayouts.ini.append.php
+# (./console exp:ini clear explayouts.ini/BlockSettings/AvailableBlocks[] <scope>).
+
 # ContentParameters[] of a block definition: the parameters the layout editor shows in its Content tab (with the block
 # label and the collection), as the reference's parameters of the group "content" - the block's own text, links,
 # images, video and map. The others (view type, CSS class and ID, container, whitespace, the design options of the
 # galleries and lists) are in the Design tab, as is every parameter of a definition that lists none. A compound
 # parameter takes its children along.
 [BlockSettings]
-AvailableBlocks[]
 AvailableBlocks[]=title
 AvailableBlocks[]=text
 AvailableBlocks[]=button
@@ -529,7 +537,6 @@ ViewTypes[]=lead_style_2
 
 Category=components
 [QuerySettings]
-AvailableQueries[]
 AvailableQueries[]=children
 AvailableQueries[]=parent
 AvailableQueries[]=subtree
@@ -596,7 +603,6 @@ Handler=expLayoutsContentByTopicQueryHandler
 # out of the site layouts' block list; AdminBlockSettings lists them for the admin
 # layouts. Their view templates are design:explayouts/block/<identifier>.tpl.
 [AdminBlockSettings]
-AvailableBlocks[]
 AvailableBlocks[]=admin_logo
 AvailableBlocks[]=admin_search
 AvailableBlocks[]=admin_theme_switch
@@ -963,7 +969,6 @@ AdminURL=
 # enabled|disabled. disabled returns every admin page to plain admin4.
 Enabled=enabled
 # Siteaccess names (fnmatch patterns) the admin layouts apply to.
-SiteAccessMatch[]
 SiteAccessMatch[]=admin
 SiteAccessMatch[]=admin_*
 SiteAccessMatch[]=*_admin
@@ -986,7 +991,6 @@ CacheTTL=3600
 # templates is added with its own folder, for example
 #   AllowedTemplateRoots[]=extension/mysite/design/mysite/templates/explayouts
 # An empty list allows nothing.
-AllowedTemplateRoots[]
 AllowedTemplateRoots[]=extension/explayouts/design/standard/templates/explayouts/layouts
 AllowedTemplateRoots[]=extension/explayouts/design/standard/templates/explayouts/block
 AllowedTemplateRoots[]=extension/explayouts/design/standard/templates/explayouts/tpl_block
