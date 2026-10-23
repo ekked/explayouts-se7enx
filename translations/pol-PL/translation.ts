@@ -5,7 +5,7 @@
     <name>design/admin/explayouts/block_edit</name>
     <message>
         <source>Edit block</source>
-        <translation>Edytuj blok</translation>
+        <translation>Edytować blok</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
         <source>Save block</source>
-        <translation>Zapisz blok</translation>
+        <translation>Zapisać blok</translation>
     </message>
     <message>
         <source>Back to layout</source>
-        <translation>Wróć do układu</translation>
+        <translation>Wrócić do układu</translation>
     </message>
     <message>
         <source>Manual items</source>
@@ -61,7 +61,7 @@
     </message>
     <message>
         <source>Remove</source>
-        <translation>Usuń</translation>
+        <translation>Usunąć</translation>
     </message>
     <message>
         <source>No items yet.</source>
@@ -69,11 +69,11 @@
     </message>
     <message>
         <source>Add item by Node ID:</source>
-        <translation>Dodaj element według ID węzła:</translation>
+        <translation>Dodać element według ID węzła:</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation>Dodaj</translation>
+        <translation>Dodać</translation>
     </message>
     <message>
         <source>Save the block to create a collection.</source>
@@ -196,15 +196,15 @@
     </message>
     <message>
         <source>Save draft</source>
-        <translation>Zapisz wersję roboczą</translation>
+        <translation>Zapisać wersję roboczą</translation>
     </message>
     <message>
         <source>Publish</source>
-        <translation>Opublikuj</translation>
+        <translation>Opublikować</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Anuluj</translation>
+        <translation>Anulować</translation>
     </message>
     <message>
         <source>Zones</source>
@@ -220,7 +220,7 @@
     </message>
     <message>
         <source>Delete zone</source>
-        <translation>Usuń strefę</translation>
+        <translation>Usunąć strefę</translation>
     </message>
     <message>
         <source>Position</source>
@@ -236,7 +236,7 @@
     </message>
     <message>
         <source>Edit</source>
-        <translation>Edytuj</translation>
+        <translation>Edytować</translation>
     </message>
     <message>
         <source>Up</source>
@@ -256,7 +256,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation>Usuń</translation>
+        <translation>Usunąć</translation>
     </message>
     <message>
         <source>No blocks yet.</source>
@@ -264,7 +264,7 @@
     </message>
     <message>
         <source>Add block</source>
-        <translation>Dodaj blok</translation>
+        <translation>Dodać blok</translation>
     </message>
     <message>
         <source>No zones yet. Choose a layout type and save to auto-create zones.</source>
@@ -276,7 +276,7 @@
     </message>
     <message>
         <source>Add custom zone</source>
-        <translation>Dodaj własną strefę</translation>
+        <translation>Dodać własną strefę</translation>
     </message>
     <message>
         <source>Draft saved.</source>
@@ -328,15 +328,15 @@
     </message>
     <message>
         <source>Move down</source>
-        <translation>Przesuń w dół</translation>
+        <translation>Przesunąć w dół</translation>
     </message>
     <message>
         <source>Move to zone</source>
-        <translation>Przenieś do strefy</translation>
+        <translation>Przenieść do strefy</translation>
     </message>
     <message>
         <source>Move up</source>
-        <translation>Przesuń w górę</translation>
+        <translation>Przesunąć w górę</translation>
     </message><message>
         <source>Unknown layout type.</source>
         <translation>Nieznany typ układu.</translation>
@@ -394,7 +394,7 @@
     </message>
     <message>
         <source>Edit</source>
-        <translation>Edytuj</translation>
+        <translation>Edytować</translation>
     </message>
     <message>
         <source>Preview</source>
@@ -406,7 +406,7 @@
     </message>
     <message>
         <source>Edit in UI</source>
-        <translation>Edytuj w interfejsie</translation>
+        <translation>Edytować w interfejsie</translation>
     </message>
     <message>
         <source>Export</source>
@@ -414,7 +414,7 @@
     </message>
     <message>
         <source>Copy</source>
-        <translation>Kopiuj</translation>
+        <translation>Kopiować</translation>
     </message>
     <message>
         <source>Delete this layout and all its zones/blocks?</source>
@@ -422,19 +422,19 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation>Usuń</translation>
+        <translation>Usunąć</translation>
     </message>
     <message>
         <source>Import layout from JSON:</source>
-        <translation>Importuj układ z JSON:</translation>
+        <translation>Zaimportować układ z JSON:</translation>
     </message>
     <message>
         <source>Paste exported layout JSON here</source>
-        <translation>Wklej tutaj wyeksportowany JSON układu</translation>
+        <translation>Wkleić tutaj wyeksportowany JSON układu</translation>
     </message>
     <message>
         <source>Import layout</source>
-        <translation>Importuj układ</translation>
+        <translation>Zaimportować układ</translation>
     </message>
     <message>
         <source>New layout</source>
@@ -481,7 +481,7 @@
     <name>design/admin/explayouts/rule_edit</name>
     <message>
         <source>Edit Rule</source>
-        <translation>Edytuj regułę</translation>
+        <translation>Edytować regułę</translation>
     </message>
     <message>
         <source>Layout:</source>
@@ -521,7 +521,7 @@
     </message>
     <message>
         <source>Save rule</source>
-        <translation>Zapisz regułę</translation>
+        <translation>Zapisać regułę</translation>
     </message>
     <message>
         <source>Back</source>
@@ -581,11 +581,11 @@
     </message>
     <message>
         <source>Edit</source>
-        <translation>Edytuj</translation>
+        <translation>Edytować</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation>Kopiuj</translation>
+        <translation>Kopiować</translation>
     </message>
     <message>
         <source>Delete this rule?</source>
@@ -593,7 +593,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation>Usuń</translation>
+        <translation>Usunąć</translation>
     </message>
     <message>
         <source>New rule</source>
@@ -632,7 +632,7 @@
     </message>
     <message>
         <source>Install / update schema</source>
-        <translation>Zainstaluj / zaktualizuj schemat</translation>
+        <translation>Zainstalować / zaktualizować schemat</translation>
     </message>
     <message>
         <source>Run the schema DDL? Existing data in these tables will not be removed because CREATE TABLE IF NOT EXISTS is used.</source>
@@ -644,7 +644,7 @@
     </message>
     <message>
         <source>Install base data</source>
-        <translation>Zainstaluj dane podstawowe</translation>
+        <translation>Zainstalować dane podstawowe</translation>
     </message>
     <message>
         <source>Install base data? This adds a default homepage layout and catch-all rule.</source>
@@ -652,7 +652,7 @@
     </message>
     <message>
         <source>Install test data</source>
-        <translation>Zainstaluj dane testowe</translation>
+        <translation>Zainstalować dane testowe</translation>
     </message>
     <message>
         <source>Install test data? This adds demo layouts and resolver rules.</source>
@@ -660,7 +660,7 @@
     </message>
     <message>
         <source>Back to layouts</source>
-        <translation>Wróć do układów</translation>
+        <translation>Wrócić do układów</translation>
     </message>
     <message>
         <source>Unsupported database type: %type</source>
@@ -679,7 +679,7 @@
     </message>
     <message>
         <source>Filter templates...</source>
-        <translation>Filtruj szablony...</translation>
+        <translation>Filtrować szablony...</translation>
     </message>
     <message>
         <source>New</source>
@@ -687,11 +687,11 @@
     </message>
     <message>
         <source>Save</source>
-        <translation>Zapisz</translation>
+        <translation>Zapisać</translation>
     </message>
     <message>
         <source>Return to admin</source>
-        <translation>Wróć do administracji</translation>
+        <translation>Wrócić do administracji</translation>
     </message>
     <message>
         <source>No file selected</source>
@@ -809,7 +809,7 @@
     </message>
     <message>
         <source>Edit layout</source>
-        <translation>Edytuj układ</translation>
+        <translation>Edytować układ</translation>
     </message>
     <message>
         <source>%count zones</source>
@@ -853,7 +853,7 @@
     </message>
     <message>
         <source>Edit mapping</source>
-        <translation>Edytuj mapowanie</translation>
+        <translation>Edytować mapowanie</translation>
     </message>
     <message>
         <source>Preview layout</source>
@@ -881,7 +881,7 @@
     </message>
     <message>
         <source>Map layout</source>
-        <translation>Mapuj układ</translation>
+        <translation>Mapować układ</translation>
     </message>
     <message>
         <source>New layout</source>
@@ -926,7 +926,7 @@
     <name>design/standard/explayouts/block/alert</name>
     <message>
         <source>Close</source>
-        <translation>Zamknij</translation>
+        <translation>Zamknąć</translation>
     </message>
 </context>
 <context>
@@ -1056,7 +1056,7 @@
     <name>explayouts/block</name>
     <message>
         <source>Edit Block</source>
-        <translation>Edytuj blok</translation>
+        <translation>Edytować blok</translation>
     </message>
 </context>
 <context>
@@ -1070,7 +1070,7 @@
     <name>explayouts/layout</name>
     <message>
         <source>Edit Layout</source>
-        <translation>Edytuj układ</translation>
+        <translation>Edytować układ</translation>
     </message>
     <message>
         <source>Layouts</source>
@@ -1088,7 +1088,7 @@
     <name>explayouts/rule</name>
     <message>
         <source>Edit Rule</source>
-        <translation>Edytuj regułę</translation>
+        <translation>Edytować regułę</translation>
     </message>
     <message>
         <source>Layout Rules</source>
@@ -1110,7 +1110,7 @@
     </message>
     <message>
         <source>View layouts and rules associated with this node</source>
-        <translation>Wyświetl układy i reguły powiązane z tym węzłem</translation>
+        <translation>Wyświetlić układy i reguły powiązane z tym węzłem</translation>
     </message>
     <message>
         <source>Authors</source>
@@ -1118,7 +1118,7 @@
     </message>
     <message>
         <source>View content author and publication information</source>
-        <translation>Wyświetl autora treści i informacje o publikacji</translation>
+        <translation>Wyświetlić autora treści i informacje o publikacji</translation>
     </message>
 </context>
 <context>
@@ -1165,11 +1165,11 @@
     </message>
     <message>
         <source>Edit layout</source>
-        <translation>Edytuj układ</translation>
+        <translation>Edytować układ</translation>
     </message>
     <message>
         <source>Edit rule</source>
-        <translation>Edytuj regułę</translation>
+        <translation>Edytować regułę</translation>
     </message>
     <message>
         <source>All rules</source>
@@ -1177,7 +1177,7 @@
     </message>
     <message>
         <source>Show the blocks on the page</source>
-        <translation>Pokaż bloki na stronie</translation>
+        <translation>Pokazać bloki na stronie</translation>
     </message>
     <message>
         <source>Not looked up by the resolver on this page</source>
@@ -1225,7 +1225,7 @@
     </message>
     <message>
         <source>View</source>
-        <translation>Wyświetl</translation>
+        <translation>Wyświetlić</translation>
     </message>
     <message>
         <source>(linked: layout %layout, zone %zone)</source>
@@ -1237,7 +1237,7 @@
     </message>
     <message>
         <source>Edit</source>
-        <translation>Edytuj</translation>
+        <translation>Edytować</translation>
     </message>
     <message>
         <source>Available blocks (%count)</source>
